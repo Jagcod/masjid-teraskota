@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="id" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Panel Admin - Display TV Masjid Teraskota">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Admin - Masjid Teraskota</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="../assets/css/admin.css">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="../assets/images/favicon.svg">
+</head>
+<body class="admin-body">
+    <!-- ===== LOGIN SCREEN ===== -->
+    <div id="login-screen" class="login-screen">
+        <div class="login-card">
+            <div class="login-header">
+                <img src="../assets/images/logo-masjid.svg" alt="Logo" class="login-logo" onerror="this.style.display='none'">
+                <h1>Masjid Teraskota</h1>
+                <p>Panel Admin Display TV</p>
+            </div>
+            <form id="login-form" class="login-form" autocomplete="on">
+                <div class="form-group">
+                    <label for="login-email">Email</label>
+                    <input type="email" id="login-email" name="email" placeholder="admin@masjidteraskota.id" required autocomplete="email">
+                </div>
+                <div class="form-group">
+                    <label for="login-password">Password</label>
+                    <input type="password" id="login-password" name="password" placeholder="••••••••" required autocomplete="current-password">
+                </div>
+                <div id="login-error" class="form-error hidden"></div>
+                <button type="submit" id="login-btn" class="btn btn-primary btn-block">
+                    <span class="btn-text">Masuk</span>
+                    <span class="btn-loader hidden"></span>
+                </button>
+            </form>
+            <div class="login-footer">
+                <p id="firebase-status" class="firebase-status">Memeriksa koneksi...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== ADMIN PANEL ===== -->
+    <div id="admin-panel" class="admin-panel hidden">
+        <!-- Sidebar -->
+        <aside id="admin-sidebar" class="admin-sidebar">
+            <div class="sidebar-header">
+                <img src="../assets/images/logo-masjid.svg" alt="Logo" class="sidebar-logo" onerror="this.style.display='none'">
+                <span class="sidebar-title">Admin Panel</span>
+                <button id="sidebar-toggle" class="sidebar-toggle" aria-label="Toggle sidebar">
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
+                </button>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="#dashboard" class="nav-item active" data-page="dashboard">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
+                    <span>Dashboard</span>
+                </a>
+                <a href="#settings" class="nav-item" data-page="settings">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.49.49 0 0 0-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 0 0-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.07.62-.07.94s.02.64.07.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+                    <span>Pengaturan Masjid</span>
+                </a>
+                <a href="#background" class="nav-item" data-page="background">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14zm-5.04-6.71l-2.75 3.54-1.96-2.36L6.5 17h11l-3.54-4.71z"/></svg>
+                    <span>Pengaturan Background</span>
+                </a>
+                <a href="#prayer" class="nav-item" data-page="prayer">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
+                    <span>Jadwal Sholat</span>
+                </a>
+                <a href="#kajian" class="nav-item" data-page="kajian">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/></svg>
+                    <span>Kajian</span>
+                </a>
+                <a href="#activities" class="nav-item" data-page="activities">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19a2 2 0 0 0 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM9 10H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2z"/></svg>
+                    <span>Kegiatan</span>
+                </a>
+                <a href="#announcements" class="nav-item" data-page="announcements">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-7 9h-2V5h2v6zm0 4h-2v-2h2v2z"/></svg>
+                    <span>Pengumuman</span>
+                </a>
+                <a href="#news" class="nav-item" data-page="news">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/></svg>
+                    <span>Berita</span>
+                </a>
+                <a href="#friday" class="nav-item" data-page="friday">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                    <span>Info Jumat</span>
+                </a>
+                <a href="#finance" class="nav-item" data-page="finance">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg>
+                    <span>Keuangan</span>
+                </a>
+                <a href="#qris" class="nav-item" data-page="qris">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M3 11h8V3H3v8zm2-6h4v4H5V5zM3 21h8v-8H3v8zm2-6h4v4H5v-4zM13 3v8h8V3h-8zm6 6h-4V5h4v4zM13 13h2v2h-2zM15 15h2v2h-2zM13 17h2v2h-2zM17 13h2v2h-2zM19 15h2v2h-2zM17 17h2v2h-2zM15 19h2v2h-2zM19 19h2v2h-2z"/></svg>
+                    <span>QRIS</span>
+                </a>
+                <a href="#display" class="nav-item" data-page="display">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M21 3H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h5v2h8v-2h5c1.1 0 1.99-.9 1.99-2L23 5c0-1.1-.9-2-2-2zm0 14H3V5h18v12z"/></svg>
+                    <span>Display & Slide</span>
+                </a>
+                <a href="#preview" class="nav-item" data-page="preview">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+                    <span>Pratinjau TV</span>
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="admin-info">
+                    <span id="admin-email" class="admin-email">admin@masjid.id</span>
+                </div>
+                <button id="logout-btn" class="btn btn-outline btn-sm">Keluar</button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main id="admin-main" class="admin-main">
+            <!-- Top Bar -->
+            <header class="admin-topbar">
+                <button id="mobile-menu-btn" class="mobile-menu-btn" aria-label="Menu">
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
+                </button>
+                <h2 id="page-title" class="page-title">Dashboard</h2>
+                <div class="topbar-actions">
+                    <span id="save-indicator" class="save-indicator hidden">
+                        <span class="save-dot"></span> Tersimpan
+                    </span>
+                </div>
+            </header>
+
+            <!-- Page Container -->
+            <div id="page-container" class="page-container">
+
+                <!-- Toast Notifications -->
+                <div id="toast-container" class="toast-container"></div>
+
+                <!-- ===== DASHBOARD PAGE ===== -->
+                <div id="page-dashboard" class="admin-page active" data-title="Dashboard">
+                    <div class="dashboard-grid">
+                        <div class="dash-card">
+                            <div class="dash-card-icon" style="background:rgba(76,175,80,0.1);color:#4caf50">
+                                <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/></svg>
+                            </div>
+                            <div class="dash-card-info">
+                                <span class="dash-card-value" id="dash-kajian-count">0</span>
+                                <span class="dash-card-label">Kajian Aktif</span>
+                            </div>
+                        </div>
+                        <div class="dash-card">
+                            <div class="dash-card-icon" style="background:rgba(33,150,243,0.1);color:#2196f3">
+                                <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19a2 2 0 0 0 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/></svg>
+                            </div>
+                            <div class="dash-card-info">
+                                <span class="dash-card-value" id="dash-activity-count">0</span>
+                                <span class="dash-card-label">Kegiatan</span>
+                            </div>
+                        </div>
+                        <div class="dash-card">
+                            <div class="dash-card-icon" style="background:rgba(255,152,0,0.1);color:#ff9800">
+                                <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-7 9h-2V5h2v6zm0 4h-2v-2h2v2z"/></svg>
+                            </div>
+                            <div class="dash-card-info">
+                                <span class="dash-card-value" id="dash-announcement-count">0</span>
+                                <span class="dash-card-label">Pengumuman</span>
+                            </div>
+                        </div>
+                        <div class="dash-card">
+                            <div class="dash-card-icon" style="background:rgba(201,168,76,0.1);color:#c9a84c">
+                                <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M21 3H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h5v2h8v-2h5c1.1 0 1.99-.9 1.99-2L23 5c0-1.1-.9-2-2-2zm0 14H3V5h18v12z"/></svg>
+                            </div>
+                            <div class="dash-card-info">
+                                <span class="dash-card-value" id="dash-status">Online</span>
+                                <span class="dash-card-label">Status Display</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section-card">
+                        <h3>Selamat Datang</h3>
+                        <p>Gunakan panel admin ini untuk mengelola konten yang ditampilkan di Display TV Masjid Teraskota. Pilih menu di sebelah kiri untuk mulai mengelola.</p>
+                        <div style="margin-top:16px">
+                            <a href="#preview" class="btn btn-primary" onclick="navigateTo('preview')">Lihat Pratinjau TV</a>
+                        </div>
+                    </div>
+
+                    <div class="section-card" id="firebase-info-card">
+                        <h3>Status Firebase</h3>
+                        <div id="firebase-info-content">
+                            <p>Memeriksa koneksi Firebase...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ===== SETTINGS PAGE ===== -->
+                <div id="page-settings" class="admin-page" data-title="Pengaturan Masjid">
+                    <div class="section-card">
+                        <h3>Identitas Masjid</h3>
+                        <form id="form-mosque-settings" class="admin-form">
+                            <div class="form-group">
+                                <label for="setting-name">Nama Masjid</label>
+                                <input type="text" id="setting-name" placeholder="Masjid Teraskota" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="setting-address">Alamat</label>
+                                <input type="text" id="setting-address" placeholder="Perumahan Teraskota, Tangerang Selatan">
+                            </div>
+                            <div class="form-group">
+                                <label for="setting-phone">Telepon</label>
+                                <input type="tel" id="setting-phone" placeholder="0812-xxxx-xxxx">
+                            </div>
+                            <div class="form-group">
+                                <label for="setting-email">Email Masjid</label>
+                                <input type="email" id="setting-email" placeholder="info@masjidteraskota.id">
+                            </div>
+                            <div class="form-group">
+                                <label for="setting-running-text">Running Text (teks berjalan di bawah TV)</label>
+                                <textarea id="setting-running-text" rows="2" placeholder="Pisahkan teks dengan tanda •"></textarea>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="setting-slide-duration">Durasi Slide (detik)</label>
+                                    <input type="number" id="setting-slide-duration" min="3" max="60" value="8">
+                                </div>
+                                <div class="form-group">
+                                    <label for="setting-hijri-adj">Koreksi Hijriah (hari)</label>
+                                    <select id="setting-hijri-adj">
+                                        <option value="-2">-2</option>
+                                        <option value="-1">-1</option>
+                                        <option value="0" selected>0 (Default)</option>
+                                        <option value="1">+1</option>
+                                        <option value="2">+2</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-actions">
+                                <button type="submit" class="btn btn-primary">Simpan Pengaturan</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- ===== BACKGROUND SETTINGS PAGE ===== -->
+                <div id="page-background" class="admin-page" data-title="Pengaturan Background TV">
+                    <div class="section-card">
+                        <div class="section-header">
+                            <div>
+                                <h3>Background Layar Display TV</h3>
+                                <p class="section-desc">Ganti background layar TV dengan format gambar apa saja (JPG, PNG, WebP, GIF, SVG), video (MP4, WebM), atau gradien warna kustom.</p>
+                            </div>
+                            <a href="../index.html" target="_blank" class="btn btn-outline btn-sm">Buka Display TV ↗</a>
+                        </div>
+
+                        <form id="form-background-settings" class="admin-form">
+                            <!-- Pilihan Tipe Background -->
+                            <div class="form-group">
+                                <label>Tipe Media Background</label>
+                                <div class="bg-type-selector">
+                                    <label class="bg-type-card">
+                                        <input type="radio" name="bg-type" value="default" checked>
+                                        <div class="bg-type-box">
+                                            <span class="bg-type-icon">🌙</span>
+                                            <span class="bg-type-title">Default Gelap</span>
+                                            <span class="bg-type-sub">Modern Islamic Mesh</span>
+                                        </div>
+                                    </label>
+                                    <label class="bg-type-card">
+                                        <input type="radio" name="bg-type" value="image">
+                                        <div class="bg-type-box">
+                                            <span class="bg-type-icon">🖼️</span>
+                                            <span class="bg-type-title">Gambar Bebas</span>
+                                            <span class="bg-type-sub">JPG, PNG, WebP, GIF</span>
+                                        </div>
+                                    </label>
+                                    <label class="bg-type-card">
+                                        <input type="radio" name="bg-type" value="video">
+                                        <div class="bg-type-box">
+                                            <span class="bg-type-icon">🎬</span>
+                                            <span class="bg-type-title">Video Bergerak</span>
+                                            <span class="bg-type-sub">MP4, WebM (Loop)</span>
+                                        </div>
+                                    </label>
+                                    <label class="bg-type-card">
+                                        <input type="radio" name="bg-type" value="gradient">
+                                        <div class="bg-type-box">
+                                            <span class="bg-type-icon">🎨</span>
+                                            <span class="bg-type-title">Gradien / Warna</span>
+                                            <span class="bg-type-sub">CSS Gradient Halus</span>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Upload File Input (Supports All Formats) -->
+                            <div class="form-group" id="group-bg-file">
+                                <label>Unggah File Media (Gambar atau Video)</label>
+                                <div class="file-upload-area" id="bg-upload-dropzone">
+                                    <input type="file" id="bg-file-input" accept="image/*,video/mp4,video/webm" class="file-input">
+                                    <div class="file-upload-placeholder" id="bg-file-placeholder">
+                                        <svg viewBox="0 0 24 24" width="36" height="36" fill="currentColor" opacity="0.4"><path d="M19 7v2.99s-1.99.01-2 0V7h-3s.01-1.99 0-2h3V2h2v3h3v2h-3zm-3 4V8h-3V5H5c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2v-8h-3zM5 19l3-4 2 3 3-4 4 5H5z"/></svg>
+                                        <p><strong>Klik atau Seret file gambar/video ke sini</strong></p>
+                                        <p class="file-hint">Format Gambar: JPG, PNG, WebP, GIF, SVG • Format Video: MP4, WebM</p>
+                                    </div>
+                                    <div id="bg-file-info" class="file-info-badge hidden"></div>
+                                </div>
+                            </div>
+
+                            <!-- URL Input (Direct Link) -->
+                            <div class="form-group" id="group-bg-url">
+                                <label for="bg-url-input">Atau Masukkan URL Langsung (Link Gambar / Video Online)</label>
+                                <input type="url" id="bg-url-input" placeholder="https://images.unsplash.com/... atau link direct mp4">
+                                <small class="field-hint">Mendukung link gambar Unsplash, link CDN masjid, atau direct link file MP4.</small>
+                            </div>
+
+                            <!-- Overlay Darkness Slider -->
+                            <div class="form-group">
+                                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                                    <label for="bg-opacity-slider" style="margin:0;">Tingkat Kegelapan Lapisan Overlay (Filter Tulisan)</label>
+                                    <span id="bg-opacity-val" style="color:var(--admin-primary); font-weight:800; font-size:1.1rem;">65%</span>
+                                </div>
+                                <input type="range" id="bg-opacity-slider" min="0" max="90" value="65" step="5" style="width:100%;">
+                                <small class="field-hint">Lapisan gelap memastikan teks jam, hitung mundur, dan jadwal salat tetap terlihat kontras dan terbaca jelas di atas gambar/video apa pun.</small>
+                            </div>
+
+                            <!-- Quick Presets Gallery -->
+                            <div class="form-group">
+                                <label>Preset Cepat Pilihan:</label>
+                                <div class="preset-cards-grid">
+                                    <button type="button" class="btn-preset active" data-type="default" data-url="" data-opacity="0.65">
+                                        <span class="preset-swatch" style="background: radial-gradient(circle, #132235, #0b131e);"></span>
+                                        <span>🌙 Default Dark</span>
+                                    </button>
+                                    <button type="button" class="btn-preset" data-type="image" data-url="https://images.unsplash.com/photo-1542816417-0983c9c9ad53?auto=format&fit=crop&w=1920&q=80" data-opacity="0.75">
+                                        <span class="preset-swatch" style="background: #1e3a5f;"></span>
+                                        <span>🕌 Kubah Emas Malam</span>
+                                    </button>
+                                    <button type="button" class="btn-preset" data-type="image" data-url="https://images.unsplash.com/photo-1564769625905-50e93615e769?auto=format&fit=crop&w=1920&q=80" data-opacity="0.70">
+                                        <span class="preset-swatch" style="background: #2a2015;"></span>
+                                        <span>✨ Masjidil Haram</span>
+                                    </button>
+                                    <button type="button" class="btn-preset" data-type="gradient" data-url="linear-gradient(135deg, #064e3b 0%, #0b131e 60%, #022c22 100%)" data-opacity="0.50">
+                                        <span class="preset-swatch" style="background: linear-gradient(135deg, #064e3b, #0b131e);"></span>
+                                        <span>🌿 Emerald Islamic</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Live Preview Mockup Box -->
+                            <div class="form-group">
+                                <label>Pratinjau Langsung Tampilan TV:</label>
+                                <div class="bg-preview-mockup" id="bg-live-preview-box">
+                                    <video id="preview-box-video" class="mockup-media hidden" autoplay muted loop playsinline></video>
+                                    <div id="preview-box-image" class="mockup-media"></div>
+                                    <div id="preview-box-overlay" class="mockup-overlay" style="opacity:0.65;"></div>
+                                    <div class="mockup-content">
+                                        <div class="mockup-top">
+                                            <div class="mockup-mosque">
+                                                <strong>Masjid Teraskota</strong>
+                                                <small>📍 BSD City</small>
+                                            </div>
+                                            <div class="mockup-clock-box">
+                                                <span class="mockup-hm">22:11</span>
+                                                <span class="mockup-s">:09</span>
+                                                <small>WIB</small>
+                                            </div>
+                                        </div>
+                                        <div class="mockup-middle">
+                                            <div class="mockup-greeting">السَّلَامُ عَلَيْكُمْ وَرَحْمَةُ اللهِ وَبَرَكَاتُهُ</div>
+                                            <div class="mockup-title">Selamat Datang di <span style="color:#facc15;">Masjid Teraskota</span></div>
+                                            <div class="mockup-badge">🕌 DOA MASUK MASJID</div>
+                                        </div>
+                                        <div class="mockup-bottom">
+                                            <div class="mockup-prayer active">
+                                                <small>IMSAK</small>
+                                                <strong>04:18</strong>
+                                                <span class="mockup-cd">-06:06:51</span>
+                                            </div>
+                                            <div class="mockup-prayer">
+                                                <small>SUBUH</small>
+                                                <strong>04:28</strong>
+                                            </div>
+                                            <div class="mockup-prayer">
+                                                <small>TERBIT</small>
+                                                <strong>05:43</strong>
+                                            </div>
+                                            <div class="mockup-prayer">
+                                                <small>DZUHUR</small>
+                                                <strong>11:49</strong>
+                                            </div>
+                                            <div class="mockup-prayer">
+                                                <small>ASHAR</small>
+                                                <strong>15:05</strong>
+                                            </div>
+                                            <div class="mockup-prayer">
+                                                <small>MAGHRIB</small>
+                                                <strong>17:51</strong>
+                                            </div>
+                                            <div class="mockup-prayer">
+                                                <small>ISYA'</small>
+                                                <strong>19:01</strong>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-actions">
+                                <button type="submit" class="btn btn-primary" id="btn-save-bg">💾 Simpan & Terapkan Background ke TV</button>
+                                <button type="button" class="btn btn-outline" id="btn-reset-bg">↺ Kembalikan ke Background Bawaan</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- ===== PRAYER PAGE ===== -->
+                <div id="page-prayer" class="admin-page" data-title="Jadwal Sholat">
+                    <div class="section-card">
+                        <h3>Konfigurasi Lokasi</h3>
+                        <p class="section-desc">Jadwal sholat dihitung otomatis dari API Aladhan menggunakan metode Kemenag RI. Atur lokasi agar perhitungan akurat.</p>
+                        <form id="form-prayer-config" class="admin-form">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="prayer-lat">Latitude</label>
+                                    <input type="number" id="prayer-lat" step="0.0001" value="-6.3000">
+                                </div>
+                                <div class="form-group">
+                                    <label for="prayer-lng">Longitude</label>
+                                    <input type="number" id="prayer-lng" step="0.0001" value="106.6700">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="prayer-city">Kota</label>
+                                    <input type="text" id="prayer-city-input" value="Tangerang Selatan">
+                                </div>
+                                <div class="form-group">
+                                    <label for="prayer-method">Metode Hisab</label>
+                                    <select id="prayer-method-select">
+                                        <option value="20" selected>Kemenag RI</option>
+                                        <option value="11">MUIS (Singapura)</option>
+                                        <option value="3">ISNA (Amerika Utara)</option>
+                                        <option value="5">Universitas Umm al-Qura</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-actions">
+                                <button type="submit" class="btn btn-primary">Simpan Konfigurasi</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="section-card">
+                        <h3>Override Manual</h3>
+                        <p class="section-desc">Jika waktu sholat perlu dikoreksi manual, aktifkan override dan masukkan waktu yang benar. Override akan menggantikan waktu dari API.</p>
+                        <form id="form-prayer-override" class="admin-form">
+                            <div class="form-group">
+                                <label class="toggle-label">
+                                    <input type="checkbox" id="prayer-override-enabled">
+                                    <span>Aktifkan Override Manual</span>
+                                </label>
+                            </div>
+                            <div id="prayer-override-fields" class="override-fields disabled">
+                                <div class="form-row">
+                                    <div class="form-group"><label>Imsak</label><input type="time" id="override-imsak"></div>
+                                    <div class="form-group"><label>Subuh</label><input type="time" id="override-subuh"></div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group"><label>Terbit</label><input type="time" id="override-terbit"></div>
+                                    <div class="form-group"><label>Duha</label><input type="time" id="override-dhuha"></div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group"><label>Zuhur</label><input type="time" id="override-dzuhur"></div>
+                                    <div class="form-group"><label>Asar</label><input type="time" id="override-ashar"></div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group"><label>Magrib</label><input type="time" id="override-maghrib"></div>
+                                    <div class="form-group"><label>Isya</label><input type="time" id="override-isya"></div>
+                                </div>
+                            </div>
+                            <div class="form-actions">
+                                <button type="submit" class="btn btn-primary">Simpan Override</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- ===== KAJIAN PAGE ===== -->
+                <div id="page-kajian" class="admin-page" data-title="Kajian">
+                    <div class="section-card">
+                        <div class="section-header">
+                            <h3>Daftar Kajian</h3>
+                            <button class="btn btn-primary btn-sm" onclick="AdminApp.showModal('kajian')">+ Tambah Kajian</button>
+                        </div>
+                        <div id="kajian-list" class="data-list">
+                            <p class="empty-state">Memuat data...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ===== ACTIVITIES PAGE ===== -->
+                <div id="page-activities" class="admin-page" data-title="Kegiatan">
+                    <div class="section-card">
+                        <div class="section-header">
+                            <h3>Daftar Kegiatan</h3>
+                            <button class="btn btn-primary btn-sm" onclick="AdminApp.showModal('activities')">+ Tambah Kegiatan</button>
+                        </div>
+                        <div id="activities-list" class="data-list">
+                            <p class="empty-state">Memuat data...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ===== ANNOUNCEMENTS PAGE ===== -->
+                <div id="page-announcements" class="admin-page" data-title="Pengumuman">
+                    <div class="section-card">
+                        <div class="section-header">
+                            <h3>Daftar Pengumuman</h3>
+                            <button class="btn btn-primary btn-sm" onclick="AdminApp.showModal('announcements')">+ Tambah Pengumuman</button>
+                        </div>
+                        <div id="announcements-list" class="data-list">
+                            <p class="empty-state">Memuat data...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ===== NEWS PAGE ===== -->
+                <div id="page-news" class="admin-page" data-title="Berita">
+                    <div class="section-card">
+                        <div class="section-header">
+                            <h3>Daftar Berita</h3>
+                            <button class="btn btn-primary btn-sm" onclick="AdminApp.showModal('news')">+ Tambah Berita</button>
+                        </div>
+                        <div id="news-list" class="data-list">
+                            <p class="empty-state">Memuat data...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ===== FRIDAY PAGE ===== -->
+                <div id="page-friday" class="admin-page" data-title="Info Jumat">
+                    <div class="section-card">
+                        <div class="section-header">
+                            <h3>Jadwal Jumat</h3>
+                            <button class="btn btn-primary btn-sm" onclick="AdminApp.showModal('friday')">+ Tambah Jadwal</button>
+                        </div>
+                        <div id="friday-list" class="data-list">
+                            <p class="empty-state">Memuat data...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ===== FINANCE PAGE ===== -->
+                <div id="page-finance" class="admin-page" data-title="Keuangan & ZISWAF">
+                    <div class="section-card">
+                        <div class="section-header">
+                            <h3>Laporan Keuangan</h3>
+                            <button class="btn btn-primary btn-sm" onclick="AdminApp.showModal('finance')">+ Tambah Laporan</button>
+                        </div>
+                        <div id="finance-list" class="data-list">
+                            <p class="empty-state">Memuat data...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ===== QRIS PAGE ===== -->
+                <div id="page-qris" class="admin-page" data-title="QRIS">
+                    <div class="section-card">
+                        <h3>QRIS Infaq & Sedekah</h3>
+                        <form id="form-qris" class="admin-form">
+                            <div class="form-group">
+                                <label for="qris-label">Label QRIS</label>
+                                <input type="text" id="qris-label" placeholder="QRIS Infaq Masjid Teraskota">
+                            </div>
+                            <div class="form-group">
+                                <label>Gambar QRIS</label>
+                                <div class="file-upload-area" id="qris-upload-area">
+                                    <input type="file" id="qris-file" accept="image/*" class="file-input">
+                                    <div class="file-upload-placeholder">
+                                        <svg viewBox="0 0 24 24" width="32" height="32" fill="currentColor" opacity="0.4"><path d="M19 7v2.99s-1.99.01-2 0V7h-3s.01-1.99 0-2h3V2h2v3h3v2h-3zm-3 4V8h-3V5H5c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2v-8h-3zM5 19l3-4 2 3 3-4 4 5H5z"/></svg>
+                                        <p>Klik atau drag gambar QRIS ke sini</p>
+                                        <p class="file-hint">Format: JPG, PNG. Maks 2MB</p>
+                                    </div>
+                                    <img id="qris-preview" class="file-preview hidden" alt="Preview QRIS">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="toggle-label">
+                                    <input type="checkbox" id="qris-active" checked>
+                                    <span>Tampilkan di Display TV</span>
+                                </label>
+                            </div>
+                            <div class="form-actions">
+                                <button type="submit" class="btn btn-primary">Simpan QRIS</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- ===== DISPLAY SETTINGS PAGE ===== -->
+                <div id="page-display" class="admin-page" data-title="Display & Slide">
+                    <div class="section-card">
+                        <h3>Pengaturan Tampilan</h3>
+                        <form id="form-display-settings" class="admin-form">
+                            <div class="form-group">
+                                <label>Urutan Slide</label>
+                                <p class="section-desc">Atur urutan konten yang ditampilkan di TV. Drag untuk mengubah urutan.</p>
+                                <div id="slide-order-list" class="slide-order-list">
+                                    <!-- Populated by JS -->
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="display-bg-url">URL Background (opsional)</label>
+                                <input type="url" id="display-bg-url" placeholder="https://...">
+                            </div>
+                            <div class="form-actions">
+                                <button type="submit" class="btn btn-primary">Simpan Pengaturan Display</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- ===== PREVIEW PAGE ===== -->
+                <div id="page-preview" class="admin-page" data-title="Pratinjau TV">
+                    <div class="section-card">
+                        <h3>Pratinjau Display TV</h3>
+                        <p class="section-desc">Lihat tampilan Display TV dalam ukuran kecil. Untuk pengalaman penuh, buka halaman Display TV di tab baru.</p>
+                        <div style="margin-bottom:16px">
+                            <a id="preview-link" href="../index.html" target="_blank" class="btn btn-primary">Buka Display TV (Tab Baru)</a>
+                        </div>
+                        <div class="preview-frame-wrapper">
+                            <iframe id="preview-iframe" src="../index.html" class="preview-iframe" title="Pratinjau Display TV"></iframe>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- ===== MODAL ===== -->
+    <div id="modal-overlay" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title">Form</h3>
+                <button class="modal-close" onclick="AdminApp.closeModal()">&times;</button>
+            </div>
+            <div id="modal-body" class="modal-body">
+                <!-- Dynamic form content -->
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== CONFIRM DIALOG ===== -->
+    <div id="confirm-overlay" class="modal-overlay hidden">
+        <div class="modal-content modal-sm">
+            <div class="modal-header">
+                <h3>Konfirmasi</h3>
+            </div>
+            <div class="modal-body">
+                <p id="confirm-message">Apakah Anda yakin?</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="AdminApp.closeConfirm()">Batal</button>
+                <button id="confirm-btn" class="btn btn-danger">Hapus</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../assets/js/firebase-config.js"></script>
+    <script src="../assets/js/services/firestore-service.js"></script>
+    <script src="../assets/js/admin.js"></script>
+</body>
+</html>

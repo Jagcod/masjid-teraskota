@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="id" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Display TV Masjid Teraskota - Jadwal Salat, Informasi Kegiatan, Doa dan Pengumuman Resmi">
+    <meta name="theme-color" content="#0b131e">
+    <title>Display TV - Masjid Teraskota</title>
+
+    <!-- Google Fonts: Plus Jakarta Sans & Amiri (Arabic) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@700;800&display=swap" rel="stylesheet">
+
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="assets/css/display.css">
+    <link rel="stylesheet" href="assets/css/responsive.css">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg">
+</head>
+<body class="display-tv">
+
+    <!-- Dynamic Background Layer (Supports Image, Video, Gradient in any format) -->
+    <div id="display-background" class="display-background" aria-hidden="true">
+        <video id="bg-video" class="bg-media hidden" autoplay muted loop playsinline></video>
+        <div id="bg-image" class="bg-media"></div>
+        <div id="bg-overlay" class="bg-overlay"></div>
+    </div>
+
+    <!-- Connection Status Indicator -->
+    <div id="connection-status" class="connection-status hidden" aria-live="polite">
+        <span class="connection-dot"></span>
+        <span class="connection-text">Menghubungkan...</span>
+    </div>
+
+    <!-- Main Display App Container -->
+    <div id="display-container" class="display-container">
+
+        <!-- ===== 1. HEADER ===== -->
+        <header id="display-header" class="display-header">
+            <!-- Left: Mosque Identity -->
+            <div class="header-left">
+                <div class="mosque-logo-wrapper">
+                    <img id="mosque-logo" src="assets/images/logo-masjid.svg" alt="Logo Masjid Teraskota" class="mosque-logo" onerror="this.style.display='none'">
+                </div>
+                <div class="mosque-info">
+                    <h1 id="mosque-name" class="mosque-name">Masjid Teraskota</h1>
+                    <p id="mosque-address" class="mosque-address">
+                        <span class="pin-icon">📍</span>
+                        <span id="address-text">Pusat Ibadah, Dakwah & Pembinaan Umat, BSD City</span>
+                    </p>
+                </div>
+            </div>
+
+            <!-- Right: Date & Digital Clock Card -->
+            <div class="header-right">
+                <div class="date-container">
+                    <div id="date-masehi" class="date-masehi">Memuat Tanggal...</div>
+                    <div id="date-hijri" class="date-hijri">Memuat Hijriah...</div>
+                </div>
+
+                <div class="clock-card">
+                    <div class="clock-digits">
+                        <span id="clock-hours-mins" class="clock-hm">00:00</span>
+                        <span id="clock-seconds" class="clock-s">:00</span>
+                    </div>
+                    <div class="clock-tz">
+                        <svg class="tz-icon" viewBox="0 0 24 24" width="12" height="12" fill="currentColor">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
+                        </svg>
+                        <span>WIB (JAKARTA)</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- ===== 2. MIDDLE SLIDE SHOWCASE ===== -->
+        <main class="display-main">
+            <div id="slide-container" class="slide-container">
+                <!-- Slide content dynamically rendered by display.js -->
+                <div class="slide-content" id="slide-content">
+                    <!-- Default Initial Slide (Exact Match to Reference Screenshot) -->
+                    <div class="slide slide-welcome">
+                        <!-- Left Column -->
+                        <div class="slide-left-col">
+                            <div class="welcome-tag">
+                                <span class="tag-icon">🕌</span>
+                                <span>AHLAN WA SAHLAN • RUMAH ALLAH</span>
+                            </div>
+                            <div class="arabic-greeting">السَّلَامُ عَلَيْكُمْ وَرَحْمَةُ اللهِ وَبَرَكَاتُهُ</div>
+                            <h2 class="welcome-heading">Selamat Datang di <span class="text-gold">Masjid Teraskota</span></h2>
+                            <p class="welcome-subheading">Pusat Ibadah, Dakwah & Pembinaan Umat • BSD City</p>
+                        </div>
+
+                        <!-- Right Column: Card Box (Doa Masuk Masjid) -->
+                        <div class="slide-right-col">
+                            <div class="feature-card">
+                                <div class="card-header-badge">
+                                    <span class="badge-icon">🕌</span>
+                                    <span>DOA MASUK MASJID</span>
+                                </div>
+                                <div class="card-arabic">اللَّهُمَّ افْتَحْ لِي أَبْوَابَ رَحْمَتِكَ</div>
+                                <div class="card-translation">"Ya Allah, bukakanlah untukku pintu-pintu rahmat-Mu."</div>
+                                <div class="card-ref">(HR. Muslim no. 713 • Sunan Abu Dawud)</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide Indicators (Dots) -->
+            <div id="slide-indicators" class="slide-indicators" aria-label="Navigasi Slide">
+                <span class="indicator-dot active"></span>
+                <span class="indicator-dot"></span>
+                <span class="indicator-dot"></span>
+            </div>
+        </main>
+
+        <!-- ===== 3. PRAYER TIMES BAR (7 HORIZONTAL CARDS) ===== -->
+        <section id="prayer-section" class="prayer-section" aria-label="Jadwal Salat">
+            <div class="prayer-grid" id="prayer-grid">
+                <!-- 1. IMSAK -->
+                <div class="prayer-card active" data-prayer="imsak" id="card-imsak">
+                    <div class="prayer-icon-wrap">
+                        <svg class="prayer-svg" viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+                            <path d="M12.3 2a10 10 0 0 0-1.9 19.8 10 10 0 1 1 1.9-19.8z"/>
+                        </svg>
+                    </div>
+                    <div class="prayer-name">IMSAK</div>
+                    <div class="prayer-time" id="time-imsak">04:18</div>
+                    <div class="prayer-countdown" id="countdown-imsak">-00:00:00</div>
+                </div>
+
+                <!-- 2. SUBUH -->
+                <div class="prayer-card" data-prayer="subuh" id="card-subuh">
+                    <div class="prayer-icon-wrap">
+                        <svg class="prayer-svg" viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+                            <path d="M12.3 2a10 10 0 0 0-1.9 19.8 10 10 0 1 1 1.9-19.8z"/>
+                        </svg>
+                    </div>
+                    <div class="prayer-name">SUBUH</div>
+                    <div class="prayer-time" id="time-subuh">04:28</div>
+                    <div class="prayer-countdown hidden" id="countdown-subuh">-00:00:00</div>
+                </div>
+
+                <!-- 3. TERBIT -->
+                <div class="prayer-card" data-prayer="terbit" id="card-terbit">
+                    <div class="prayer-icon-wrap">
+                        <svg class="prayer-svg" viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+                            <circle cx="12" cy="12" r="5"/>
+                            <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+                        </svg>
+                    </div>
+                    <div class="prayer-name">TERBIT</div>
+                    <div class="prayer-time" id="time-terbit">05:43</div>
+                    <div class="prayer-countdown hidden" id="countdown-terbit">-00:00:00</div>
+                </div>
+
+                <!-- 4. DZUHUR -->
+                <div class="prayer-card" data-prayer="dzuhur" id="card-dzuhur">
+                    <div class="prayer-icon-wrap">
+                        <svg class="prayer-svg" viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+                            <circle cx="12" cy="12" r="4"/>
+                            <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+                        </svg>
+                    </div>
+                    <div class="prayer-name">DZUHUR</div>
+                    <div class="prayer-time" id="time-dzuhur">11:49</div>
+                    <div class="prayer-countdown hidden" id="countdown-dzuhur">-00:00:00</div>
+                </div>
+
+                <!-- 5. ASHAR -->
+                <div class="prayer-card" data-prayer="ashar" id="card-ashar">
+                    <div class="prayer-icon-wrap">
+                        <svg class="prayer-svg" viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+                            <circle cx="12" cy="12" r="4"/>
+                            <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+                        </svg>
+                    </div>
+                    <div class="prayer-name">ASHAR</div>
+                    <div class="prayer-time" id="time-ashar">15:05</div>
+                    <div class="prayer-countdown hidden" id="countdown-ashar">-00:00:00</div>
+                </div>
+
+                <!-- 6. MAGHRIB -->
+                <div class="prayer-card" data-prayer="maghrib" id="card-maghrib">
+                    <div class="prayer-icon-wrap">
+                        <svg class="prayer-svg" viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+                            <path d="M12.005 3.003c.552 0 1 .448 1 1v2c0 .553-.448 1-1 1s-1-.447-1-1v-2c0-.552.448-1 1-1zm6.364 2.637a1 1 0 0 1 1.414 1.414l-1.414 1.414a1 1 0 0 1-1.414-1.414l1.414-1.414zM4.227 5.64a1 1 0 0 1 1.414 0l1.415 1.414a1 1 0 0 1-1.415 1.415L4.227 7.054a1 1 0 0 1 0-1.414zM3 13h18c.552 0 1 .448 1 1s-.448 1-1 1H3c-.552 0-1-.448-1-1s.448-1 1-1zm1 5h16c.552 0 1 .448 1 1s-.448 1-1 1H4c-.552 0-1-.448-1-1s.448-1 1-1zm8-7a5 5 0 0 1 4.9 4H7.1a5 5 0 0 1 4.9-4z"/>
+                        </svg>
+                    </div>
+                    <div class="prayer-name">MAGHRIB</div>
+                    <div class="prayer-time" id="time-maghrib">17:51</div>
+                    <div class="prayer-countdown hidden" id="countdown-maghrib">-00:00:00</div>
+                </div>
+
+                <!-- 7. ISYA' -->
+                <div class="prayer-card" data-prayer="isya" id="card-isya">
+                    <div class="prayer-icon-wrap">
+                        <svg class="prayer-svg" viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+                            <path d="M12.3 2a10 10 0 0 0-1.9 19.8 10 10 0 1 1 1.9-19.8z"/>
+                        </svg>
+                    </div>
+                    <div class="prayer-name">ISYA'</div>
+                    <div class="prayer-time" id="time-isya">19:01</div>
+                    <div class="prayer-countdown hidden" id="countdown-isya">-00:00:00</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== 4. FOOTER RUNNING TEXT ===== -->
+        <footer id="display-footer" class="display-footer">
+            <div class="info-badge">
+                <span class="info-icon">📢</span>
+                <span class="info-label">INFO</span>
+            </div>
+            <div class="running-text-wrapper">
+                <div id="running-text" class="running-text">
+                    Selamat Datang di Masjid Teraskota • Lurus dan rapatkan saf saat salat berjamaah • Matikan atau heningkan nada dering telepon seluler di dalam masjid • Jagalah kebersihan dan kesucian rumah Allah SWT.
+                </div>
+            </div>
+        </footer>
+
+    </div>
+
+    <!-- Fallback Screen (if critical failure occurs) -->
+    <div id="fallback-screen" class="fallback-screen hidden" aria-hidden="true">
+        <div class="fallback-content">
+            <img src="assets/images/logo-masjid.svg" alt="Logo" class="fallback-logo">
+            <h2>Masjid Teraskota</h2>
+            <p id="fallback-message">Menghubungkan ke server...</p>
+            <div class="fallback-clock" id="fallback-clock">00:00</div>
+        </div>
+    </div>
+
+    <!-- Scripts (Static hosting compatible) -->
+    <script src="assets/js/firebase-config.js"></script>
+    <script src="assets/js/services/hijri-date.js"></script>
+    <script src="assets/js/services/prayer-times.js"></script>
+    <script src="assets/js/services/firestore-service.js"></script>
+    <script src="assets/js/display.js"></script>
+
+</body>
+</html>

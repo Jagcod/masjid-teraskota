@@ -1,0 +1,97 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── Helper Functions ──
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Periksa apakah user terdaftar sebagai admin aktif di koleksi adminProfiles
+    function isAdmin() {
+      return isAuthenticated() && (
+        exists(/databases/$(database)/documents/adminProfiles/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/adminProfiles/$(request.auth.uid)).data.isActive == true
+      );
+    }
+
+    // ── Koleksi Publik (Bisa dibaca siapa saja untuk Display TV) ──
+    // Display TV hanya membaca (get, list) data publik.
+    // Menulis/mengubah/menghapus HANYA diperbolehkan untuk Admin terotentikasi.
+
+    // 1. Pengaturan Identitas Masjid & Tampilan
+    match /settings/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // 2. Koreksi / Jadwal Salat Manual
+    match /prayerSchedules/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // 3. Jadwal Kajian
+    match /kajian/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // 4. Agenda & Kegiatan Masjid
+    match /activities/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // 5. Berita & Informasi Masjid
+    match /news/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // 6. Pengumuman Berjalan / Running Text & Banner
+    match /announcements/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // 7. Jadwal Petugas Salat Jumat (Khatib, Imam, Muazin)
+    match /fridaySchedules/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // 8. Laporan Keuangan & ZISWAF
+    match /financeReports/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // 9. Kode & Informasi QRIS Infaq / Sedekah
+    match /qris/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // 10. Pengaturan Slide Display TV
+    match /displaySlides/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // ── Koleksi Profil Admin ──
+    // Hanya user terotentikasi yang bisa melihat statusnya sendiri
+    // Modifikasi admin profiles hanya oleh admin aktif
+    match /adminProfiles/{userId} {
+      allow read: if isAuthenticated() && (request.auth.uid == userId || isAdmin());
+      // Admin baru dapat didaftarkan oleh admin aktif
+      // Untuk bootstrap admin pertama, dapat dibuat melalui Firebase Console atau script inisialisasi
+      allow write: if isAdmin();
+    }
+
+    // Default deny untuk path lainnya
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

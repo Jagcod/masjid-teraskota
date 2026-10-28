@@ -1,0 +1,463 @@
+/* ===================================================
+   RESPONSIVE STYLES - DISPLAY TV MASJID TERASKOTA
+   Precision Scaling: 4K TV (3840x2160) -> 1080p -> 720p 
+   -> Laptop -> Tablet -> Mobile (HP)
+   =================================================== */
+
+/* ── 1. SAMSUNG TV 4K / ULTRA-LARGE (3840x2160, 2560x1440, 55"-85" TV) ── */
+@media screen and (min-width: 2500px) {
+    .display-container {
+        padding: 2vh 3vw 1.5vh 3vw;
+    }
+    .mosque-name {
+        font-size: 3rem;
+    }
+    .mosque-address {
+        font-size: 1.3rem;
+    }
+    .clock-hm {
+        font-size: 5rem;
+    }
+    .clock-s {
+        font-size: 3rem;
+    }
+    .arabic-greeting {
+        font-size: 5rem;
+    }
+    .welcome-heading {
+        font-size: 4.2rem;
+    }
+    .card-arabic {
+        font-size: 4.5rem;
+    }
+    .prayer-time {
+        font-size: 3.2rem;
+    }
+    .prayer-name {
+        font-size: 1.3rem;
+    }
+    .prayer-countdown {
+        font-size: 1.3rem;
+    }
+    .running-text {
+        font-size: 1.5rem;
+    }
+}
+
+/* ── 2. STANDARD FULL HD TV (1920x1080) ── */
+@media screen and (min-width: 1600px) and (max-width: 2499px) {
+    .display-container {
+        padding: 2vh 2.5vw 1.2vh 2.5vw;
+    }
+    .clock-hm {
+        font-size: 3.6rem;
+    }
+    .clock-s {
+        font-size: 2.1rem;
+    }
+    .arabic-greeting {
+        font-size: 3.8rem;
+    }
+    .welcome-heading {
+        font-size: 3.1rem;
+    }
+    .card-arabic {
+        font-size: 3.2rem;
+    }
+    .prayer-time {
+        font-size: 2.3rem;
+    }
+}
+
+/* ── 3. HD TV / SMALL TV (1280x720, 1366x768, 32" TV) ── */
+@media screen and (min-width: 1025px) and (max-width: 1599px) {
+    .display-container {
+        padding: 1.5vh 2vw 1vh 2vw;
+    }
+    .display-header {
+        height: 12vh;
+        min-height: 70px;
+    }
+    .mosque-name {
+        font-size: 1.7rem;
+    }
+    .mosque-address {
+        font-size: 0.85rem;
+    }
+    .clock-card {
+        padding: 4px 14px;
+        border-radius: 12px;
+    }
+    .clock-hm {
+        font-size: 2.4rem;
+    }
+    .clock-s {
+        font-size: 1.4rem;
+    }
+    .display-main {
+        height: 48vh;
+    }
+    .arabic-greeting {
+        font-size: 2.4rem;
+        margin-bottom: 0.8vh;
+    }
+    .welcome-heading {
+        font-size: 2rem;
+    }
+    .welcome-subheading {
+        font-size: 0.95rem;
+    }
+    .feature-card {
+        padding: 2vh 1.4vw;
+        border-radius: 16px;
+    }
+    .card-arabic {
+        font-size: 2.2rem;
+        margin-bottom: 1.2vh;
+    }
+    .card-translation {
+        font-size: 0.88rem;
+    }
+    .prayer-section {
+        height: 22vh;
+        min-height: 105px;
+    }
+    .prayer-grid {
+        gap: 0.6vw;
+    }
+    .prayer-card {
+        padding: 0.8vh 0.4vw;
+        border-radius: 10px;
+    }
+    .prayer-name {
+        font-size: 0.8rem;
+    }
+    .prayer-time {
+        font-size: 1.6rem;
+    }
+    .prayer-countdown {
+        font-size: 0.8rem;
+    }
+    .display-footer {
+        height: 7vh;
+        min-height: 40px;
+    }
+    .running-text {
+        font-size: 0.95rem;
+    }
+}
+
+/* ── 4. LAPTOP VIEWPORT (1024px - 1440px with normal browser chrome) ── */
+@media screen and (min-width: 900px) and (max-width: 1200px) and (max-height: 800px) {
+    .display-container {
+        padding: 10px 16px 8px 16px;
+    }
+    .display-header {
+        height: 12vh;
+        min-height: 60px;
+    }
+    .display-main {
+        height: 48vh;
+    }
+    .prayer-section {
+        height: 22vh;
+        min-height: 95px;
+    }
+    .prayer-time {
+        font-size: 1.45rem;
+    }
+    .clock-hm {
+        font-size: 2.2rem;
+    }
+}
+
+/* ── 5. TABLET (768px - 1024px) ── */
+@media screen and (min-width: 601px) and (max-width: 900px) {
+    body.display-tv {
+        overflow-y: auto;
+        height: auto;
+        min-height: 100vh;
+    }
+    .display-container {
+        height: auto;
+        min-height: 100vh;
+        gap: 20px;
+        padding: 16px;
+    }
+    .display-header {
+        height: auto;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+    .display-main {
+        height: auto;
+        padding: 10px 0;
+    }
+    .slide {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    .feature-card {
+        max-height: none;
+        padding: 24px 20px;
+    }
+    .prayer-section {
+        height: auto;
+    }
+    .prayer-grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 10px;
+    }
+    .prayer-card {
+        padding: 16px 10px;
+    }
+    .prayer-time {
+        font-size: 1.6rem;
+    }
+    .display-footer {
+        height: 50px;
+        margin-top: 10px;
+    }
+}
+
+/* ── 6. SMARTPHONE / HP (PORTRAIT: width <= 600px) ── */
+@media screen and (max-width: 600px) {
+    body.display-tv {
+        overflow-y: auto !important;
+        overflow-x: hidden !important;
+        height: auto !important;
+        min-height: 100vh;
+    }
+
+    .display-container {
+        width: 100vw;
+        height: auto;
+        min-height: 100vh;
+        padding: 14px 14px 20px 14px;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        gap: 16px;
+    }
+
+    /* Header Mobile: Stacked & Elegant */
+    .display-header {
+        height: auto;
+        min-height: unset;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 14px;
+        padding-bottom: 0;
+    }
+
+    .header-left {
+        gap: 12px;
+    }
+
+    .mosque-logo-wrapper {
+        width: 48px;
+        min-width: 48px;
+    }
+
+    .mosque-name {
+        font-size: 1.35rem;
+    }
+
+    .mosque-address {
+        font-size: 0.78rem;
+    }
+
+    .header-right {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+        background: rgba(15, 27, 43, 0.65);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 14px;
+        padding: 10px 14px;
+    }
+
+    .date-container {
+        align-items: flex-start;
+    }
+
+    .date-masehi {
+        font-size: 0.85rem;
+    }
+
+    .date-hijri {
+        font-size: 0.8rem;
+        margin-top: 2px;
+    }
+
+    .clock-card {
+        padding: 0;
+        background: none;
+        border: none;
+        box-shadow: none;
+        align-items: flex-end;
+    }
+
+    .clock-hm {
+        font-size: 1.85rem;
+    }
+
+    .clock-s {
+        font-size: 1.15rem;
+    }
+
+    .clock-tz {
+        font-size: 0.65rem;
+    }
+
+    /* Main Slide Section Mobile: Stacked Vertical */
+    .display-main {
+        height: auto;
+        padding: 0;
+        gap: 12px;
+    }
+
+    .slide-container {
+        height: auto;
+    }
+
+    .slide {
+        grid-template-columns: 1fr;
+        gap: 16px;
+        height: auto;
+    }
+
+    .slide-left-col {
+        padding-right: 0;
+        align-items: center;
+        text-align: center;
+    }
+
+    .welcome-tag {
+        font-size: 0.75rem;
+        padding: 4px 12px;
+        margin-bottom: 10px;
+    }
+
+    .arabic-greeting {
+        font-size: 1.85rem;
+        text-align: center;
+        align-self: center;
+        margin-bottom: 8px;
+    }
+
+    .welcome-heading {
+        font-size: 1.45rem;
+        text-align: center;
+        margin-bottom: 6px;
+    }
+
+    .welcome-subheading {
+        font-size: 0.85rem;
+        text-align: center;
+    }
+
+    .slide-right-col {
+        width: 100%;
+        height: auto;
+    }
+
+    .feature-card {
+        max-height: none;
+        padding: 18px 14px;
+        border-radius: 16px;
+    }
+
+    .card-header-badge {
+        font-size: 0.78rem;
+        margin-bottom: 10px;
+    }
+
+    .card-arabic {
+        font-size: 1.7rem;
+        margin-bottom: 10px;
+    }
+
+    .card-translation {
+        font-size: 0.85rem;
+        max-width: 100%;
+        margin-bottom: 6px;
+    }
+
+    .card-ref {
+        font-size: 0.72rem;
+    }
+
+    /* Prayer Grid Mobile: 2-3 Column Responsive Grid */
+    .prayer-section {
+        height: auto;
+        min-height: unset;
+    }
+
+    .prayer-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+    }
+
+    /* Make the 7th item (Isya) span 2 columns or center */
+    .prayer-card:last-child {
+        grid-column: span 2;
+    }
+
+    .prayer-card {
+        padding: 12px 8px;
+        border-radius: 12px;
+    }
+
+    .prayer-svg {
+        width: 18px;
+        height: 18px;
+    }
+
+    .prayer-name {
+        font-size: 0.75rem;
+    }
+
+    .prayer-time {
+        font-size: 1.5rem;
+    }
+
+    .prayer-countdown {
+        font-size: 0.8rem;
+    }
+
+    /* Footer Mobile */
+    .display-footer {
+        height: 44px;
+        min-height: 44px;
+        padding: 0 10px;
+        gap: 8px;
+        border-radius: 10px;
+    }
+
+    .info-badge {
+        font-size: 0.7rem;
+        padding: 4px 8px;
+    }
+
+    .running-text {
+        font-size: 0.8rem;
+    }
+}
+
+/* ── 7. ACCESSIBILITY: REDUCED MOTION ── */
+@media (prefers-reduced-motion: reduce) {
+    .running-text {
+        animation: none !important;
+        padding-left: 0 !important;
+        white-space: normal !important;
+    }
+    .slide, .bg-media {
+        transition: none !important;
+    }
+    .connection-dot {
+        animation: none !important;
+    }
+}
