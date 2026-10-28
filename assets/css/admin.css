@@ -1251,3 +1251,39 @@ body.admin-body {
     font-weight: 600;
 }
 
+/* ── Demo Notice Banner ── */
+.demo-notice-banner {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    background: #fff8e1;
+    border: 1px solid #ffe082;
+    border-left: 5px solid #ffb300;
+    padding: 14px 18px;
+    border-radius: var(--admin-radius);
+    margin-bottom: 20px;
+    box-shadow: var(--admin-shadow);
+}
+
+.notice-icon {
+    flex-shrink: 0;
+    color: #f57f17;
+    margin-top: 2px;
+}
+
+.notice-text strong {
+    display: block;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #bf360c;
+    margin-bottom: 4px;
+}
+
+.notice-text p {
+    font-size: 0.85rem;
+    line-height: 1.5;
+    color: #4e342e;
+    margin: 0;
+}
+
+

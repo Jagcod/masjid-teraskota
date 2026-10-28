@@ -259,14 +259,16 @@
             }
             DOM.bgImage.style.background = url || 'radial-gradient(circle at 50% 20%, #1a324b 0%, #0b131e 75%, #050a10 100%)';
         } else {
-            // Reset to Default Modern Islamic Dark Mesh
+            // Reset to Default Modern Islamic Vector Background
             if (DOM.bgVideo) {
                 DOM.bgVideo.pause();
                 DOM.bgVideo.classList.add('hidden');
             }
             if (DOM.bgImage) {
-                DOM.bgImage.style.backgroundImage = 'none';
-                DOM.bgImage.style.background = 'radial-gradient(circle at 50% 20%, #132235 0%, #0b131e 70%, #060b11 100%)';
+                DOM.bgImage.style.backgroundImage = 'url("assets/images/bg-masjid-default.svg")';
+                DOM.bgImage.style.backgroundSize = 'cover';
+                DOM.bgImage.style.backgroundPosition = 'center center';
+                DOM.bgImage.style.backgroundRepeat = 'no-repeat';
             }
         }
     }
@@ -418,7 +420,7 @@
                 <div class="slide slide-welcome">
                     <div class="slide-left-col">
                         <div class="welcome-tag">
-                            <span class="tag-icon">🕌</span>
+                            <svg class="tag-icon-svg" viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M12 2c-.55 0-1 .45-1 1v1.1c-2.83.48-5 2.94-5 5.9 0 1.25.38 2.4 1.03 3.36L4 16v5h16v-5l-3.03-2.64c.65-.96 1.03-2.11 1.03-3.36 0-2.96-2.17-5.42-5-5.9V3c0-.55-.45-1-1-1zm-1 8h2v8h-2v-8z"/></svg>
                             <span>AHLAN WA SAHLAN • RUMAH ALLAH</span>
                         </div>
                         <div class="arabic-greeting">السَّلَامُ عَلَيْكُمْ وَرَحْمَةُ اللهِ وَبَرَكَاتُهُ</div>
@@ -428,7 +430,7 @@
                     <div class="slide-right-col">
                         <div class="feature-card">
                             <div class="card-header-badge">
-                                <span class="badge-icon">🕌</span>
+                                <svg class="card-icon-svg" viewBox="0 0 24 24" width="15" height="15" fill="#facc15" aria-hidden="true"><path d="M12 3L2 12h3v8h6v-6h2v6h6v-8h3L12 3zm0 2.84L18 11v7h-2v-6H8v6H6v-7l6-5.16z"/></svg>
                                 <span>DOA MASUK MASJID</span>
                             </div>
                             <div class="card-arabic">اللَّهُمَّ افْتَحْ لِي أَبْوَابَ رَحْمَتِكَ</div>
@@ -457,7 +459,7 @@
                 <div class="slide slide-kajian">
                     <div class="slide-left-col">
                         <div class="welcome-tag">
-                            <span class="tag-icon">📖</span>
+                            <svg class="tag-icon-svg" viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/></svg>
                             <span>JADWAL KAJIAN ISLAM RUTIN</span>
                         </div>
                         <h2 class="welcome-heading">Majelis Ilmu & Dakwah</h2>
@@ -479,7 +481,7 @@
                     <div class="slide-right-col">
                         <div class="feature-card">
                             <div class="card-header-badge">
-                                <span class="badge-icon">✨</span>
+                                <svg class="card-icon-svg" viewBox="0 0 24 24" width="15" height="15" fill="#facc15" aria-hidden="true"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
                                 <span>KEUTAMAAN MENUNTUT ILMU</span>
                             </div>
                             <div class="card-arabic">مَنْ سَلَكَ طَرِيقًا يَلْتَمِسُ فِيهِ عِلْمًا سَهَّلَ اللَّهُ لَهُ بِهِ طَرِيقًا إِلَى الْجَنَّةِ</div>
@@ -508,7 +510,7 @@
                 <div class="slide slide-activities">
                     <div class="slide-left-col">
                         <div class="welcome-tag">
-                            <span class="tag-icon">📅</span>
+                            <svg class="tag-icon-svg" viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19a2 2 0 0 0 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/></svg>
                             <span>AGENDA & KEGIATAN MASJID</span>
                         </div>
                         <h2 class="welcome-heading">Kegiatan Terdekat</h2>
@@ -519,7 +521,7 @@
                     <div class="slide-right-col">
                         <div class="feature-card">
                             <div class="card-header-badge">
-                                <span class="badge-icon">🤝</span>
+                                <svg class="card-icon-svg" viewBox="0 0 24 24" width="15" height="15" fill="#facc15" aria-hidden="true"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
                                 <span>PENGINGAT AMAL</span>
                             </div>
                             <div class="card-arabic">وَتَعَاوَنُوا عَلَى الْبِرِّ وَالتَّقْوَىٰ</div>
@@ -540,7 +542,7 @@
                 <div class="slide slide-friday">
                     <div class="slide-left-col">
                         <div class="welcome-tag">
-                            <span class="tag-icon">🕌</span>
+                            <svg class="tag-icon-svg" viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M12 2c-.55 0-1 .45-1 1v1.1c-2.83.48-5 2.94-5 5.9 0 1.25.38 2.4 1.03 3.36L4 16v5h16v-5l-3.03-2.64c.65-.96 1.03-2.11 1.03-3.36 0-2.96-2.17-5.42-5-5.9V3c0-.55-.45-1-1-1zm-1 8h2v8h-2v-8z"/></svg>
                             <span>SALAT JUMAT BERJEMAAH</span>
                         </div>
                         <div class="arabic-greeting">يَا أَيُّهَا الَّذِينَ آمَنُوا إِذَا نُودِيَ لِلصَّلَاةِ مِن يَوْمِ الْجُمُعَةِ</div>
@@ -550,7 +552,7 @@
                     <div class="slide-right-col">
                         <div class="feature-card">
                             <div class="card-header-badge">
-                                <span class="badge-icon">🎙️</span>
+                                <svg class="card-icon-svg" viewBox="0 0 24 24" width="15" height="15" fill="#facc15" aria-hidden="true"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.91-3c-.49 0-.9.36-.98.85C16.52 14.2 14.47 16 12 16s-4.52-1.8-4.93-4.15c-.08-.49-.49-.85-.98-.85-.61 0-1.09.54-1 1.14.49 3 2.89 5.35 5.91 5.78V20c0 .55.45 1 1 1s1-.45 1-1v-2.08c3.02-.43 5.42-2.78 5.91-5.78.1-.6-.39-1.14-1-1.14z"/></svg>
                                 <span>PETUGAS JUMAT</span>
                             </div>
                             <div style="width:100%; text-align:left; padding:0 12px; margin-bottom:12px;">
@@ -582,7 +584,7 @@
         const saldoText = finance ? `Rp ${(finance.saldo || 0).toLocaleString('id-ID')}` : 'Rp 45.250.000';
         const pemasukanText = finance ? `Rp ${(finance.pemasukan || 0).toLocaleString('id-ID')}` : 'Rp 12.400.000';
         const pengeluaranText = finance ? `Rp ${(finance.pengeluaran || 0).toLocaleString('id-ID')}` : 'Rp 8.150.000';
-        const qrisImg = (qris && qris.imageUrl) ? qris.imageUrl : 'assets/images/logo-masjid.svg';
+        const qrisImg = (qris && qris.imageUrl) ? qris.imageUrl : 'assets/images/qris-masjid.svg';
 
         return {
             id: 'finance-qris',
@@ -590,7 +592,7 @@
                 <div class="slide slide-finance">
                     <div class="slide-left-col">
                         <div class="welcome-tag">
-                            <span class="tag-icon">💳</span>
+                            <svg class="tag-icon-svg" viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
                             <span>LAPORAN KAS & ZISWAF</span>
                         </div>
                         <h2 class="welcome-heading">Transparansi Keuangan</h2>
@@ -612,7 +614,7 @@
                     <div class="slide-right-col">
                         <div class="feature-card">
                             <div class="card-header-badge">
-                                <span class="badge-icon">📲</span>
+                                <svg class="card-icon-svg" viewBox="0 0 24 24" width="15" height="15" fill="#facc15" aria-hidden="true"><path d="M3 11h8V3H3v8zm2-6h4v4H5V5zM3 21h8v-8H3v8zm2-6h4v4H5v-4zM13 3v8h8V3h-8zm6 6h-4V5h4v4zM13 13h2v2h-2zM15 15h2v2h-2zM13 17h2v2h-2zM17 13h2v2h-2zM19 15h2v2h-2zM17 17h2v2h-2zM15 19h2v2h-2zM19 19h2v2h-2z"/></svg>
                                 <span>INFAQ DIGITAL QRIS</span>
                             </div>
                             <div style="background:#ffffff; border-radius:12px; padding:10px; display:inline-block; margin-bottom:10px;">
@@ -635,7 +637,7 @@
                 <div class="slide slide-announcement">
                     <div class="slide-left-col">
                         <div class="welcome-tag">
-                            <span class="tag-icon">📢</span>
+                            <svg class="tag-icon-svg" viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H5.17L4 17.17V4h16v12z"/></svg>
                             <span>PENGUMUMAN DKM</span>
                         </div>
                         <h2 class="welcome-heading">${escapeHtml(ann.title || 'Warta Masjid')}</h2>
@@ -646,7 +648,7 @@
                     <div class="slide-right-col">
                         <div class="feature-card">
                             <div class="card-header-badge">
-                                <span class="badge-icon">✨</span>
+                                <svg class="card-icon-svg" viewBox="0 0 24 24" width="15" height="15" fill="#facc15" aria-hidden="true"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
                                 <span>ADAB DI DALAM MASJID</span>
                             </div>
                             <div class="card-arabic">خَيْرُ الْبِقَاعِ مَسَاجِدُهَا</div>
@@ -723,15 +725,18 @@
             FirestoreService.listenCollection('qris', () => loadSlides());
         }
 
-        // 2. Cross-tab LocalStorage sync (Works instantly in demo mode & local server)
-        window.addEventListener('storage', (e) => {
-            if (e.key && e.key.startsWith('masjid_')) {
-                console.info('[Display] LocalStorage update detected:', e.key);
+        // 2. Cross-tab LocalStorage & Local Change sync (Works instantly in demo mode & local server)
+        const handleLocalSync = (evt) => {
+            if (!evt.key || evt.key.startsWith('masjid_')) {
+                console.info('[Display] Local change detected. Syncing display...');
                 loadSettings();
                 loadPrayerTimes();
                 loadSlides();
             }
-        });
+        };
+
+        window.addEventListener('storage', handleLocalSync);
+        window.addEventListener('masjid-data-update', handleLocalSync);
     }
 
     // ── 7. Midnight Refresh & Visibility ──

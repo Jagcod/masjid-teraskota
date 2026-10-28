@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="100%" height="100%">
+  <defs>
+    <!-- Background Gradient -->
+    <radialGradient id="skyGrad" cx="50%" cy="30%" r="75%">
+      <stop offset="0%" stop-color="#142436"/>
+      <stop offset="50%" stop-color="#0b131e"/>
+      <stop offset="100%" stop-color="#050a11"/>
+    </radialGradient>
+
+    <!-- Subtle Golden Glow -->
+    <radialGradient id="centerGlow" cx="50%" cy="45%" r="40%">
+      <stop offset="0%" stop-color="#c9a84c" stop-opacity="0.12"/>
+      <stop offset="60%" stop-color="#0f2a1c" stop-opacity="0.04"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Islamic Geometric Lattice Pattern -->
+    <pattern id="islamicGrid" width="80" height="80" patternUnits="userSpaceOnUse">
+      <path d="M40 0 L80 40 L40 80 L0 40 Z" fill="none" stroke="#facc15" stroke-width="0.75" stroke-opacity="0.04"/>
+      <circle cx="40" cy="40" r="28" fill="none" stroke="#ffffff" stroke-width="0.5" stroke-opacity="0.025"/>
+      <path d="M0 0 L40 40 L0 80 M80 0 L40 40 L80 80" fill="none" stroke="#38bdf8" stroke-width="0.5" stroke-opacity="0.02"/>
+    </pattern>
+
+    <!-- Arch Glow Filter -->
+    <linearGradient id="domeGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#1b334a" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#0b131e" stop-opacity="0.85"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Deep Night Sky -->
+  <rect width="1920" height="1080" fill="url(#skyGrad)"/>
+
+  <!-- Subtle Ambient Glow -->
+  <rect width="1920" height="1080" fill="url(#centerGlow)"/>
+
+  <!-- Geometric Islamic Motif Layer -->
+  <rect width="1920" height="1080" fill="url(#islamicGrid)"/>
+
+  <!-- Distant Constellations / Stars -->
+  <g fill="#ffffff" opacity="0.6">
+    <circle cx="240" cy="120" r="1.5"/>
+    <circle cx="480" cy="90" r="1"/>
+    <circle cx="820" cy="160" r="1.8"/>
+    <circle cx="1140" cy="110" r="1.2"/>
+    <circle cx="1480" cy="80" r="1.5"/>
+    <circle cx="1720" cy="150" r="1"/>
+    <circle cx="320" cy="240" r="1.2"/>
+    <circle cx="1620" cy="220" r="1.5"/>
+    <circle cx="980" cy="70" r="2"/>
+    <circle cx="680" cy="210" r="1"/>
+    <circle cx="1320" cy="250" r="1.2"/>
+  </g>
+
+  <!-- Soft Distant Silhouette of Mosque Skyline at the Bottom -->
+  <g opacity="0.35">
+    <!-- Far Minarets -->
+    <rect x="180" y="480" width="16" height="600" fill="#0d1b2a"/>
+    <path d="M176 480 Q188 430 196 480 Z" fill="#c9a84c" opacity="0.7"/>
+    <rect x="1724" y="480" width="16" height="600" fill="#0d1b2a"/>
+    <path d="M1720 480 Q1732 430 1740 480 Z" fill="#c9a84c" opacity="0.7"/>
+
+    <!-- Left & Right Supporting Domes -->
+    <path d="M360 1080 L360 720 Q480 580 600 720 L600 1080 Z" fill="url(#domeGrad)"/>
+    <path d="M1320 1080 L1320 720 Q1440 580 1560 720 L1560 1080 Z" fill="url(#domeGrad)"/>
+
+    <!-- Central Grand Dome Outline -->
+    <path d="M680 1080 L680 680 Q960 480 1240 680 L1240 1080 Z" fill="url(#domeGrad)" stroke="#c9a84c" stroke-width="1" stroke-opacity="0.3"/>
+
+    <!-- Crescent Finial on Central Dome -->
+    <path d="M960 470 A14 14 0 0 1 966 442 A18 18 0 1 0 960 470 Z" fill="#facc15" opacity="0.6"/>
+  </g>
+
+  <!-- Ambient Bottom Vignette -->
+  <rect y="780" width="1920" height="300" fill="black" opacity="0.4"/>
+</svg>

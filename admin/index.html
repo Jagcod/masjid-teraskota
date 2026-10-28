@@ -144,6 +144,17 @@
 
                 <!-- ===== DASHBOARD PAGE ===== -->
                 <div id="page-dashboard" class="admin-page active" data-title="Dashboard">
+                    <!-- Status & Verifikasi Data Notice -->
+                    <div class="demo-notice-banner">
+                        <div class="notice-icon">
+                            <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+                        </div>
+                        <div class="notice-text">
+                            <strong>Status Data Display: Mode Data Verifikasi / Demo</strong>
+                            <p>Konten yang tampil saat ini di layar Display TV menggunakan data awal standar Masjid Teraskota. Pengurus / Admin dipersilakan memverifikasi dan memperbarui jadwal kajian, agenda kegiatan, pengumuman, info petugas Jumat, dan laporan kas melalui menu di sebelah kiri sebelum dipublikasikan secara resmi ke jamaah.</p>
+                        </div>
+                    </div>
+
                     <div class="dashboard-grid">
                         <div class="dash-card">
                             <div class="dash-card-icon" style="background:rgba(76,175,80,0.1);color:#4caf50">
@@ -266,7 +277,9 @@
                                     <label class="bg-type-card">
                                         <input type="radio" name="bg-type" value="default" checked>
                                         <div class="bg-type-box">
-                                            <span class="bg-type-icon">🌙</span>
+                                            <span class="bg-type-icon">
+                                                <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M12.3 2a10 10 0 0 0-1.9 19.8 10 10 0 1 1 1.9-19.8z"/></svg>
+                                            </span>
                                             <span class="bg-type-title">Default Gelap</span>
                                             <span class="bg-type-sub">Modern Islamic Mesh</span>
                                         </div>
@@ -274,7 +287,9 @@
                                     <label class="bg-type-card">
                                         <input type="radio" name="bg-type" value="image">
                                         <div class="bg-type-box">
-                                            <span class="bg-type-icon">🖼️</span>
+                                            <span class="bg-type-icon">
+                                                <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+                                            </span>
                                             <span class="bg-type-title">Gambar Bebas</span>
                                             <span class="bg-type-sub">JPG, PNG, WebP, GIF</span>
                                         </div>
@@ -282,7 +297,9 @@
                                     <label class="bg-type-card">
                                         <input type="radio" name="bg-type" value="video">
                                         <div class="bg-type-box">
-                                            <span class="bg-type-icon">🎬</span>
+                                            <span class="bg-type-icon">
+                                                <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M18 4l2 4h-3l-2-4h-2l2 4h-3l-2-4H8l2 4H7L5 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4h-4z"/></svg>
+                                            </span>
                                             <span class="bg-type-title">Video Bergerak</span>
                                             <span class="bg-type-sub">MP4, WebM (Loop)</span>
                                         </div>
@@ -290,7 +307,9 @@
                                     <label class="bg-type-card">
                                         <input type="radio" name="bg-type" value="gradient">
                                         <div class="bg-type-box">
-                                            <span class="bg-type-icon">🎨</span>
+                                            <span class="bg-type-icon">
+                                                <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M12 3c-4.97 0-9 4.03-9 9 0 2.12.74 4.07 1.97 5.61L4.35 18.23a1 1 0 0 0 1.41 1.41l.62-.62C7.93 20.26 9.88 21 12 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm0 16c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z"/></svg>
+                                            </span>
                                             <span class="bg-type-title">Gradien / Warna</span>
                                             <span class="bg-type-sub">CSS Gradient Halus</span>
                                         </div>
@@ -335,19 +354,19 @@
                                 <div class="preset-cards-grid">
                                     <button type="button" class="btn-preset active" data-type="default" data-url="" data-opacity="0.65">
                                         <span class="preset-swatch" style="background: radial-gradient(circle, #132235, #0b131e);"></span>
-                                        <span>🌙 Default Dark</span>
+                                        <span>Default Gelap</span>
                                     </button>
                                     <button type="button" class="btn-preset" data-type="image" data-url="https://images.unsplash.com/photo-1542816417-0983c9c9ad53?auto=format&fit=crop&w=1920&q=80" data-opacity="0.75">
                                         <span class="preset-swatch" style="background: #1e3a5f;"></span>
-                                        <span>🕌 Kubah Emas Malam</span>
+                                        <span>Kubah Emas Malam</span>
                                     </button>
                                     <button type="button" class="btn-preset" data-type="image" data-url="https://images.unsplash.com/photo-1564769625905-50e93615e769?auto=format&fit=crop&w=1920&q=80" data-opacity="0.70">
                                         <span class="preset-swatch" style="background: #2a2015;"></span>
-                                        <span>✨ Masjidil Haram</span>
+                                        <span>Masjidil Haram</span>
                                     </button>
                                     <button type="button" class="btn-preset" data-type="gradient" data-url="linear-gradient(135deg, #064e3b 0%, #0b131e 60%, #022c22 100%)" data-opacity="0.50">
                                         <span class="preset-swatch" style="background: linear-gradient(135deg, #064e3b, #0b131e);"></span>
-                                        <span>🌿 Emerald Islamic</span>
+                                        <span>Emerald Islamic</span>
                                     </button>
                                 </div>
                             </div>
@@ -363,7 +382,7 @@
                                         <div class="mockup-top">
                                             <div class="mockup-mosque">
                                                 <strong>Masjid Teraskota</strong>
-                                                <small>📍 BSD City</small>
+                                                <small>BSD City, Tangerang Selatan</small>
                                             </div>
                                             <div class="mockup-clock-box">
                                                 <span class="mockup-hm">22:11</span>
@@ -374,7 +393,7 @@
                                         <div class="mockup-middle">
                                             <div class="mockup-greeting">السَّلَامُ عَلَيْكُمْ وَرَحْمَةُ اللهِ وَبَرَكَاتُهُ</div>
                                             <div class="mockup-title">Selamat Datang di <span style="color:#facc15;">Masjid Teraskota</span></div>
-                                            <div class="mockup-badge">🕌 DOA MASUK MASJID</div>
+                                            <div class="mockup-badge">DOA MASUK MASJID</div>
                                         </div>
                                         <div class="mockup-bottom">
                                             <div class="mockup-prayer active">
@@ -412,8 +431,12 @@
                             </div>
 
                             <div class="form-actions">
-                                <button type="submit" class="btn btn-primary" id="btn-save-bg">💾 Simpan & Terapkan Background ke TV</button>
-                                <button type="button" class="btn btn-outline" id="btn-reset-bg">↺ Kembalikan ke Background Bawaan</button>
+                                <button type="submit" class="btn btn-primary" id="btn-save-bg">
+                                    <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" style="vertical-align:middle;margin-right:6px;"><path d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/></svg>Simpan & Terapkan Background ke TV
+                                </button>
+                                <button type="button" class="btn btn-outline" id="btn-reset-bg">
+                                    <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" style="vertical-align:middle;margin-right:6px;"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>Kembalikan ke Background Bawaan
+                                </button>
                             </div>
                         </form>
                     </div>
