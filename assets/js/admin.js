@@ -1006,7 +1006,12 @@ const AdminApp = (() => {
             const label = getInputValue('prayer-tz-label') || (tz === 'Asia/Jayapura' ? 'WIT (JAYAPURA)' : (tz === 'Asia/Makassar' ? 'WITA (MAKASSAR)' : 'WIB (JAKARTA)'));
 
             await FirestoreService.setDocument('settings', 'mosque', { timezone: tz, timezoneLabel: label });
+            localStorage.setItem('masjid_tz_label', label);
+            localStorage.setItem('masjid_tz_city', data.city);
+            localStorage.setItem('masjid_sync_trigger', JSON.stringify({ type: 'prayer', label, city: data.city, time: Date.now() }));
             await FirestoreService.setDocument('settings', 'prayerConfig', { timezone: tz, timezoneLabel: label });
+            localStorage.setItem('masjid_tz_label', label);
+            localStorage.setItem('masjid_sync_trigger', JSON.stringify({ type: 'timezone', label, time: Date.now() }));
 
             window.dispatchEvent(new CustomEvent('masjid-data-update', { detail: { type: 'timezone' } }));
             try { window.dispatchEvent(new Event('storage')); } catch(e) {}
@@ -1340,15 +1345,35 @@ const AdminApp = (() => {
                 const targetRadio = document.querySelector(`input[name="bg-type"][value="${isVideo ? 'video' : 'image'}"]`);
                 if (targetRadio) targetRadio.checked = true;
 
-                // Read file via FileReader as DataURL
-                const reader = new FileReader();
-                reader.onload = (event) => {
-                    _currentBgFileBase64 = event.target.result;
-                    if (urlInput) urlInput.value = ''; // clear url when file is uploaded
-                    const opacity = opacitySlider ? parseFloat(opacitySlider.value) / 100 : 0.65;
-                    updateBackgroundMockup(isVideo ? 'video' : 'image', _currentBgFileBase64, opacity);
-                };
-                reader.readAsDataURL(file);
+                // Compress image or read video
+                if (isImage) {
+                    compressImage(file, 1920, 1080, 0.8).then(compressedBase64 => {
+                        _currentBgFileBase64 = compressedBase64;
+                        if (urlInput) urlInput.value = '';
+                        const opacity = opacitySlider ? parseFloat(opacitySlider.value) / 100 : 0.65;
+                        updateBackgroundMockup('image', _currentBgFileBase64, opacity);
+                        if (fileInfo) fileInfo.textContent = `✓ Terpilih & Teroptimasi: ${file.name}`;
+                    }).catch(err => {
+                        console.warn('[Admin] Fallback uncompressed:', err);
+                        const reader = new FileReader();
+                        reader.onload = (event) => {
+                            _currentBgFileBase64 = event.target.result;
+                            if (urlInput) urlInput.value = '';
+                            const opacity = opacitySlider ? parseFloat(opacitySlider.value) / 100 : 0.65;
+                            updateBackgroundMockup('image', _currentBgFileBase64, opacity);
+                        };
+                        reader.readAsDataURL(file);
+                    });
+                } else {
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        _currentBgFileBase64 = event.target.result;
+                        if (urlInput) urlInput.value = '';
+                        const opacity = opacitySlider ? parseFloat(opacitySlider.value) / 100 : 0.65;
+                        updateBackgroundMockup('video', _currentBgFileBase64, opacity);
+                    };
+                    reader.readAsDataURL(file);
+                }
             });
         }
 
@@ -1440,6 +1465,7 @@ const AdminApp = (() => {
 
                     // Also save to localStorage for instant local / demo cross-tab sync
                     localStorage.setItem('masjid_bg_settings', JSON.stringify(bgData));
+                    localStorage.setItem('masjid_sync_trigger', JSON.stringify({ type: 'background', time: Date.now() }));
 
                     // Trigger storage event for other windows/tabs
                     try {

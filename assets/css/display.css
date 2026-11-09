@@ -211,6 +211,8 @@ html, body {
     display: flex;
     align-items: center;
     gap: 1.8vw;
+    flex-shrink: 0;
+    white-space: nowrap;
 }
 
 .date-container {
@@ -218,6 +220,8 @@ html, body {
     flex-direction: column;
     align-items: flex-end;
     justify-content: center;
+    white-space: nowrap;
+    flex-shrink: 0;
 }
 
 .date-masehi {
@@ -246,6 +250,8 @@ html, body {
     justify-content: center;
     backdrop-filter: blur(12px);
     box-shadow: none;
+    flex-shrink: 0;
+    white-space: nowrap;
 }
 
 .clock-digits {
@@ -253,6 +259,8 @@ html, body {
     align-items: baseline;
     font-family: var(--font-mono);
     line-height: 1;
+    flex-wrap: nowrap;
+    white-space: nowrap;
 }
 
 .clock-hm {

@@ -65,6 +65,47 @@
     }
 
     // ── Initialization Lifecycle ──
+    function loadInstantLocalData() {
+        // 1. Instant background from localStorage
+        try {
+            const savedBg = localStorage.getItem('masjid_bg_settings');
+            if (savedBg) {
+                applyBackgroundSettings(JSON.parse(savedBg));
+            } else {
+                const demoStore = localStorage.getItem('masjid_demo_store');
+                if (demoStore) {
+                    const parsed = JSON.parse(demoStore);
+                    if (parsed && parsed.settings && parsed.settings.background) {
+                        applyBackgroundSettings(parsed.settings.background);
+                    }
+                }
+            }
+        } catch(e) {}
+
+        // 2. Instant Mosque settings from demoStore or localStorage
+        try {
+            const demoStore = localStorage.getItem('masjid_demo_store');
+            if (demoStore) {
+                const parsed = JSON.parse(demoStore);
+                if (parsed && parsed.settings) {
+                    if (parsed.settings.mosque) {
+                        state.settings = parsed.settings.mosque;
+                        applyMosqueSettings(parsed.settings.mosque);
+                    }
+                    if (parsed.settings.prayerConfig) {
+                        PrayerTimesService.setConfig(parsed.settings.prayerConfig);
+                        if (parsed.settings.prayerConfig.timezoneLabel) {
+                            state.settings = { ...(state.settings || {}), timezoneLabel: parsed.settings.prayerConfig.timezoneLabel };
+                        }
+                    }
+                }
+            }
+        } catch(e) {}
+
+        // 3. Instant Timezone label
+        updateTimezoneLabel();
+    }
+
     async function init() {
         console.info('[Display] Initializing TV display system...');
         cacheDOMReferences();
@@ -73,42 +114,50 @@
         startClock();
         updateDates();
 
-        // 2. Initialize Firestore Database Service
-        showConnectionStatus('Menghubungkan ke database...');
-        const firestoreReady = await FirestoreService.init();
+        // 2. Load Local Data INSTANTLY (0 ms latency, no waiting for database)
+        loadInstantLocalData();
 
-        if (firestoreReady) {
-            showConnectionStatus('Terhubung ke Firestore');
-            setTimeout(hideConnectionStatus, 2500);
-        } else {
-            showConnectionStatus('Mode Standalone / Demo');
-            setTimeout(hideConnectionStatus, 3500);
-        }
+        // 3. Load Prayer Times Immediately (from cache/defaults)
+        loadPrayerTimes();
 
-        // 3. Load Settings & Background
-        await loadSettings();
+        // 4. Load Slide Content Immediately (from cache/defaults)
+        loadSlides();
 
-        // 4. Load Prayer Times
-        await loadPrayerTimes();
-
-        // 5. Load Slide Content
-        await loadSlides();
-
-        // 6. Start Prayer Timers & Slide Loop
+        // 5. Start Timers
         startPrayerCountdown();
         startSlideShow();
 
-        // 7. Subscribe to Realtime Data & Cross-tab Events
+        // 6. Cross-tab & Realtime Sync
         subscribeToUpdates();
 
-        // 8. Schedule Daily Refresh at Midnight
+        // 7. Hijri background update listener
+        window.addEventListener('masjid-hijri-updated', (evt) => {
+            if (evt.detail && evt.detail.formatted && DOM.dateHijri) {
+                DOM.dateHijri.textContent = evt.detail.formatted;
+            }
+        });
+
+        // 8. Refresh dates every 60 seconds
+        setInterval(() => { updateDates(); }, 60000);
+
+        // 9. Schedule Daily Refresh at Midnight
         scheduleMidnightRefresh();
 
-        // 9. Page Visibility Handling
+        // 10. Page Visibility Handling
         document.addEventListener('visibilitychange', handleVisibilityChange);
 
         state.isInitialized = true;
-        console.info('[Display] TV display system initialized.');
+        console.info('[Display] TV display system initialized instantly.');
+
+        // 11. Connect to Firestore in background (Non-blocking)
+        FirestoreService.init().then((firestoreReady) => {
+            if (firestoreReady) {
+                console.info('[Display] Firestore ready, syncing latest cloud data...');
+                loadSettings();
+                loadPrayerTimes();
+                loadSlides();
+            }
+        }).catch(err => console.warn('[Display] Firestore init notice:', err));
     }
 
     // ── 1. Digital Clock (Split Hours:Minutes & Seconds) ──
@@ -117,8 +166,9 @@
 
         function tick() {
             const now = new Date();
-            // Formatter for Jakarta timezone (WIB)
-            const options = { timeZone: 'Asia/Jakarta', hour12: false };
+            const tz = (state.settings && state.settings.timezone) || 'Asia/Jakarta';
+            // Formatter for configured timezone
+            const options = { timeZone: tz, hour12: false };
             const timeStr = now.toLocaleTimeString('id-ID', {
                 ...options,
                 hour: '2-digit',
@@ -140,8 +190,23 @@
 
     // ── 2. Dates (Masehi & Hijriah) ──
     async function updateDates() {
+        const tz = (state.settings && state.settings.timezone) || 'Asia/Jakarta';
+
         if (DOM.dateMasehi) {
-            DOM.dateMasehi.textContent = HijriDateService.getMasehiDate();
+            // Use timezone-aware date
+            try {
+                const now = new Date();
+                const formatter = new Intl.DateTimeFormat('id-ID', {
+                    timeZone: tz,
+                    weekday: 'long',
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric'
+                });
+                DOM.dateMasehi.textContent = formatter.format(now);
+            } catch (e) {
+                DOM.dateMasehi.textContent = HijriDateService.getMasehiDate();
+            }
         }
 
         if (DOM.dateHijri) {
@@ -150,8 +215,20 @@
                 DOM.dateHijri.textContent = hijri.formatted;
             } catch (err) {
                 console.warn('[Display] Hijri date fetch error:', err);
-                DOM.dateHijri.textContent = '16 Jumadil Awal 1448 H';
+                DOM.dateHijri.textContent = '';
             }
+        }
+
+        // Update timezone label
+        updateTimezoneLabel();
+    }
+
+    function updateTimezoneLabel() {
+        const storedTz = localStorage.getItem('masjid_tz_label');
+        const tzLabel = (state.settings && state.settings.timezoneLabel) || storedTz || 'WIB (JAKARTA)';
+        const tzEl = document.querySelector('.clock-tz span');
+        if (tzEl) {
+            tzEl.textContent = tzLabel;
         }
     }
 
@@ -183,6 +260,10 @@
             const prayerConfig = await FirestoreService.getDocument('settings', 'prayerConfig');
             if (prayerConfig) {
                 PrayerTimesService.setConfig(prayerConfig);
+                if (prayerConfig.timezoneLabel || prayerConfig.timezone) {
+                    state.settings = { ...(state.settings || {}), timezone: prayerConfig.timezone || state.settings?.timezone, timezoneLabel: prayerConfig.timezoneLabel || state.settings?.timezoneLabel };
+                    updateTimezoneLabel();
+                }
             }
         } catch (error) {
             console.warn('[Display] Settings load error:', error);
@@ -191,6 +272,9 @@
 
     function applyMosqueSettings(settings) {
         if (!settings) return;
+
+        // Save settings to state for timezone usage
+        state.settings = { ...state.settings, ...settings };
 
         if (settings.name && DOM.mosqueName) {
             DOM.mosqueName.textContent = settings.name;
@@ -214,6 +298,13 @@
             } else {
                 DOM.runningText.textContent = raw;
             }
+        }
+
+        // Timezone update — refresh clock and label
+        if (settings.timezone || settings.timezoneLabel) {
+            startClock(); // Restart clock with new timezone
+            updateTimezoneLabel();
+            updateDates();
         }
 
         // Sholat Mode Check
@@ -1043,6 +1134,19 @@
                 if (data) applyBackgroundSettings(data);
             });
 
+            FirestoreService.listenDocument('settings', 'prayerConfig', (data) => {
+                if (data) {
+                    PrayerTimesService.setConfig(data);
+                    if (data.timezoneLabel || data.timezone) {
+                        state.settings = { ...(state.settings || {}), timezone: data.timezone || state.settings?.timezone, timezoneLabel: data.timezoneLabel || state.settings?.timezoneLabel };
+                        updateTimezoneLabel();
+                        startClock();
+                        updateDates();
+                    }
+                    loadPrayerTimes();
+                }
+            });
+
             FirestoreService.listenDocument('settings', 'tarawih', debouncedLoadSlides);
 
             FirestoreService.listenCollection('kajian', debouncedLoadSlides);
@@ -1058,13 +1162,20 @@
         let _localSyncTimer = null;
         const handleLocalSync = (evt) => {
             if (!evt.key || evt.key.startsWith('masjid_')) {
+                // Apply background instantly if present
+                try {
+                    const localBg = localStorage.getItem('masjid_bg_settings');
+                    if (localBg) applyBackgroundSettings(JSON.parse(localBg));
+                } catch(e) {}
+                updateTimezoneLabel();
+
                 if (_localSyncTimer) clearTimeout(_localSyncTimer);
                 _localSyncTimer = setTimeout(() => {
                     console.info('[Display] Local change detected. Syncing display...');
                     loadSettings();
                     loadPrayerTimes();
                     debouncedLoadSlides();
-                }, 400);
+                }, 200);
             }
         };
 

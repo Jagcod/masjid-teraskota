@@ -51,7 +51,8 @@ const FIREBASE_SCRIPTS = [
  * @returns {Promise<void>}
  */
 function loadFirebaseSDK() {
-    if (window._firebaseSDKLoaded) {
+    if (window._firebaseSDKLoaded || (typeof firebase !== 'undefined' && firebase.firestore)) {
+        window._firebaseSDKLoaded = true;
         return Promise.resolve();
     }
 

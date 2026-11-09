@@ -69,3 +69,4 @@ Jika masjid memiliki domain sendiri (misal: `tv.masjidteraskota.id`):
 2. Masukkan nama domain Anda.
 3. Arahkan DNS CNAME di penyedia domain Anda ke `cname.vercel-dns.com`.
 4. SSL/HTTPS gratis otomatis aktif dari Vercel.
+

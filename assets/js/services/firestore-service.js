@@ -41,16 +41,10 @@ const FirestoreService = (() => {
             if (app && firebase.firestore) {
                 _db = firebase.firestore();
                 
-                // Enable offline persistence
-                try {
-                    await _db.enablePersistence({ synchronizeTabs: true });
-                } catch (err) {
-                    if (err.code === 'failed-precondition') {
-                        console.warn('[Firestore] Persistence failed: multiple tabs open.');
-                    } else if (err.code === 'unimplemented') {
-                        console.warn('[Firestore] Persistence not supported by browser.');
-                    }
-                }
+                // Enable offline persistence non-blocking
+                _db.enablePersistence({ synchronizeTabs: true }).catch((err) => {
+                    console.info('[Firestore] Offline persistence note:', err.code || err.message);
+                });
 
                 _isOnline = true;
                 console.info('[Firestore] Ready.');
@@ -80,7 +74,7 @@ const FirestoreService = (() => {
 
         try {
             const getPromise = _db.collection(collection).doc(docId).get();
-            const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('Firestore timeout')), 2500));
+            const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('Firestore timeout')), 5000));
             const doc = await Promise.race([getPromise, timeoutPromise]);
             if (doc.exists) {
                 return { id: doc.id, ...doc.data() };
@@ -120,7 +114,7 @@ const FirestoreService = (() => {
 
             // Proteksi timeout 2.5 detik agar tidak pernah hang
             const getPromise = query.get();
-            const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('Firestore getCollection timeout')), 2500));
+            const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('Firestore getCollection timeout')), 5000));
             const snapshot = await Promise.race([getPromise, timeoutPromise]);
             
             const cloudDocs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -179,7 +173,7 @@ const FirestoreService = (() => {
             }
 
             const setPromise = _db.collection(collection).doc(docId).set(docData, { merge: true });
-            const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('Firestore setDocument timeout')), 2500));
+            const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('Firestore setDocument timeout')), 5000));
             await Promise.race([setPromise, timeoutPromise]);
             return { id: docId, ...data };
         } catch (error) {
@@ -221,7 +215,7 @@ const FirestoreService = (() => {
             };
 
             const addPromise = _db.collection(collection).add(docData);
-            const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('Firestore add timeout')), 2500));
+            const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('Firestore add timeout')), 5000));
             const ref = await Promise.race([addPromise, timeoutPromise]);
             
             // Simpan juga dengan ID asli dari Firestore ke local demo store
@@ -269,7 +263,7 @@ const FirestoreService = (() => {
                 ...data,
                 updatedAt: timestamp
             });
-            const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('Firestore update timeout')), 2500));
+            const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('Firestore update timeout')), 5000));
             await Promise.race([updatePromise, timeoutPromise]);
             return { id: docId, ...data };
         } catch (error) {
@@ -297,7 +291,7 @@ const FirestoreService = (() => {
 
         try {
             const deletePromise = _db.collection(collection).doc(docId).delete();
-            const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('Firestore delete timeout')), 2500));
+            const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('Firestore delete timeout')), 5000));
             await Promise.race([deletePromise, timeoutPromise]);
             return true;
         } catch (error) {
@@ -465,6 +459,8 @@ const FirestoreService = (() => {
 
     function notifyLocalChange(collection, docId) {
         try {
+            // Write to localStorage to trigger the browser's native 'storage' event across ALL other tabs
+            localStorage.setItem('masjid_sync_trigger', JSON.stringify({ collection, docId, time: Date.now() }));
             window.dispatchEvent(new CustomEvent('masjid-data-update', { detail: { collection, docId } }));
             window.dispatchEvent(new Event('storage'));
         } catch(e) {}

@@ -67,9 +67,12 @@ const HijriDateService = (() => {
         const url = `https://api.aladhan.com/v1/gToH/${dd}-${mm}-${yyyy}?adjustment=${_hijriAdjustment}`;
 
         try {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 3500);
             const response = await fetch(url, {
-                signal: AbortSignal.timeout(8000)
+                signal: controller.signal
             });
+            clearTimeout(timeoutId);
 
             if (!response.ok) throw new Error(`Status ${response.status}`);
 
@@ -157,16 +160,24 @@ const HijriDateService = (() => {
 
         // Try cached first for speed
         const cached = getCachedHijri(dateStr);
-        
-        // Fetch from API in background
-        const apiResult = await fetchHijriFromAPI(d);
-        if (apiResult) return apiResult;
-
-        // Use cache if available
         if (cached) return cached;
 
-        // Fallback to Intl
+        // Try Intl (instant, no network)
         const intlResult = getHijriFromIntl(d);
+        if (intlResult) {
+            cacheHijri(intlResult, dateStr);
+        }
+
+        // Fetch from API in background (non-blocking)
+        fetchHijriFromAPI(d).then(apiResult => {
+            if (apiResult) {
+                cacheHijri(apiResult, dateStr);
+                // Dispatch event so display can update
+                window.dispatchEvent(new CustomEvent('masjid-hijri-updated', { detail: apiResult }));
+            }
+        }).catch(() => {});
+
+        // Return Intl result immediately
         if (intlResult) return intlResult;
 
         // Last resort
