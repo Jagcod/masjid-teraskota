@@ -9,20 +9,27 @@
  */
 
 const FIREBASE_CONFIG = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_PROJECT_ID.appspot.com",
-    messagingSenderId: "YOUR_SENDER_ID",
-    appId: "YOUR_APP_ID"
+    apiKey: "AIzaSyCvsfPk88SOvQheP--w2CTfuEnqZyGAftE",
+    authDomain: "masjidtv-57edd.firebaseapp.com",
+    projectId: "masjidtv-57edd",
+    storageBucket: "masjidtv-57edd.firebasestorage.app",
+    messagingSenderId: "597935556919",
+    appId: "1:597935556919:web:c9fe398b8018d4e14cb2b2"
 };
 
 /**
  * Check if Firebase is configured with real credentials
  */
 function isFirebaseConfigured() {
-    return FIREBASE_CONFIG.apiKey !== "YOUR_API_KEY" && 
-           FIREBASE_CONFIG.projectId !== "YOUR_PROJECT_ID";
+    const key = (FIREBASE_CONFIG.apiKey || '').toLowerCase();
+    const project = (FIREBASE_CONFIG.projectId || '').toLowerCase();
+    const placeholders = ['your_api_key', 'placeholder_api_key', 'your-api-key', 'placeholder', ''];
+    const projectPlaceholders = ['your_project_id', 'your-project-id', 'placeholder', ''];
+    
+    const keyIsPlaceholder = placeholders.some(p => key === p || key.includes('placeholder') || key.includes('your_'));
+    const projectIsPlaceholder = projectPlaceholders.some(p => project === p || project.includes('placeholder') || project.includes('your-') || project.includes('your_'));
+    
+    return !keyIsPlaceholder && !projectIsPlaceholder;
 }
 
 /**

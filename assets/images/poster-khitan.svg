@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1000" width="100%" height="100%">
+  <defs>
+    <linearGradient id="khitanBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#042f2e"/>
+      <stop offset="40%" stop-color="#0f3d39"/>
+      <stop offset="80%" stop-color="#092523"/>
+      <stop offset="100%" stop-color="#021716"/>
+    </linearGradient>
+
+    <linearGradient id="goldKhitan" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fde047"/>
+      <stop offset="50%" stop-color="#eab308"/>
+      <stop offset="100%" stop-color="#ca8a04"/>
+    </linearGradient>
+
+    <radialGradient id="tealGlow" cx="50%" cy="30%" r="55%">
+      <stop offset="0%" stop-color="#14b8a6" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#14b8a6" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="800" height="1000" fill="url(#khitanBg)"/>
+  <circle cx="400" cy="320" r="380" fill="url(#tealGlow)"/>
+
+  <!-- Ornate Border Frame -->
+  <rect x="25" y="25" width="750" height="950" rx="20" fill="none" stroke="url(#goldKhitan)" stroke-width="3" stroke-opacity="0.75"/>
+  <rect x="35" y="35" width="730" height="930" rx="14" fill="none" stroke="#2dd4bf" stroke-width="1" stroke-opacity="0.35"/>
+
+  <!-- Header -->
+  <g text-anchor="middle">
+    <!-- Crescent & Medical Cross Motif -->
+    <path d="M 400 100 A 30 30 0 1 0 435 150 A 25 25 0 1 1 400 100 Z" fill="#fde047"/>
+    <rect x="394" y="125" width="12" height="30" rx="3" fill="#10b981"/>
+    <rect x="385" y="134" width="30" height="12" rx="3" fill="#10b981"/>
+
+    <text x="400" y="220" font-family="'Plus Jakarta Sans', sans-serif" font-size="16" font-weight="800" fill="#2dd4bf" letter-spacing="3">PROGRAM BAKTI SOSIAL UMAT</text>
+    
+    <rect x="240" y="245" width="320" height="38" rx="19" fill="#eab308"/>
+    <text x="400" y="270" font-family="'Plus Jakarta Sans', sans-serif" font-size="16" font-weight="900" fill="#0f172a" letter-spacing="2">DKM MASJID TERASKOTA</text>
+
+    <!-- Title -->
+    <text x="400" y="350" font-family="'Plus Jakarta Sans', sans-serif" font-size="44" font-weight="900" fill="#ffffff" letter-spacing="-1">SANTUNAN AKBAR</text>
+    <text x="400" y="415" font-family="'Plus Jakarta Sans', sans-serif" font-size="44" font-weight="900" fill="url(#goldKhitan)" letter-spacing="-1">&amp; KHITANAN MASSAL</text>
+    
+    <text x="400" y="460" font-family="'Plus Jakarta Sans', sans-serif" font-size="18" fill="#99f6e4">Bekerjasama dengan Tim Medis RS Islam &amp; Relawan Medis</text>
+  </g>
+
+  <!-- Info Cards -->
+  <g transform="translate(75, 495)">
+    <!-- Fasilitas Peserta -->
+    <rect x="0" y="0" width="650" height="190" rx="16" fill="rgba(15, 47, 45, 0.85)" stroke="rgba(234, 179, 8, 0.5)" stroke-width="1.5"/>
+    <text x="30" y="35" font-family="'Plus Jakarta Sans', sans-serif" font-size="16" font-weight="800" fill="#fde047">🎁 FASILITAS PESERTA (100% GRATIS):</text>
+    
+    <g transform="translate(30, 60)" font-family="'Plus Jakarta Sans', sans-serif" font-size="15" font-weight="600" fill="#ffffff">
+      <text x="0" y="20">✓ Tindakan Khitan Metode Laser Modern (Aman &amp; Cepat)</text>
+      <text x="0" y="50">✓ Paket Obat &amp; Perawatan Pasca Khitan Lengkap</text>
+      <text x="0" y="80">✓ Sarung, Baju Koko, Peci, &amp; Tas Sekolah</text>
+      <text x="0" y="110">✓ Uang Saku &amp; Santunan untuk Setiap Anak</text>
+    </g>
+  </g>
+
+  <!-- Schedule Card -->
+  <g transform="translate(75, 710)">
+    <rect x="0" y="0" width="650" height="150" rx="16" fill="rgba(6, 30, 28, 0.85)" stroke="rgba(255, 255, 255, 0.12)" stroke-width="1"/>
+    
+    <text x="35" y="40" font-family="'Plus Jakarta Sans', sans-serif" font-size="13" font-weight="700" fill="#94a3b8">🗓️ WAKTU PELAKSANAAN</text>
+    <text x="35" y="65" font-family="'Plus Jakarta Sans', sans-serif" font-size="18" font-weight="800" fill="#ffffff">Ahad, 22 November 2026 &bull; Pukul 08:00 WIB - Selesai</text>
+
+    <text x="35" y="105" font-family="'Plus Jakarta Sans', sans-serif" font-size="13" font-weight="700" fill="#94a3b8">📍 TEMPAT</text>
+    <text x="35" y="130" font-family="'Plus Jakarta Sans', sans-serif" font-size="18" font-weight="800" fill="#ffffff">Gedung Serbaguna &amp; Klinik DKM Masjid Teraskota</text>
+  </g>
+
+  <!-- Bottom CTA -->
+  <g transform="translate(75, 895)">
+    <rect x="0" y="0" width="650" height="45" rx="10" fill="#eab308"/>
+    <text x="325" y="28" font-family="'Plus Jakarta Sans', sans-serif" font-size="15" font-weight="800" fill="#0f172a" text-anchor="middle" letter-spacing="1">KUOTA TERBATAS 100 ANAK &bull; PENDAFTARAN DI KANTOR DKM</text>
+  </g>
+</svg>

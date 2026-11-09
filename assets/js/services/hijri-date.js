@@ -64,7 +64,7 @@ const HijriDateService = (() => {
         const mm = String(d.getMonth() + 1).padStart(2, '0');
         const yyyy = d.getFullYear();
 
-        const url = `https://api.aladhan.com/v1/gpiToH/${dd}-${mm}-${yyyy}?adjustment=${_hijriAdjustment}`;
+        const url = `https://api.aladhan.com/v1/gToH/${dd}-${mm}-${yyyy}?adjustment=${_hijriAdjustment}`;
 
         try {
             const response = await fetch(url, {

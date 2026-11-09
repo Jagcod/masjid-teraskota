@@ -23,7 +23,7 @@
     <div id="login-screen" class="login-screen">
         <div class="login-card">
             <div class="login-header">
-                <img src="../assets/images/logo-masjid.svg" alt="Logo" class="login-logo" onerror="this.style.display='none'">
+                <img src="../assets/images/logo-masjid.png" alt="Logo" class="login-logo" onerror="this.src='../assets/images/logo-masjid.svg'">
                 <h1>Masjid Teraskota</h1>
                 <p>Panel Admin Display TV</p>
             </div>
@@ -42,6 +42,12 @@
                     <span class="btn-loader hidden"></span>
                 </button>
             </form>
+            <div class="login-divider">
+                <span>atau</span>
+            </div>
+            <button type="button" id="demo-login-btn" class="btn btn-demo btn-block" onclick="AdminApp.loginDemo()">
+                🚀 Masuk Langsung (Mode Admin)
+            </button>
             <div class="login-footer">
                 <p id="firebase-status" class="firebase-status">Memeriksa koneksi...</p>
             </div>
@@ -53,7 +59,7 @@
         <!-- Sidebar -->
         <aside id="admin-sidebar" class="admin-sidebar">
             <div class="sidebar-header">
-                <img src="../assets/images/logo-masjid.svg" alt="Logo" class="sidebar-logo" onerror="this.style.display='none'">
+                <img src="../assets/images/logo-masjid.png" alt="Logo" class="sidebar-logo" onerror="this.src='../assets/images/logo-masjid.svg'">
                 <span class="sidebar-title">Admin Panel</span>
                 <button id="sidebar-toggle" class="sidebar-toggle" aria-label="Toggle sidebar">
                     <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
@@ -62,55 +68,56 @@
             <nav class="sidebar-nav">
                 <a href="#dashboard" class="nav-item active" data-page="dashboard">
                     <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
-                    <span>Dashboard</span>
+                    <span>Dashboard Utama</span>
                 </a>
                 <a href="#settings" class="nav-item" data-page="settings">
                     <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.49.49 0 0 0-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 0 0-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.07.62-.07.94s.02.64.07.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
-                    <span>Pengaturan Masjid</span>
+                    <span>Identitas Masjid</span>
                 </a>
                 <a href="#background" class="nav-item" data-page="background">
                     <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14zm-5.04-6.71l-2.75 3.54-1.96-2.36L6.5 17h11l-3.54-4.71z"/></svg>
-                    <span>Pengaturan Background</span>
+                    <span>Background TV</span>
                 </a>
                 <a href="#prayer" class="nav-item" data-page="prayer">
                     <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
-                    <span>Jadwal Sholat</span>
-                </a>
-                <a href="#kajian" class="nav-item" data-page="kajian">
-                    <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/></svg>
-                    <span>Kajian</span>
+                    <span>Jam &amp; Jadwal Sholat</span>
                 </a>
                 <a href="#activities" class="nav-item" data-page="activities">
                     <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19a2 2 0 0 0 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM9 10H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2z"/></svg>
-                    <span>Kegiatan</span>
+                    <span>Kegiatan &amp; Poster</span>
+                </a>
+                <a href="#kajian" class="nav-item" data-page="kajian">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/></svg>
+                    <span>Kajian Rutin</span>
                 </a>
                 <a href="#announcements" class="nav-item" data-page="announcements">
                     <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-7 9h-2V5h2v6zm0 4h-2v-2h2v2z"/></svg>
-                    <span>Pengumuman</span>
-                </a>
-                <a href="#news" class="nav-item" data-page="news">
-                    <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/></svg>
-                    <span>Berita</span>
+                    <span>Pengumuman DKM</span>
                 </a>
                 <a href="#friday" class="nav-item" data-page="friday">
                     <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
-                    <span>Info Jumat</span>
+                    <span>Petugas Salat Jumat</span>
+                </a>
+                <a href="#tarawih" class="nav-item" data-page="tarawih">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12.3 2a10 10 0 0 0-1.9 20 10 10 0 0 0 8.6-4.9c.3-.5 0-1.1-.5-1.3-.5-.2-1.1 0-1.3.5A8 8 0 1 1 11.2 4c.5-.1.9-.6.8-1.1s-.6-.9-1.1-.9h1.4z"/></svg>
+                    <span>Jadwal Tarawih Ramadhan</span>
                 </a>
                 <a href="#finance" class="nav-item" data-page="finance">
                     <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg>
-                    <span>Keuangan</span>
+                    <span>Laporan Kas &amp; Keuangan</span>
                 </a>
                 <a href="#qris" class="nav-item" data-page="qris">
                     <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M3 11h8V3H3v8zm2-6h4v4H5V5zM3 21h8v-8H3v8zm2-6h4v4H5v-4zM13 3v8h8V3h-8zm6 6h-4V5h4v4zM13 13h2v2h-2zM15 15h2v2h-2zM13 17h2v2h-2zM17 13h2v2h-2zM19 15h2v2h-2zM17 17h2v2h-2zM15 19h2v2h-2zM19 19h2v2h-2z"/></svg>
-                    <span>QRIS</span>
+                    <span>Infaq QRIS Digital</span>
                 </a>
-                <a href="#display" class="nav-item" data-page="display">
-                    <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M21 3H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h5v2h8v-2h5c1.1 0 1.99-.9 1.99-2L23 5c0-1.1-.9-2-2-2zm0 14H3V5h18v12z"/></svg>
-                    <span>Display & Slide</span>
+                <a href="#slideContent" class="nav-item" data-page="slideContent">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-1 9H9V9h10v2zm-4 4H9v-2h6v2zm4-8H9V5h10v2z"/>
+                    </svg>
+                    <span>Konten Slide Display</span>
                 </a>
                 <a href="#preview" class="nav-item" data-page="preview">
                     <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
-                    <span>Pratinjau TV</span>
+                    <span>Pratinjau Display TV</span>
                 </a>
             </nav>
             <div class="sidebar-footer">
@@ -194,11 +201,99 @@
                         </div>
                     </div>
 
-                    <div class="section-card">
-                        <h3>Selamat Datang</h3>
-                        <p>Gunakan panel admin ini untuk mengelola konten yang ditampilkan di Display TV Masjid Teraskota. Pilih menu di sebelah kiri untuk mulai mengelola.</p>
-                        <div style="margin-top:16px">
-                            <a href="#preview" class="btn btn-primary" onclick="navigateTo('preview')">Lihat Pratinjau TV</a>
+                    <!-- Pusat Kontrol Cepat DKM (Quick Controls) -->
+                    <div class="section-card" style="border-left: 4px solid var(--emerald, #10b981);">
+                        <div class="section-header">
+                            <div>
+                                <h3 style="display:flex; align-items:center; gap:8px;">
+                                    <span>⚡ Pusat Kontrol Cepat DKM</span>
+                                    <span class="badge badge-active" style="font-size:0.75rem;">Langsung Aktif di TV</span>
+                                </h3>
+                                <p class="section-desc">Ubah teks berjalan, update saldo kas, atau aktifkan mode sholat secara cepat tanpa membuka menu dalam.</p>
+                            </div>
+                            <div style="display:flex; gap:8px;">
+                                <button type="button" class="btn btn-outline btn-sm" id="btn-sync-tv" title="Kirim sinyal refresh ke layar TV">
+                                    🔄 Refresh TV
+                                </button>
+                                <a href="../index.html" target="_blank" class="btn btn-primary btn-sm" style="text-decoration:none;">
+                                    📺 Buka Layar TV
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- 3 Kotak Kontrol Utama -->
+                        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:16px; margin-top:14px;">
+                            
+                            <!-- 1. Quick Running Text -->
+                            <div style="background:rgba(255,255,255,0.03); border:1px solid var(--admin-border); border-radius:12px; padding:14px; display:flex; flex-direction:column; justify-content:space-between;">
+                                <div>
+                                    <label style="font-weight:700; color:#facc15; font-size:0.85rem; margin-bottom:6px; display:flex; align-items:center; gap:6px;">
+                                        <span>📢 Teks Berjalan di TV (Running Text)</span>
+                                    </label>
+                                    <textarea id="quick-running-text" class="form-control" rows="2" placeholder="Ketik warta atau imbauan jamaah di sini..." style="resize:vertical; font-size:0.88rem; width:100%;"></textarea>
+                                    <small style="color:var(--text-muted); font-size:0.75rem; display:block; margin-top:4px;">Tips: Gunakan tanda bintang atau titik (•) untuk pemisah kalimat.</small>
+                                </div>
+                                <button type="button" class="btn btn-primary btn-sm" id="btn-save-quick-ticker" style="margin-top:10px; width:100%;">
+                                    💾 Simpan Running Text
+                                </button>
+                            </div>
+
+                            <!-- 2. Quick Saldo Kas -->
+                            <div style="background:rgba(255,255,255,0.03); border:1px solid var(--admin-border); border-radius:12px; padding:14px; display:flex; flex-direction:column; justify-content:space-between;">
+                                <div>
+                                    <label style="font-weight:700; color:#34d399; font-size:0.85rem; margin-bottom:6px; display:flex; align-items:center; gap:6px;">
+                                        <span>💰 Saldo Kas Masjid Terkini</span>
+                                    </label>
+                                    <div style="position:relative;">
+                                        <span style="position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--text-muted); font-weight:700;">Rp</span>
+                                        <input type="number" id="quick-saldo-kas" class="form-control" placeholder="0" style="padding-left:42px; font-weight:700; font-size:1.05rem;">
+                                    </div>
+                                    <small style="color:var(--text-muted); font-size:0.75rem; display:block; margin-top:4px;">Saldo ini langsung tampil di slide Transparansi Kas.</small>
+                                </div>
+                                <button type="button" class="btn btn-primary btn-sm" id="btn-save-quick-saldo" style="margin-top:10px; width:100%;">
+                                    💾 Update Saldo Kas
+                                </button>
+                            </div>
+
+                            <!-- 3. Saklar Mode Sholat Berjamaah (Luruskan Shaf) -->
+                            <div style="background:rgba(239,68,68,0.06); border:1px solid rgba(239,68,68,0.3); border-radius:12px; padding:14px; display:flex; flex-direction:column; justify-content:space-between;">
+                                <div>
+                                    <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                                        <label style="font-weight:700; color:#f87171; font-size:0.85rem; margin-bottom:6px; display:flex; align-items:center; gap:6px;">
+                                            <span>📿 Mode Sholat (Luruskan Shaf)</span>
+                                        </label>
+                                        <label class="switch">
+                                            <input type="checkbox" id="quick-sholat-mode-toggle">
+                                            <span class="switch-slider"></span>
+                                        </label>
+                                    </div>
+                                    <p style="font-size:0.8rem; color:#cbd5e1; line-height:1.4; margin:4px 0 0 0;" id="quick-sholat-desc">
+                                        Aktifkan saklar ini saat sholat berjamaah dimulai. Layar TV akan otomatis hening &amp; menampilkan instruksi meluruskan shaf.
+                                    </p>
+                                </div>
+                                <div style="margin-top:10px; font-size:0.75rem; color:#fca5a5; font-weight:600;" id="quick-sholat-status">
+                                    Status: Normal (Slide Berjalan)
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Baris Tombol Tambah Konten Cepat & Backup -->
+                        <div style="margin-top:16px; padding-top:14px; border-top:1px solid var(--admin-border); display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:10px;">
+                            <div style="display:flex; flex-wrap:wrap; gap:8px;">
+                                <button class="btn btn-outline btn-sm" onclick="AdminApp.showModal('kajian')">+ Kajian</button>
+                                <button class="btn btn-outline btn-sm" onclick="AdminApp.showModal('activities')">+ Kegiatan &amp; Poster</button>
+                                <button class="btn btn-outline btn-sm" onclick="AdminApp.showModal('announcements')">+ Pengumuman</button>
+                                <button class="btn btn-outline btn-sm" onclick="AdminApp.showModal('friday')">+ Petugas Jumat</button>
+                            </div>
+                            <div style="display:flex; gap:8px;">
+                                <button type="button" class="btn btn-outline btn-sm" id="btn-backup-data" title="Download backup seluruh data masjid ke file JSON">
+                                    📥 Backup JSON
+                                </button>
+                                <input type="file" id="input-restore-file" accept=".json" style="display:none;">
+                                <button type="button" class="btn btn-outline btn-sm" id="btn-restore-data" title="Pulihkan data masjid dari file backup JSON">
+                                    📤 Restore
+                                </button>
+                            </div>
                         </div>
                     </div>
 
@@ -218,6 +313,19 @@
                             <div class="form-group">
                                 <label for="setting-name">Nama Masjid</label>
                                 <input type="text" id="setting-name" placeholder="Masjid Teraskota" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Logo Masjid</label>
+                                <div class="file-upload-area" id="logo-upload-area">
+                                    <input type="file" id="setting-logo-file" accept="image/*" class="file-input">
+                                    <div class="file-upload-placeholder" id="logo-upload-placeholder">
+                                        <svg viewBox="0 0 24 24" width="32" height="32" fill="currentColor" opacity="0.4"><path d="M19 7v2.99s-1.99.01-2 0V7h-3s.01-1.99 0-2h3V2h2v3h3v2h-3zm-3 4V8h-3V5H5c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2v-8h-3zM5 19l3-4 2 3 3-4 4 5H5z"/></svg>
+                                        <p>Klik atau drag file logo masjid ke sini</p>
+                                        <p class="file-hint">Format: PNG, JPG, WebP, SVG (Disarankan format PNG transparan)</p>
+                                    </div>
+                                    <img id="setting-logo-preview" class="file-preview hidden" alt="Pratinjau Logo">
+                                </div>
+                                <input type="url" id="setting-logo-url" placeholder="Atau masukkan tautan URL logo online..." style="margin-top:8px;">
                             </div>
                             <div class="form-group">
                                 <label for="setting-address">Alamat</label>
@@ -338,6 +446,22 @@
                                 <small class="field-hint">Mendukung link gambar Unsplash, link CDN masjid, atau direct link file MP4.</small>
                             </div>
 
+                            <!-- Fit Mode Selector (Tanpa Terpotong vs Cover) -->
+                            <div class="form-group">
+                                <label>Mode Tampilan Gambar / Media Background</label>
+                                <div style="display:flex; gap:12px; margin-top:8px; flex-wrap:wrap;">
+                                    <label class="toggle-label" style="background:rgba(255,255,255,0.05); padding:10px 16px; border-radius:10px; border:1px solid rgba(255,255,255,0.12); cursor:pointer;">
+                                        <input type="radio" name="bg-fit-mode" value="contain" checked>
+                                        <span style="font-weight:700; margin-left:8px;">Utuh Tanpa Terpotong (Dengan Efek Latar Blur) [Rekomendasi TV]</span>
+                                    </label>
+                                    <label class="toggle-label" style="background:rgba(255,255,255,0.05); padding:10px 16px; border-radius:10px; border:1px solid rgba(255,255,255,0.12); cursor:pointer;">
+                                        <input type="radio" name="bg-fit-mode" value="cover">
+                                        <span style="font-weight:700; margin-left:8px;">Penuh Layar (Cover)</span>
+                                    </label>
+                                </div>
+                                <small class="field-hint">Mode "Utuh Tanpa Terpotong" memastikan gambar format apa pun tidak pernah terpotong di layar TV mana pun.</small>
+                            </div>
+
                             <!-- Overlay Darkness Slider -->
                             <div class="form-group">
                                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
@@ -442,83 +566,181 @@
                     </div>
                 </div>
 
-                <!-- ===== PRAYER PAGE ===== -->
-                <div id="page-prayer" class="admin-page" data-title="Jadwal Sholat">
+                <!-- ===== PRAYER & CLOCK PAGE ===== -->
+                <div id="page-prayer" class="admin-page" data-title="Jam &amp; Jadwal Sholat">
+                    <!-- Kartu Jam Digital & Zona Waktu -->
                     <div class="section-card">
-                        <h3>Konfigurasi Lokasi</h3>
-                        <p class="section-desc">Jadwal sholat dihitung otomatis dari API Aladhan menggunakan metode Kemenag RI. Atur lokasi agar perhitungan akurat.</p>
-                        <form id="form-prayer-config" class="admin-form">
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label for="prayer-lat">Latitude</label>
-                                    <input type="number" id="prayer-lat" step="0.0001" value="-6.3000">
-                                </div>
-                                <div class="form-group">
-                                    <label for="prayer-lng">Longitude</label>
-                                    <input type="number" id="prayer-lng" step="0.0001" value="106.6700">
-                                </div>
+                        <div class="section-header">
+                            <div>
+                                <h3>Jam Digital &amp; Zona Waktu Daerah</h3>
+                                <p class="section-desc">Pilih zona waktu masjid Anda (WIB, WITA, atau WIT). Jam Display TV akan sinkron otomatis secara presisi.</p>
                             </div>
+                            <div class="admin-live-clock-card" style="background:rgba(45,212,191,0.1); border:1px solid rgba(45,212,191,0.3); border-radius:12px; padding:8px 16px; text-align:center;">
+                                <div style="font-size:0.75rem; color:var(--text-muted); font-weight:700;">JAM SAAT INI</div>
+                                <div id="admin-live-clock" style="font-family:var(--font-mono); font-size:1.6rem; font-weight:800; color:#2dd4bf; letter-spacing:1px;">00:00:00</div>
+                                <div id="admin-live-tz" style="font-size:0.72rem; color:#facc15; font-weight:800;">WIB</div>
+                            </div>
+                        </div>
+
+                        <form id="form-timezone-settings" class="admin-form">
                             <div class="form-row">
                                 <div class="form-group">
-                                    <label for="prayer-city">Kota</label>
-                                    <input type="text" id="prayer-city-input" value="Tangerang Selatan">
+                                    <label for="prayer-timezone-select">Pilih Zona Waktu Wilayah Masjid</label>
+                                    <select id="prayer-timezone-select">
+                                        <option value="Asia/Jakarta" selected>WIB - Waktu Indonesia Barat (UTC+7: Jakarta, Jawa, Sumatera, Kalbar, Kalteng)</option>
+                                        <option value="Asia/Makassar">WITA - Waktu Indonesia Tengah (UTC+8: Bali, NTB, NTT, Sulsel, Kalsel, Kaltim, Sulut)</option>
+                                        <option value="Asia/Jayapura">WIT - Waktu Indonesia Timur (UTC+9: Maluku, Papua, Jayapura, Sorong)</option>
+                                    </select>
                                 </div>
                                 <div class="form-group">
-                                    <label for="prayer-method">Metode Hisab</label>
-                                    <select id="prayer-method-select">
-                                        <option value="20" selected>Kemenag RI</option>
-                                        <option value="11">MUIS (Singapura)</option>
-                                        <option value="3">ISNA (Amerika Utara)</option>
-                                        <option value="5">Universitas Umm al-Qura</option>
-                                    </select>
+                                    <label for="prayer-tz-label">Label Tampilan Jam di TV</label>
+                                    <input type="text" id="prayer-tz-label" value="WIB (JAKARTA)" placeholder="Contoh: WIB (JAKARTA) atau WITA (MAKASSAR)">
+                                    <small class="field-hint">Label ini ditampilkan di bawah jam digital pada layar Display TV.</small>
                                 </div>
                             </div>
                             <div class="form-actions">
-                                <button type="submit" class="btn btn-primary">Simpan Konfigurasi</button>
+                                <button type="submit" class="btn btn-primary" id="btn-save-tz">Simpan Zona Waktu Jam</button>
                             </div>
                         </form>
                     </div>
 
+                    <!-- Kartu Perhitungan Otomatis Lokasi & API Kemenag RI -->
                     <div class="section-card">
-                        <h3>Override Manual</h3>
-                        <p class="section-desc">Jika waktu sholat perlu dikoreksi manual, aktifkan override dan masukkan waktu yang benar. Override akan menggantikan waktu dari API.</p>
-                        <form id="form-prayer-override" class="admin-form">
-                            <div class="form-group">
-                                <label class="toggle-label">
-                                    <input type="checkbox" id="prayer-override-enabled">
-                                    <span>Aktifkan Override Manual</span>
-                                </label>
+                        <h3>Lokasi &amp; Perhitungan Otomatis (Metode Kemenag RI)</h3>
+                        <p class="section-desc">Pilih kota masjid Anda atau masukkan koordinat GPS untuk menghitung jadwal sholat otomatis resmi standar Kementerian Agama RI.</p>
+                        
+                        <div class="form-group" style="margin-bottom:16px;">
+                            <label for="quick-city-select">Pilihan Cepat Kota / Kabupaten:</label>
+                            <select id="quick-city-select" style="font-weight:600;">
+                                <option value="" selected>-- Pilih Kota Cepat (Otomatis Isi Koordinat) --</option>
+                                <option value="-6.3000,106.6700,Tangerang Selatan,Asia/Jakarta,WIB (TANGERANG)">Tangerang Selatan, Banten (WIB)</option>
+                                <option value="-6.2088,106.8456,DKI Jakarta,Asia/Jakarta,WIB (JAKARTA)">DKI Jakarta (WIB)</option>
+                                <option value="-6.9175,107.6191,Bandung,Asia/Jakarta,WIB (BANDUNG)">Bandung, Jawa Barat (WIB)</option>
+                                <option value="-6.9667,110.4167,Semarang,Asia/Jakarta,WIB (SEMARANG)">Semarang, Jawa Tengah (WIB)</option>
+                                <option value="-7.7956,110.3695,Yogyakarta,Asia/Jakarta,WIB (YOGYAKARTA)">Yogyakarta, DIY (WIB)</option>
+                                <option value="-7.2575,112.7521,Surabaya,Asia/Jakarta,WIB (SURABAYA)">Surabaya, Jawa Timur (WIB)</option>
+                                <option value="3.5952,98.6722,Medan,Asia/Jakarta,WIB (MEDAN)">Medan, Sumatera Utara (WIB)</option>
+                                <option value="-2.9909,104.7566,Palembang,Asia/Jakarta,WIB (PALEMBANG)">Palembang, Sumatera Selatan (WIB)</option>
+                                <option value="-8.6705,115.2126,Denpasar,Asia/Makassar,WITA (DENPASAR)">Denpasar, Bali (WITA)</option>
+                                <option value="-5.1477,119.4327,Makassar,Asia/Makassar,WITA (MAKASSAR)">Makassar, Sulawesi Selatan (WITA)</option>
+                                <option value="-3.3194,114.5908,Banjarmasin,Asia/Makassar,WITA (BANJARMASIN)">Banjarmasin, Kalimantan Selatan (WITA)</option>
+                                <option value="-2.5337,140.7181,Jayapura,Asia/Jayapura,WIT (JAYAPURA)">Jayapura, Papua (WIT)</option>
+                            </select>
+                        </div>
+
+                        <form id="form-prayer-config" class="admin-form">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="prayer-lat">Latitude (Lintang)</label>
+                                    <input type="number" id="prayer-lat" step="0.0001" value="-6.3000" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="prayer-lng">Longitude (Bujur)</label>
+                                    <input type="number" id="prayer-lng" step="0.0001" value="106.6700" required>
+                                </div>
                             </div>
-                            <div id="prayer-override-fields" class="override-fields disabled">
-                                <div class="form-row">
-                                    <div class="form-group"><label>Imsak</label><input type="time" id="override-imsak"></div>
-                                    <div class="form-group"><label>Subuh</label><input type="time" id="override-subuh"></div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="prayer-city-input">Nama Kota / Daerah</label>
+                                    <input type="text" id="prayer-city-input" value="Tangerang Selatan" required>
                                 </div>
-                                <div class="form-row">
-                                    <div class="form-group"><label>Terbit</label><input type="time" id="override-terbit"></div>
-                                    <div class="form-group"><label>Duha</label><input type="time" id="override-dhuha"></div>
-                                </div>
-                                <div class="form-row">
-                                    <div class="form-group"><label>Zuhur</label><input type="time" id="override-dzuhur"></div>
-                                    <div class="form-group"><label>Asar</label><input type="time" id="override-ashar"></div>
-                                </div>
-                                <div class="form-row">
-                                    <div class="form-group"><label>Magrib</label><input type="time" id="override-maghrib"></div>
-                                    <div class="form-group"><label>Isya</label><input type="time" id="override-isya"></div>
+                                <div class="form-group">
+                                    <label for="prayer-method-select">Metode Hisab</label>
+                                    <select id="prayer-method-select">
+                                        <option value="20" selected>Kementerian Agama RI (Kemenag)</option>
+                                        <option value="11">MUIS (Singapura)</option>
+                                        <option value="3">ISNA (Amerika Utara)</option>
+                                        <option value="5">Umm al-Qura University Makkah</option>
+                                    </select>
                                 </div>
                             </div>
                             <div class="form-actions">
-                                <button type="submit" class="btn btn-primary">Simpan Override</button>
+                                <button type="submit" class="btn btn-primary" id="btn-save-prayer-config">Simpan Lokasi &amp; Jadwal Otomatis</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Kartu Override Manual (Input Jam Sholat Sendiri) -->
+                    <div class="section-card">
+                        <h3>Input Waktu Sholat Manual (Kode Jam Sholat Digital)</h3>
+                        <p class="section-desc">Aktifkan opsi ini jika pengurus masjid ingin memasukkan jam Subuh, Dzuhur, Ashar, Maghrib, Isya secara manual sesuai jadwal resmi masjid. Waktu yang Anda masukkan akan langsung ditampilkan di layar TV.</p>
+                        
+                        <form id="form-prayer-override" class="admin-form">
+                            <div class="form-group">
+                                <label class="toggle-label" style="background:rgba(255,255,255,0.06); padding:12px 18px; border-radius:12px; border:1px solid var(--gold-border); display:inline-flex; align-items:center; cursor:pointer;">
+                                    <input type="checkbox" id="prayer-override-enabled" style="transform:scale(1.2);">
+                                    <span style="font-weight:800; color:var(--gold); margin-left:10px;">Aktifkan Input Waktu Sholat Manual (Override)</span>
+                                </label>
+                            </div>
+
+                            <div id="prayer-override-fields" class="override-fields disabled">
+                                <div class="form-row">
+                                    <div class="form-group"><label>Imsak</label><input type="time" id="override-imsak" value="04:18"></div>
+                                    <div class="form-group"><label>Subuh</label><input type="time" id="override-subuh" value="04:28"></div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group"><label>Terbit</label><input type="time" id="override-terbit" value="05:43"></div>
+                                    <div class="form-group"><label>Duha</label><input type="time" id="override-dhuha" value="06:05"></div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group"><label>Zuhur</label><input type="time" id="override-dzuhur" value="11:49"></div>
+                                    <div class="form-group"><label>Asar</label><input type="time" id="override-ashar" value="15:05"></div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group"><label>Magrib</label><input type="time" id="override-maghrib" value="17:51"></div>
+                                    <div class="form-group"><label>Isya'</label><input type="time" id="override-isya" value="19:01"></div>
+                                </div>
+                            </div>
+                            <div class="form-actions">
+                                <button type="submit" class="btn btn-primary" id="btn-save-override">Simpan &amp; Terapkan Waktu Sholat ke TV</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Kartu Audio & Notifikasi Adzan / Iqamah -->
+                    <div class="section-card">
+                        <div class="section-header">
+                            <div>
+                                <h3>Pengingat Suara &amp; Hitung Mundur Iqamah</h3>
+                                <p class="section-desc">Atur bunyi nada alarm saat waktu sholat masuk dan durasi jeda hitung mundur menuju Iqamah di layar Display TV.</p>
+                            </div>
+                        </div>
+                        <form id="form-prayer-audio" class="admin-form">
+                            <div class="form-group">
+                                <label class="toggle-label" style="background:rgba(255,255,255,0.06); padding:12px 18px; border-radius:12px; border:1px solid var(--gold-border); display:inline-flex; align-items:center; cursor:pointer;">
+                                    <input type="checkbox" id="prayer-audio-enabled" checked style="transform:scale(1.2);">
+                                    <span style="font-weight:800; color:var(--gold); margin-left:10px;">Bunyikan Nada Panggilan Sholat saat Waktu Tiba</span>
+                                </label>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="iqamah-wait-duration">Jeda Menuju Iqamah (Menit)</label>
+                                    <input type="number" id="iqamah-wait-duration" min="1" max="30" value="10">
+                                    <small class="field-hint">Display TV akan menampilkan layar Adzan dan hitung mundur Iqamah otomatis.</small>
+                                </div>
+                                <div class="form-group">
+                                    <label>Uji Coba Nada Pengingat</label>
+                                    <button type="button" class="btn btn-outline" id="btn-test-chime" style="display:flex; align-items:center; gap:8px; margin-top:2px;">
+                                        <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+                                        <span>Uji Bunyi Suara Alarm Sholat</span>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="form-actions">
+                                <button type="submit" class="btn btn-primary" id="btn-save-audio-settings">Simpan Pengaturan Audio &amp; Iqamah</button>
                             </div>
                         </form>
                     </div>
                 </div>
 
                 <!-- ===== KAJIAN PAGE ===== -->
-                <div id="page-kajian" class="admin-page" data-title="Kajian">
+                <div id="page-kajian" class="admin-page" data-title="Kajian Rutin">
                     <div class="section-card">
                         <div class="section-header">
-                            <h3>Daftar Kajian</h3>
+                            <div>
+                                <h3>Daftar Kajian Rutin Masjid</h3>
+                                <p class="section-desc">Kelola jadwal majelis taklim, kajian tafsir, dan ceramah rutin mingguan.</p>
+                            </div>
                             <button class="btn btn-primary btn-sm" onclick="AdminApp.showModal('kajian')">+ Tambah Kajian</button>
                         </div>
                         <div id="kajian-list" class="data-list">
@@ -527,12 +749,15 @@
                     </div>
                 </div>
 
-                <!-- ===== ACTIVITIES PAGE ===== -->
-                <div id="page-activities" class="admin-page" data-title="Kegiatan">
+                <!-- ===== ACTIVITIES & POSTER PAGE ===== -->
+                <div id="page-activities" class="admin-page" data-title="Kegiatan &amp; Poster Acara">
                     <div class="section-card">
                         <div class="section-header">
-                            <h3>Daftar Kegiatan</h3>
-                            <button class="btn btn-primary btn-sm" onclick="AdminApp.showModal('activities')">+ Tambah Kegiatan</button>
+                            <div>
+                                <h3>Daftar Kegiatan &amp; Poster Acara Masjid</h3>
+                                <p class="section-desc">Unggah pamflet/poster kegiatan format apa saja (JPG, PNG, WebP) agar tampil memukau di Display TV tanpa terpotong.</p>
+                            </div>
+                            <button class="btn btn-primary btn-sm" onclick="AdminApp.showModal('activities')">+ Tambah Kegiatan &amp; Poster</button>
                         </div>
                         <div id="activities-list" class="data-list">
                             <p class="empty-state">Memuat data...</p>
@@ -576,6 +801,69 @@
                         <div id="friday-list" class="data-list">
                             <p class="empty-state">Memuat data...</p>
                         </div>
+                    </div>
+                </div>
+
+                <!-- ===== TARAWIH 30 NIGHTS PAGE ===== -->
+                <div id="page-tarawih" class="admin-page" data-title="Jadwal Tarawih Ramadhan">
+                    <div class="section-card">
+                        <div class="section-header">
+                            <div>
+                                <h3>Jadwal Sholat Tarawih &amp; Witir (30 Malam Penuh)</h3>
+                                <p class="section-desc">Atur nama Imam &amp; Bilal selama 30 malam Ramadhan. Anda dapat mengaktifkan atau menonaktifkan tampilan slide ini di Display TV sewaktu-waktu.</p>
+                            </div>
+                            <div style="display:flex; gap:10px; align-items:center;">
+                                <button type="button" class="btn btn-outline btn-sm" id="btn-tarawih-autofill">⚡ Isi Otomatis Contoh</button>
+                                <button type="button" class="btn btn-primary btn-sm" id="btn-tarawih-save-top">💾 Simpan Jadwal</button>
+                            </div>
+                        </div>
+
+                        <form id="form-tarawih" class="admin-form">
+                            <!-- Toggle & Info Header -->
+                            <div style="background:rgba(250,204,21,0.08); border:1px solid rgba(250,204,21,0.25); border-radius:12px; padding:16px; margin-bottom:20px; display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:16px;">
+                                <div style="display:flex; align-items:center; gap:14px;">
+                                    <label class="switch">
+                                        <input type="checkbox" id="tarawih-enabled">
+                                        <span class="switch-slider"></span>
+                                    </label>
+                                    <div>
+                                        <strong style="color:#ffffff; font-size:1.05rem;" id="tarawih-status-label">Status di Layar TV: Nonaktif</strong>
+                                        <div style="color:var(--text-muted); font-size:0.85rem;">Aktifkan saat bulan Ramadhan agar muncul otomatis di Display TV.</div>
+                                    </div>
+                                </div>
+
+                                <div style="display:flex; gap:12px; flex:1; min-width:320px; max-width:550px;">
+                                    <div style="flex:2;">
+                                        <label for="tarawih-title-input" style="font-size:0.85rem; color:var(--text-muted); margin-bottom:4px; display:block;">Judul Slide di TV</label>
+                                        <input type="text" id="tarawih-title-input" class="form-control" value="Jadwal Imam &amp; Bilal Salat Tarawih" placeholder="Judul slide">
+                                    </div>
+                                    <div style="flex:1;">
+                                        <label for="tarawih-year-input" style="font-size:0.85rem; color:var(--text-muted); margin-bottom:4px; display:block;">Tahun Hijriah</label>
+                                        <input type="text" id="tarawih-year-input" class="form-control" value="1447 H / 2026 M" placeholder="1447 H / 2026 M">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Table Editor 30 Nights -->
+                            <div style="overflow-x:auto;">
+                                <table class="admin-table" style="width:100%; min-width:700px; border-collapse:collapse;">
+                                    <thead>
+                                        <tr style="border-bottom:2px solid rgba(255,255,255,0.15); text-align:left;">
+                                            <th style="width:12%; padding:10px;">Malam Ke-</th>
+                                            <th style="width:44%; padding:10px;">Nama Imam Sholat Tarawih</th>
+                                            <th style="width:44%; padding:10px;">Nama Bilal / Muazin</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tarawih-table-body">
+                                        <!-- Will be rendered dynamically by AdminApp -->
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="form-actions" style="margin-top:20px; display:flex; justify-content:flex-end;">
+                                <button type="submit" class="btn btn-primary" id="btn-tarawih-save-bottom">💾 Simpan Semua Perubahan Tarawih</button>
+                            </div>
+                        </form>
                     </div>
                 </div>
 
@@ -649,6 +937,22 @@
                     </div>
                 </div>
 
+                <!-- ===== SLIDE CONTENT PAGE ===== -->
+                <div id="page-slideContent" class="admin-page" data-title="Konten Slide Display">
+                    <div class="section-card">
+                        <div class="section-header">
+                            <div>
+                                <h3>Konten Kustom Slide Display TV</h3>
+                                <p class="section-desc">Tambahkan kutipan ayat Al-Qur'an, Hadits, atau doa untuk ditampilkan di sisi kanan setiap slide. Jika tidak ada konten yang diatur, sisi kanan slide tidak akan menampilkan apa-apa.</p>
+                            </div>
+                            <button class="btn btn-primary btn-sm" onclick="AdminApp.showModal('slideContent')">+ Tambah Konten</button>
+                        </div>
+                        <div id="slideContent-list" class="data-list">
+                            <p class="empty-state">Memuat data...</p>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- ===== PREVIEW PAGE ===== -->
                 <div id="page-preview" class="admin-page" data-title="Pratinjau TV">
                     <div class="section-card">
@@ -671,7 +975,7 @@
     <div id="modal-overlay" class="modal-overlay hidden">
         <div class="modal-content">
             <div class="modal-header">
-                <h3 id="modal-title">Form</h3>
+                <h3 id="modal-header-title">Form</h3>
                 <button class="modal-close" onclick="AdminApp.closeModal()">&times;</button>
             </div>
             <div id="modal-body" class="modal-body">

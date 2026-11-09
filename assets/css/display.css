@@ -25,7 +25,7 @@
 
     /* Neutrals */
     --text-white: #ffffff;
-    --text-muted: #94a3b8;
+    --text-muted: #cbd5e1;
     --text-dark: #0f172a;
     --border-subtle: rgba(255, 255, 255, 0.08);
 
@@ -175,7 +175,7 @@ html, body {
     width: 100%;
     height: 100%;
     object-fit: contain;
-    filter: drop-shadow(0 2px 8px rgba(0,0,0,0.5));
+    filter: none;
 }
 
 .mosque-info {
@@ -245,7 +245,7 @@ html, body {
     align-items: center;
     justify-content: center;
     backdrop-filter: blur(12px);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+    box-shadow: none;
 }
 
 .clock-digits {
@@ -287,12 +287,12 @@ html, body {
 
 /* ── 5. MIDDLE SLIDE SHOWCASE ── */
 .display-main {
-    height: 48vh;
+    height: 55vh;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     position: relative;
-    padding: 1vh 0;
+    padding: 0.5vh 0;
 }
 
 .slide-container {
@@ -318,6 +318,10 @@ html, body {
     transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
 }
 
+.slide.single-col {
+    grid-template-columns: 1fr;
+}
+
 /* Left Column: Greeting / Info */
 .slide-left-col {
     display: flex;
@@ -330,16 +334,16 @@ html, body {
 .welcome-tag {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
+    gap: 7px;
     background: var(--gold);
     color: var(--text-dark);
-    font-size: clamp(0.75rem, 0.9vw, 1.1rem);
+    font-size: clamp(0.65rem, 0.8vw, 0.95rem);
     font-weight: 800;
     letter-spacing: 0.5px;
-    padding: 0.5vh 1.1vw;
+    padding: 5px 14px;
     border-radius: 9999px;
-    margin-bottom: 2vh;
-    box-shadow: 0 4px 14px rgba(250, 204, 21, 0.25);
+    margin-bottom: 10px;
+    box-shadow: none;
 }
 
 .tag-icon {
@@ -348,18 +352,19 @@ html, body {
 
 .arabic-greeting {
     font-family: var(--font-arabic);
-    font-size: clamp(2.2rem, 3.6vw, 4.8rem);
+    font-size: clamp(1.6rem, 2.4vw, 3rem);
     color: var(--text-white);
-    line-height: 1.25;
-    margin-bottom: 1.5vh;
-    text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+    line-height: 1.6;
+    padding-top: 6px;
+    margin-top: 8px;
+    margin-bottom: 14px;
     direction: rtl;
     text-align: right;
     align-self: flex-start;
 }
 
 .welcome-heading {
-    font-size: clamp(1.8rem, 3vw, 4rem);
+    font-size: clamp(1.4rem, 2.2vw, 2.8rem);
     font-weight: 800;
     color: var(--text-white);
     line-height: 1.15;
@@ -371,7 +376,7 @@ html, body {
 }
 
 .welcome-subheading {
-    font-size: clamp(0.95rem, 1.25vw, 1.6rem);
+    font-size: clamp(0.85rem, 1.05vw, 1.3rem);
     font-weight: 600;
     color: var(--cyan-text);
     line-height: 1.3;
@@ -387,18 +392,115 @@ html, body {
 
 .feature-card {
     width: 100%;
-    max-height: 40vh;
+    max-height: 44vh;
     background: rgba(15, 27, 43, 0.72);
     border: 1px solid var(--gold-border);
-    border-radius: 20px;
-    padding: 3vh 2vw;
+    border-radius: 16px;
+    padding: 2.5vh 1.5vw;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     text-align: center;
     backdrop-filter: blur(14px);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    box-shadow: none;
+    overflow: hidden;
+}
+
+/* Pure Poster Image (No background card, no outer border) */
+.poster-only-img {
+    max-height: 48vh;
+    max-width: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    border-radius: 16px;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    display: block;
+}
+
+/* ── Large & Crisp TV Typography for Kajian & Activities ── */
+.slide-hero-title {
+    font-size: clamp(1.3rem, 2vw, 2.4rem);
+    font-weight: 800;
+    color: var(--text-white);
+    line-height: 1.15;
+    margin: 4px 0 10px 0;
+}
+
+.slide-info-card {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.slide-info-row.speaker-row {
+    background: rgba(56, 189, 248, 0.08);
+    border-left: 4px solid var(--cyan-text);
+    border-radius: 0 12px 12px 0;
+    padding: 8px 16px;
+    margin-bottom: 2px;
+}
+
+.slide-info-label {
+    display: block;
+    color: var(--gold);
+    font-size: clamp(0.65rem, 0.75vw, 0.9rem);
+    font-weight: 800;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 2px;
+}
+
+.slide-speaker-name {
+    color: var(--cyan-text);
+    font-size: clamp(1.2rem, 1.7vw, 2.2rem);
+    font-weight: 800;
+    line-height: 1.2;
+}
+
+.slide-meta-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    width: 100%;
+}
+
+.slide-meta-item {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    padding: 6px 12px;
+    flex: 1 1 auto;
+}
+
+.slide-meta-val {
+    font-size: clamp(0.9rem, 1.1vw, 1.4rem);
+    font-weight: 700;
+    line-height: 1.3;
+}
+
+.slide-desc-row {
+    background: rgba(15, 27, 43, 0.55);
+    border: 1px solid rgba(250, 204, 21, 0.25);
+    border-radius: 10px;
+    padding: 8px 12px;
+    width: 100%;
+}
+
+.slide-desc-text {
+    font-size: clamp(0.85rem, 1vw, 1.2rem);
+    color: #e2e8f0;
+    line-height: 1.45;
+    font-weight: 500;
+    margin: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
 
 .card-header-badge {
@@ -406,10 +508,10 @@ html, body {
     align-items: center;
     gap: 7px;
     color: var(--gold);
-    font-size: clamp(0.8rem, 0.95vw, 1.2rem);
+    font-size: clamp(0.7rem, 0.8vw, 1rem);
     font-weight: 800;
     letter-spacing: 1px;
-    margin-bottom: 2vh;
+    margin-bottom: 1.5vh;
 }
 
 .badge-icon {
@@ -418,16 +520,16 @@ html, body {
 
 .card-arabic {
     font-family: var(--font-arabic);
-    font-size: clamp(2rem, 3.2vw, 4.2rem);
+    font-size: clamp(1.5rem, 2.4vw, 3rem);
     color: var(--text-white);
     line-height: 1.35;
-    margin-bottom: 2vh;
+    margin-bottom: 1.5vh;
     direction: rtl;
     text-shadow: 0 2px 8px rgba(0,0,0,0.5);
 }
 
 .card-translation {
-    font-size: clamp(0.9rem, 1.1vw, 1.4rem);
+    font-size: clamp(0.8rem, 0.95vw, 1.15rem);
     font-weight: 500;
     color: var(--cyan-text);
     font-style: italic;
@@ -437,34 +539,50 @@ html, body {
 }
 
 .card-ref {
-    font-size: clamp(0.7rem, 0.85vw, 1rem);
+    font-size: clamp(0.65rem, 0.75vw, 0.9rem);
     color: var(--text-muted);
     font-weight: 500;
 }
 
-/* Slide Indicator Dots */
+/* Slide Indicator Dots (Clickable & Sleek) */
 .slide-indicators {
-    height: 20px;
+    height: 24px;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
-    z-index: 15;
+    z-index: 25;
+    margin: 10px auto 2px auto;
+    width: fit-content;
+    padding: 4px 14px;
+    background: rgba(15, 27, 43, 0.75);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 9999px;
+    user-select: none;
+    cursor: pointer;
 }
 
 .indicator-dot {
-    width: 9px;
-    height: 9px;
+    width: 10px;
+    height: 10px;
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.25);
-    transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.35);
+    transition: all 0.25s ease;
+    cursor: pointer;
+    box-shadow: none;
+    outline: none;
+}
+
+.indicator-dot:hover {
+    transform: scale(1.4);
+    background: var(--gold);
 }
 
 .indicator-dot.active {
     width: 28px;
     border-radius: 9999px;
     background: var(--gold);
-    box-shadow: 0 0 10px rgba(250, 204, 21, 0.4);
+    box-shadow: none;
 }
 
 /* Table styles for Kajian & Info slides */
@@ -495,26 +613,172 @@ html, body {
     color: var(--text-white);
 }
 
-/* ── 6. PRAYER TIMES BAR (7 HORIZONTAL CARDS) ── */
-.prayer-section {
-    height: 21vh;
-    min-height: 120px;
+/* Friday Monthly Schedule Card & Table */
+.friday-month-card {
+    width: 100%;
+    background: rgba(15, 27, 43, 0.85);
+    border: 1px solid var(--gold-border);
+    border-radius: 16px;
+    padding: 14px 18px;
+    display: flex;
+    flex-direction: column;
+    backdrop-filter: blur(14px);
+    overflow: hidden;
+    box-shadow: none;
+}
+
+.friday-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 4px;
+    font-size: clamp(0.75rem, 0.9vw, 1.1rem);
+    margin-top: 4px;
+}
+
+.friday-table th {
+    color: var(--gold);
+    text-align: left;
+    padding: 8px 10px;
+    font-weight: 800;
+    font-size: clamp(0.7rem, 0.8vw, 0.95rem);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    border-bottom: 2px solid rgba(250, 204, 21, 0.25);
+}
+
+.friday-table td {
+    padding: 8px 10px;
+    vertical-align: middle;
+    background: rgba(255, 255, 255, 0.03);
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.friday-table tr td:first-child {
+    border-top-left-radius: 8px;
+    border-bottom-left-radius: 8px;
+    border-left: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.friday-table tr td:last-child {
+    border-top-right-radius: 8px;
+    border-bottom-right-radius: 8px;
+    border-right: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.friday-table tr.friday-row-active td {
+    background: rgba(16, 185, 129, 0.22);
+    border-top: 1px solid rgba(16, 185, 129, 0.4);
+    border-bottom: 1px solid rgba(16, 185, 129, 0.4);
+    color: #ffffff;
+    font-weight: 700;
+}
+
+.friday-table tr.friday-row-active td:first-child {
+    border-left: 4px solid var(--emerald-light);
+}
+
+.friday-table tr.friday-row-active td:last-child {
+    border-right: 1px solid rgba(16, 185, 129, 0.4);
+}
+
+/* Tarawih 30 Nights Panoramic Grid */
+.slide-tarawih {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+
+.tarawih-header {
     display: flex;
     align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+.tarawih-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    width: 100%;
+    flex: 1;
+}
+
+.tarawih-col {
+    background: rgba(15, 27, 43, 0.75);
+    border: 1px solid var(--gold-border);
+    border-radius: 12px;
+    padding: 6px 10px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.tarawih-col-title {
+    font-size: clamp(0.85rem, 0.95vw, 1.15rem);
+    font-weight: 800;
+    color: var(--gold);
+    border-bottom: 1px solid rgba(250, 204, 21, 0.3);
+    padding-bottom: 4px;
+    margin-bottom: 4px;
+    text-align: center;
+}
+
+.tarawih-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: clamp(0.72rem, 0.85vw, 1.05rem);
+}
+
+.tarawih-table td {
+    padding: 2.5px 3px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.tarawih-night-num {
+    color: var(--gold);
+    font-weight: 800;
+    width: 18%;
+}
+
+.tarawih-imam {
+    color: var(--text-white);
+    font-weight: 700;
+}
+
+.tarawih-bilal {
+    color: var(--cyan-text);
+    font-size: 0.9em;
+}
+
+/* ── 6. PRAYER TIMES BAR (7 COMPACT HORIZONTAL CARDS) ── */
+.prayer-section {
+    height: 12.5vh;
+    min-height: 80px;
+    display: flex;
+    align-items: center;
+}
+
+.poster-only-img {
+    pointer-events: none;
+    user-select: none;
+    -webkit-user-drag: none;
 }
 
 .prayer-grid {
     width: 100%;
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    gap: 0.9vw;
+    gap: 0.7vw;
 }
 
 .prayer-card {
     background: rgba(15, 27, 43, 0.75);
     border: 1px solid var(--border-subtle);
-    border-radius: 14px;
-    padding: 1.2vh 0.6vw;
+    border-radius: 12px;
+    padding: 0.8vh 0.5vw;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -522,7 +786,7 @@ html, body {
     text-align: center;
     backdrop-filter: blur(10px);
     transition: all 0.3s ease;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+    box-shadow: none;
     position: relative;
     overflow: hidden;
 }
@@ -530,28 +794,28 @@ html, body {
 /* Inactive Prayer Styles */
 .prayer-icon-wrap {
     color: var(--text-muted);
-    margin-bottom: 0.4vh;
+    margin-bottom: 2px;
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
 .prayer-svg {
-    width: clamp(18px, 1.4vw, 26px);
-    height: clamp(18px, 1.4vw, 26px);
+    width: clamp(14px, 1.1vw, 20px);
+    height: clamp(14px, 1.1vw, 20px);
 }
 
 .prayer-name {
-    font-size: clamp(0.75rem, 0.9vw, 1.15rem);
+    font-size: clamp(0.7rem, 0.8vw, 1rem);
     font-weight: 700;
     color: var(--text-muted);
-    letter-spacing: 0.8px;
-    margin-bottom: 0.4vh;
+    letter-spacing: 0.6px;
+    margin-bottom: 2px;
 }
 
 .prayer-time {
     font-family: var(--font-mono);
-    font-size: clamp(1.4rem, 2.1vw, 2.9rem);
+    font-size: clamp(1.1rem, 1.5vw, 2rem);
     font-weight: 800;
     color: var(--text-white);
     letter-spacing: -0.5px;
@@ -560,10 +824,10 @@ html, body {
 
 .prayer-countdown {
     font-family: var(--font-mono);
-    font-size: clamp(0.75rem, 0.9vw, 1.2rem);
+    font-size: clamp(0.6rem, 0.65vw, 0.8rem);
     font-weight: 800;
     color: var(--gold);
-    margin-top: 0.5vh;
+    margin-top: 1px;
     letter-spacing: 0.5px;
 }
 
@@ -571,7 +835,7 @@ html, body {
 .prayer-card.active {
     border: 2px solid var(--emerald);
     background: var(--bg-card-active);
-    box-shadow: 0 0 28px rgba(16, 185, 129, 0.32), inset 0 0 16px rgba(16, 185, 129, 0.15);
+    box-shadow: none;
 }
 
 .prayer-card.active .prayer-icon-wrap {
@@ -584,7 +848,6 @@ html, body {
 
 .prayer-card.active .prayer-time {
     color: var(--text-white);
-    text-shadow: 0 0 12px rgba(255, 255, 255, 0.4);
 }
 
 .prayer-card.active .prayer-countdown {
@@ -603,7 +866,7 @@ html, body {
     align-items: center;
     padding: 0 1.2vw;
     gap: 1.2vw;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+    box-shadow: none;
 }
 
 .info-badge {
@@ -618,7 +881,7 @@ html, body {
     padding: 0.6vh 1.1vw;
     border-radius: 9999px;
     flex-shrink: 0;
-    box-shadow: 0 2px 8px rgba(250, 204, 21, 0.3);
+    box-shadow: none;
 }
 
 .info-icon {
@@ -630,15 +893,19 @@ html, body {
     overflow: hidden;
     white-space: nowrap;
     position: relative;
+    display: flex;
+    align-items: center;
 }
 
 .running-text {
     display: inline-block;
-    font-size: clamp(0.85rem, 1.05vw, 1.35rem);
-    font-weight: 600;
+    font-size: clamp(0.95rem, 1.2vw, 1.6rem);
+    font-weight: 700;
     color: var(--text-white);
     padding-left: 100%;
-    animation: marquee 35s linear infinite;
+    white-space: nowrap;
+    will-change: transform;
+    animation: marquee 35s linear infinite !important;
 }
 
 @keyframes marquee {
@@ -668,4 +935,80 @@ html, body {
     width: 80px;
     height: 80px;
     margin-bottom: 16px;
+}
+
+
+/* ── 9. MODE SHOLAT BERJAMAAH (DARURAT / HENING) ── */
+.sholat-mode-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: radial-gradient(circle at 50% 30%, #0d1a29 0%, #050a10 85%, #020408 100%);
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 3vw;
+    animation: fadeInSholat 0.8s ease-out;
+}
+
+@keyframes fadeInSholat {
+    from { opacity: 0; transform: scale(0.98); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+.sholat-mode-card {
+    max-width: 850px;
+    background: rgba(15, 27, 43, 0.7);
+    border: 1px solid rgba(250, 204, 21, 0.35);
+    border-radius: 24px;
+    padding: 4vh 4vw;
+    backdrop-filter: blur(16px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+}
+
+.sholat-mode-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(16, 185, 129, 0.2);
+    border: 1px solid var(--emerald-light);
+    color: var(--emerald-light);
+    font-size: clamp(0.75rem, 0.9vw, 1.1rem);
+    font-weight: 800;
+    letter-spacing: 1px;
+    padding: 6px 18px;
+    border-radius: 9999px;
+}
+
+.sholat-mode-arabic {
+    font-family: var(--font-arabic);
+    font-size: clamp(2.5rem, 4.2vw, 5rem);
+    color: var(--gold);
+    line-height: 1.4;
+    direction: rtl;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.6);
+}
+
+.sholat-mode-title {
+    font-size: clamp(1.8rem, 2.8vw, 3.5rem);
+    font-weight: 800;
+    color: var(--text-white);
+    margin: 0;
+    letter-spacing: 0.5px;
+}
+
+.sholat-mode-sub {
+    font-size: clamp(1rem, 1.3vw, 1.6rem);
+    color: #cbd5e1;
+    font-weight: 500;
+    margin: 0;
+    line-height: 1.5;
 }

@@ -7,24 +7,13 @@ service firebase.storage {
       return request.auth != null;
     }
 
-    // Helper: Validasi tipe mime gambar dan ukuran file (maks 2MB)
-    function isValidImage() {
-      return request.resource.contentType.matches('image/(jpeg|png|webp|svg\\+xml)') &&
-             request.resource.size < 2 * 1024 * 1024;
-    }
-
-    // Folder media masjid (slide banner, QRIS, logo, foto kajian)
-    match /masjid/{allPaths=**} {
+    // Semua gambar atau media di storage
+    match /{allPaths=**} {
       // Siapapun bisa melihat gambar pada Display TV
       allow read: if true;
-      // Hanya admin terotentikasi yang bisa mengunggah dan menghapus gambar
-      allow write: if isAuthenticated() && isValidImage();
+      // Admin yang telah login diizinkan mengunggah dan menghapus media
+      allow write: if isAuthenticated();
       allow delete: if isAuthenticated();
-    }
-
-    // Default deny untuk path lainnya
-    match /{allPaths=**} {
-      allow read, write: if false;
     }
   }
 }

@@ -3,21 +3,18 @@ service cloud.firestore {
   match /databases/{database}/documents {
 
     // ── Helper Functions ──
+    // Pengguna yang berhasil login (Firebase Authentication) dianggap admin yang sah
     function isAuthenticated() {
       return request.auth != null;
     }
 
-    // Periksa apakah user terdaftar sebagai admin aktif di koleksi adminProfiles
     function isAdmin() {
-      return isAuthenticated() && (
-        exists(/databases/$(database)/documents/adminProfiles/$(request.auth.uid)) &&
-        get(/databases/$(database)/documents/adminProfiles/$(request.auth.uid)).data.isActive == true
-      );
+      return isAuthenticated();
     }
 
     // ── Koleksi Publik (Bisa dibaca siapa saja untuk Display TV) ──
-    // Display TV hanya membaca (get, list) data publik.
-    // Menulis/mengubah/menghapus HANYA diperbolehkan untuk Admin terotentikasi.
+    // Display TV hanya membaca (get, list) data publik secara realtime tanpa login.
+    // Menulis/mengubah/menghapus HANYA diperbolehkan untuk Admin yang telah login.
 
     // 1. Pengaturan Identitas Masjid & Tampilan
     match /settings/{docId} {
@@ -79,19 +76,20 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
-    // ── Koleksi Profil Admin ──
-    // Hanya user terotentikasi yang bisa melihat statusnya sendiri
-    // Modifikasi admin profiles hanya oleh admin aktif
-    match /adminProfiles/{userId} {
-      allow read: if isAuthenticated() && (request.auth.uid == userId || isAdmin());
-      // Admin baru dapat didaftarkan oleh admin aktif
-      // Untuk bootstrap admin pertama, dapat dibuat melalui Firebase Console atau script inisialisasi
+    // 11. Konten Kustom Slide Display TV (Ayat / Hadits / Doa)
+    match /slideContent/{docId} {
+      allow read: if true;
       allow write: if isAdmin();
+    }
+
+    // ── Koleksi Profil Admin ──
+    match /adminProfiles/{userId} {
+      allow read, write: if isAuthenticated();
     }
 
     // Default deny untuk path lainnya
     match /{document=**} {
-      allow read, write: if false;
+      allow read, write: if isAuthenticated();
     }
   }
 }

@@ -197,7 +197,8 @@
         grid-template-columns: 1fr;
         gap: 20px;
     }
-    .feature-card {
+    .feature-card,
+    .poster-card {
         max-height: none;
         padding: 24px 20px;
     }
@@ -364,7 +365,8 @@
         height: auto;
     }
 
-    .feature-card {
+    .feature-card,
+    .poster-card {
         max-height: none;
         padding: 18px 14px;
         border-radius: 16px;
@@ -449,11 +451,6 @@
 
 /* ── 7. ACCESSIBILITY: REDUCED MOTION ── */
 @media (prefers-reduced-motion: reduce) {
-    .running-text {
-        animation: none !important;
-        padding-left: 0 !important;
-        white-space: normal !important;
-    }
     .slide, .bg-media {
         transition: none !important;
     }

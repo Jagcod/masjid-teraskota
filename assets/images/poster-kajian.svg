@@ -1,0 +1,127 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1000" width="100%" height="100%">
+  <defs>
+    <!-- Background Gradient -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#071524"/>
+      <stop offset="40%" stop-color="#0c233c"/>
+      <stop offset="80%" stop-color="#0a1a2b"/>
+      <stop offset="100%" stop-color="#050d17"/>
+    </linearGradient>
+
+    <!-- Gold Accent Gradient -->
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fde047"/>
+      <stop offset="50%" stop-color="#eab308"/>
+      <stop offset="100%" stop-color="#ca8a04"/>
+    </linearGradient>
+
+    <!-- Emerald Glow -->
+    <radialGradient id="emeraldGlow" cx="50%" cy="30%" r="50%">
+      <stop offset="0%" stop-color="#10b981" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#10b981" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Card Background -->
+    <linearGradient id="cardGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#162942" stop-opacity="0.95"/>
+      <stop offset="100%" stop-color="#0d1b2e" stop-opacity="0.95"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="800" height="1000" fill="url(#bgGrad)"/>
+  <circle cx="400" cy="300" r="380" fill="url(#emeraldGlow)"/>
+
+  <!-- Ornate Border Frame -->
+  <rect x="25" y="25" width="750" height="950" rx="20" fill="none" stroke="url(#goldGrad)" stroke-width="3" stroke-opacity="0.75"/>
+  <rect x="35" y="35" width="730" height="930" rx="14" fill="none" stroke="#2dd4bf" stroke-width="1" stroke-opacity="0.35"/>
+
+  <!-- Corner Islamic Ornaments -->
+  <!-- Top-Left -->
+  <path d="M 25 75 C 55 75 75 55 75 25" fill="none" stroke="url(#goldGrad)" stroke-width="3"/>
+  <circle cx="50" cy="50" r="4" fill="#eab308"/>
+  <!-- Top-Right -->
+  <path d="M 775 75 C 745 75 725 55 725 25" fill="none" stroke="url(#goldGrad)" stroke-width="3"/>
+  <circle cx="750" cy="50" r="4" fill="#eab308"/>
+  <!-- Bottom-Left -->
+  <path d="M 25 925 C 55 925 75 945 75 975" fill="none" stroke="url(#goldGrad)" stroke-width="3"/>
+  <circle cx="50" cy="950" r="4" fill="#eab308"/>
+  <!-- Bottom-Right -->
+  <path d="M 775 925 C 745 925 725 945 725 975" fill="none" stroke="url(#goldGrad)" stroke-width="3"/>
+  <circle cx="750" cy="950" r="4" fill="#eab308"/>
+
+  <!-- Bismillah & Header -->
+  <g text-anchor="middle">
+    <!-- Mosque Silhouette Graphic -->
+    <path d="M 400 120 C 375 145 350 170 350 200 L 450 200 C 450 170 425 145 400 120 Z" fill="url(#goldGrad)" opacity="0.9"/>
+    <!-- Minarets -->
+    <rect x="315" y="160" width="16" height="40" rx="4" fill="#eab308" opacity="0.8"/>
+    <polygon points="323,135 315,160 331,160" fill="#eab308"/>
+    <rect x="469" y="160" width="16" height="40" rx="4" fill="#eab308" opacity="0.8"/>
+    <polygon points="477,135 469,160 485,160" fill="#eab308"/>
+    <!-- Dome Base -->
+    <rect x="290" y="200" width="220" height="10" rx="3" fill="#2dd4bf" opacity="0.8"/>
+
+    <!-- Crescent on top -->
+    <path d="M 400 102 A 10 10 0 1 0 404 118 A 8 8 0 1 1 400 102 Z" fill="#fde047"/>
+
+    <!-- Bismillah -->
+    <text x="400" y="250" font-family="'Amiri', 'Traditional Arabic', serif" font-size="28" fill="#eab308" letter-spacing="1">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</text>
+
+    <!-- Badge -->
+    <rect x="275" y="280" width="250" height="38" rx="19" fill="#eab308"/>
+    <text x="400" y="305" font-family="'Plus Jakarta Sans', sans-serif" font-size="16" font-weight="800" fill="#0f172a" letter-spacing="2">KAJIAN AKBAR TERBUKA</text>
+
+    <!-- Main Title -->
+    <text x="400" y="375" font-family="'Plus Jakarta Sans', sans-serif" font-size="44" font-weight="900" fill="#ffffff" letter-spacing="-1">MERAIH</text>
+    <text x="400" y="440" font-family="'Plus Jakarta Sans', sans-serif" font-size="52" font-weight="900" fill="url(#goldGrad)" letter-spacing="-1">MANISNYA IMAN</text>
+    
+    <text x="400" y="485" font-family="'Plus Jakarta Sans', sans-serif" font-size="18" font-style="italic" fill="#99f6e4" letter-spacing="0.5">"Merasakan Kelezatan Ibadah &amp; Ketenangan Hati"</text>
+  </g>
+
+  <!-- Speaker Card -->
+  <rect x="75" y="520" width="650" height="175" rx="18" fill="url(#cardGrad)" stroke="#eab308" stroke-width="1.5" stroke-opacity="0.6"/>
+  <circle cx="155" cy="607" r="52" fill="#0c233c" stroke="url(#goldGrad)" stroke-width="2.5"/>
+  <!-- Speaker Vector Avatar -->
+  <path d="M 155 572 A 20 20 0 1 0 155 612 A 20 20 0 1 0 155 572 Z" fill="#eab308"/>
+  <path d="M 125 645 C 125 620 185 620 185 645 Z" fill="#2dd4bf"/>
+
+  <g transform="translate(235, 555)">
+    <text x="0" y="20" font-family="'Plus Jakarta Sans', sans-serif" font-size="14" font-weight="700" fill="#facc15" letter-spacing="1.5">PEMATERI / NARASUMBER:</text>
+    <text x="0" y="55" font-family="'Plus Jakarta Sans', sans-serif" font-size="25" font-weight="800" fill="#ffffff">Ustadz Dr. Syafiq Riza</text>
+    <text x="0" y="85" font-family="'Plus Jakarta Sans', sans-serif" font-size="24" font-weight="800" fill="url(#goldGrad)">Basalamah, M.A.</text>
+    <text x="0" y="112" font-family="'Plus Jakarta Sans', sans-serif" font-size="14" fill="#94a3b8">Alumni Doktoral Universitas Islam Madinah, KSA</text>
+  </g>
+
+  <!-- Event Details Grid -->
+  <rect x="75" y="720" width="650" height="150" rx="16" fill="rgba(15, 27, 43, 0.8)" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+  
+  <g transform="translate(105, 755)">
+    <!-- Waktu -->
+    <circle cx="20" cy="18" r="16" fill="#eab308" opacity="0.15"/>
+    <text x="20" y="24" font-family="sans-serif" font-size="18" text-anchor="middle" fill="#eab308">🗓️</text>
+    <text x="50" y="14" font-family="'Plus Jakarta Sans', sans-serif" font-size="13" font-weight="700" fill="#94a3b8">WAKTU PELAKSANAAN</text>
+    <text x="50" y="36" font-family="'Plus Jakarta Sans', sans-serif" font-size="17" font-weight="800" fill="#ffffff">Ahad, 15 November 2026 &bull; 09:00 WIB</text>
+
+    <!-- Tempat -->
+    <circle cx="20" cy="78" r="16" fill="#2dd4bf" opacity="0.15"/>
+    <text x="20" y="84" font-family="sans-serif" font-size="18" text-anchor="middle" fill="#2dd4bf">📍</text>
+    <text x="50" y="74" font-family="'Plus Jakarta Sans', sans-serif" font-size="13" font-weight="700" fill="#94a3b8">LOKASI KEGIATAN</text>
+    <text x="50" y="96" font-family="'Plus Jakarta Sans', sans-serif" font-size="17" font-weight="800" fill="#ffffff">Ruang Utama &amp; Pelataran Masjid Teraskota</text>
+  </g>
+
+  <!-- Bottom Badges -->
+  <g transform="translate(100, 900)">
+    <!-- Badge 1: Gratis -->
+    <rect x="0" y="0" width="180" height="34" rx="8" fill="#10b981" opacity="0.2" stroke="#10b981" stroke-width="1"/>
+    <text x="90" y="22" font-family="'Plus Jakarta Sans', sans-serif" font-size="13" font-weight="700" fill="#34d399" text-anchor="middle">✓ Terbuka Untuk Umum</text>
+
+    <!-- Badge 2: Ikhwan Akhwat -->
+    <rect x="205" y="0" width="180" height="34" rx="8" fill="#eab308" opacity="0.2" stroke="#eab308" stroke-width="1"/>
+    <text x="295" y="22" font-family="'Plus Jakarta Sans', sans-serif" font-size="13" font-weight="700" fill="#facc15" text-anchor="middle">✓ Ikhwan &amp; Akhwat</text>
+
+    <!-- Badge 3: YouTube Live -->
+    <rect x="410" y="0" width="190" height="34" rx="8" fill="#ef4444" opacity="0.2" stroke="#ef4444" stroke-width="1"/>
+    <text x="505" y="22" font-family="'Plus Jakarta Sans', sans-serif" font-size="13" font-weight="700" fill="#f87171" text-anchor="middle">▶ Live YouTube DKM</text>
+  </g>
+</svg>

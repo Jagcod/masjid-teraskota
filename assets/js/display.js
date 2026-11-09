@@ -13,7 +13,7 @@
  * - Firestore Realtime Sync + LocalStorage Cross-Tab Sync for Admin updates
  */
 
-(function() {
+(function () {
     'use strict';
 
     // ── Application State ──
@@ -25,7 +25,7 @@
         slides: [],
         prayerTimes: null,
         settings: null,
-        slideDuration: 8000, // 8 seconds
+        slideDuration: 15000, // 15 detik (tenang & nyaman dibaca)
         isInitialized: false,
         prayerKeys: ['imsak', 'subuh', 'terbit', 'dzuhur', 'ashar', 'maghrib', 'isya']
     };
@@ -207,11 +207,51 @@
         }
 
         if (settings.runningText && DOM.runningText) {
-            DOM.runningText.textContent = settings.runningText;
+            const raw = settings.runningText.trim();
+            const items = raw.split(/[\n|•]+/).map(s => s.trim()).filter(Boolean);
+            if (items.length > 1) {
+                DOM.runningText.innerHTML = items.map(t => escapeHtml(t)).join(' <span style="color:var(--gold); margin:0 1.2vw; font-size:1.15em;">✦</span> ');
+            } else {
+                DOM.runningText.textContent = raw;
+            }
+        }
+
+        // Sholat Mode Check
+        if (settings.sholatMode !== undefined) {
+            toggleSholatMode(!!settings.sholatMode);
         }
 
         if (settings.slideDuration) {
-            state.slideDuration = Math.max(3, parseInt(settings.slideDuration, 10)) * 1000;
+            state.slideDuration = Math.max(10, parseInt(settings.slideDuration, 10) || 15) * 1000;
+            startSlideShow();
+        }
+    }
+
+    function toggleSholatMode(active) {
+        let el = document.getElementById('sholat-mode-screen');
+        if (active) {
+            if (!el) {
+                el = document.createElement('div');
+                el.id = 'sholat-mode-screen';
+                el.className = 'sholat-mode-overlay';
+                el.innerHTML = `
+                    <div class="sholat-mode-card">
+                        <div class="sholat-mode-tag">
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                            <span>SHOLAT BERJAMAAH SEDANG BERLANGSUNG</span>
+                        </div>
+                        <div class="sholat-mode-arabic">اسْتَوُوا وَاعْتَدِلُوا وَتَرَاصُّوا</div>
+                        <h2 class="sholat-mode-title">Luruskan &amp; Rapatkan Shaf</h2>
+                        <p class="sholat-mode-sub">"Luruskan shaf-shaf kalian, karena meluruskan shaf merupakan bagian dari kesempurnaan shalat." (HR. Bukhari &amp; Muslim)</p>
+                        <div style="background:rgba(239,68,68,0.15); border:1px solid rgba(239,68,68,0.4); border-radius:12px; padding:10px 20px; color:#fca5a5; font-size:clamp(0.85rem,1.05vw,1.25rem); font-weight:700; display:flex; align-items:center; gap:8px;">
+                            <span>📴 Harap Nonaktifkan Nada Dering / Silent Handphone Anda</span>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(el);
+            }
+        } else {
+            if (el) el.remove();
         }
     }
 
@@ -340,40 +380,79 @@
     async function loadSlides() {
         const slides = [];
 
+        // Load custom slide content from admin (untuk kartu ayat/hadits di sisi kanan)
+        let slideContentMap = {};
         try {
-            // Slide 1: Welcome & Doa Masuk Masjid (Exact match with user screenshot)
-            slides.push(createWelcomeSlide());
+            const slideContentItems = await FirestoreService.getCollection('slideContent', {
+                where: [['isActive', '==', true]],
+                orderBy: 'order'
+            });
+            if (slideContentItems && slideContentItems.length > 0) {
+                slideContentItems.forEach(sc => {
+                    const key = sc.slideType || '';
+                    if (!slideContentMap[key]) slideContentMap[key] = sc;
+                });
+            }
+        } catch (e) {
+            console.warn('[Display] SlideContent load:', e);
+        }
 
-            // Slide 2: Jadwal Kajian Rutin
+        try {
+            // Slide 1: Welcome (selalu tampil)
+            slides.push(createWelcomeSlide(slideContentMap['welcome']));
+
+            // Slide per Kajian (masing-masing 1 slide dengan poster)
             const kajian = await FirestoreService.getCollection('kajian', {
                 where: [['isActive', '==', true]],
                 orderBy: 'order'
             });
             if (kajian && kajian.length > 0) {
-                slides.push(createKajianSlide(kajian));
+                const kajianContent = slideContentMap['kajian'];
+                kajian.forEach(k => {
+                    slides.push(createSingleKajianSlide(k, kajianContent));
+                });
             }
 
-            // Slide 3: Kegiatan & Agenda Masjid
+            // Slide per Kegiatan (Hanya tampilkan kegiatan yang belum lewat tanggalnya)
             const activities = await FirestoreService.getCollection('activities', {
                 where: [['isActive', '==', true]],
                 orderBy: 'order'
             });
             if (activities && activities.length > 0) {
-                slides.push(createActivitiesSlide(activities));
+                const actContent = slideContentMap['activities'];
+                const todayStr = new Date().toISOString().split('T')[0];
+                activities.forEach(a => {
+                    // Auto-hide kegiatan jika tanggalnya sudah lewat kemarin
+                    if (a.date && /^\d{4}-\d{2}-\d{2}$/.test(a.date) && a.date < todayStr) {
+                        return; // Lewat, sembunyikan otomatis
+                    }
+                    slides.push(createSingleActivitySlide(a, actContent));
+                });
             }
 
-            // Slide 4: Petugas Salat Jumat
-            const friday = await FirestoreService.getCollection('fridaySchedules', {
+            // Slide Petugas Salat Jumat (1 Bulan Penuh + Pekan Ini)
+            const fridaySchedules = await FirestoreService.getCollection('fridaySchedules', {
                 where: [['isActive', '==', true]],
                 orderBy: 'date',
-                orderDir: 'desc',
-                limit: 1
+                orderDir: 'asc'
             });
-            if (friday && friday.length > 0) {
-                slides.push(createFridaySlide(friday[0]));
+            if (fridaySchedules && fridaySchedules.length > 0) {
+                const nowStr = new Date().toISOString().split('T')[0];
+                let currentFriday = fridaySchedules.find(f => (f.date || '') >= nowStr) || fridaySchedules[fridaySchedules.length - 1];
+                slides.push(createFridaySlide(currentFriday, fridaySchedules));
             }
 
-            // Slide 5: Laporan Kas & QRIS Infaq
+            // Slide Jadwal Sholat Tarawih 30 Malam (Hanya jika diaktifkan di Admin)
+            try {
+                const tarawih = await FirestoreService.getDocument('settings', 'tarawih');
+                if (tarawih && tarawih.enabled === true && tarawih.nights && tarawih.nights.length > 0) {
+                    slides.push(createTarawihSlide(tarawih));
+                }
+            } catch (tarawihErr) {
+                console.warn('[Display] Tarawih load error:', tarawihErr);
+            }
+
+            // Slide Laporan Kas & QRIS Infaq
             const finance = await FirestoreService.getCollection('financeReports', {
                 where: [['isActive', '==', true]],
                 limit: 1
@@ -383,16 +462,19 @@
                 limit: 1
             });
             if ((finance && finance.length > 0) || (qris && qris.length > 0)) {
-                slides.push(createFinanceQRISSlide(finance ? finance[0] : null, qris ? qris[0] : null));
+                slides.push(createFinanceQRISSlide(finance ? finance[0] : null, qris ? qris[0] : null, slideContentMap['finance']));
             }
 
-            // Slide 6: Pengumuman Khusus
+            // Slide Pengumuman (masing-masing 1 slide)
             const announcements = await FirestoreService.getCollection('announcements', {
                 where: [['isActive', '==', true]],
                 orderBy: 'order'
             });
             if (announcements && announcements.length > 0) {
-                slides.push(createAnnouncementSlide(announcements[0]));
+                const annContent = slideContentMap['announcement'];
+                announcements.forEach(ann => {
+                    slides.push(createAnnouncementSlide(ann, annContent));
+                });
             }
 
         } catch (err) {
@@ -401,7 +483,7 @@
 
         // Ensure at least welcome slide is present
         if (slides.length === 0) {
-            slides.push(createWelcomeSlide());
+            slides.push(createWelcomeSlide(null));
         }
 
         state.slides = slides;
@@ -410,15 +492,37 @@
         renderSlideIndicators();
     }
 
+    // ── Helper: Buat kartu konten kanan (hanya jika ada data dari admin) ──
+    function buildFeatureCard(content) {
+        if (!content) return '';
+        if (!content.badge && !content.arabic && !content.translation) return '';
+
+        return `
+            <div class="slide-right-col">
+                <div class="feature-card">
+                    ${content.badge ? `
+                    <div class="card-header-badge">
+                        <svg class="card-icon-svg" viewBox="0 0 24 24" width="15" height="15" fill="#facc15" aria-hidden="true"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                        <span>${escapeHtml(content.badge)}</span>
+                    </div>` : ''}
+                    ${content.arabic ? `<div class="card-arabic">${escapeHtml(content.arabic)}</div>` : ''}
+                    ${content.translation ? `<div class="card-translation">${escapeHtml(content.translation)}</div>` : ''}
+                    ${content.reference ? `<div class="card-ref">${escapeHtml(content.reference)}</div>` : ''}
+                </div>
+            </div>
+        `;
+    }
+
     // ── Slide Builders ──
 
-    // 1. Welcome & Doa Masuk Masjid (Default exact match)
-    function createWelcomeSlide() {
+    // 1. Welcome Slide
+    function createWelcomeSlide(content) {
+        const rightCol = buildFeatureCard(content);
         return {
             id: 'welcome',
             html: `
-                <div class="slide slide-welcome">
-                    <div class="slide-left-col">
+                <div class="slide slide-welcome ${!rightCol ? 'single-col' : ''}">
+                    <div class="slide-left-col" ${!rightCol ? 'style="flex:1 1 100%; max-width:100%;"' : ''}>
                         <div class="welcome-tag">
                             <svg class="tag-icon-svg" viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M12 2c-.55 0-1 .45-1 1v1.1c-2.83.48-5 2.94-5 5.9 0 1.25.38 2.4 1.03 3.36L4 16v5h16v-5l-3.03-2.64c.65-.96 1.03-2.11 1.03-3.36 0-2.96-2.17-5.42-5-5.9V3c0-.55-.45-1-1-1zm-1 8h2v8h-2v-8z"/></svg>
                             <span>AHLAN WA SAHLAN • RUMAH ALLAH</span>
@@ -427,152 +531,333 @@
                         <h2 class="welcome-heading">Selamat Datang di <span class="text-gold">Masjid Teraskota</span></h2>
                         <p class="welcome-subheading">Pusat Ibadah, Dakwah & Pembinaan Umat • BSD City</p>
                     </div>
-                    <div class="slide-right-col">
-                        <div class="feature-card">
-                            <div class="card-header-badge">
-                                <svg class="card-icon-svg" viewBox="0 0 24 24" width="15" height="15" fill="#facc15" aria-hidden="true"><path d="M12 3L2 12h3v8h6v-6h2v6h6v-8h3L12 3zm0 2.84L18 11v7h-2v-6H8v6H6v-7l6-5.16z"/></svg>
-                                <span>DOA MASUK MASJID</span>
-                            </div>
-                            <div class="card-arabic">اللَّهُمَّ افْتَحْ لِي أَبْوَابَ رَحْمَتِكَ</div>
-                            <div class="card-translation">"Ya Allah, bukakanlah untukku pintu-pintu rahmat-Mu."</div>
-                            <div class="card-ref">(HR. Muslim no. 713 • Sunan Abu Dawud)</div>
-                        </div>
-                    </div>
+                    ${rightCol}
                 </div>
             `
         };
     }
 
-    // 2. Kajian Slide
-    function createKajianSlide(kajianList) {
-        const rows = kajianList.slice(0, 4).map(k => `
-            <tr>
-                <td style="font-weight:700; color:var(--gold);">${escapeHtml(k.day || '')} ${escapeHtml(k.time || '')}</td>
-                <td style="font-weight:700;">${escapeHtml(k.title || '')}</td>
-                <td style="color:var(--cyan-text);">${escapeHtml(k.speaker || '')}</td>
-            </tr>
-        `).join('');
+    // 2. Single Kajian Slide (1 kajian = 1 slide, dengan poster atau kaligrafi mutiara ilmu)
+    function createSingleKajianSlide(k, content) {
+        const posterUrl = k.imageUrl || '';
+        const hasPoster = posterUrl && posterUrl.length > 5;
+
+        // Kolom kanan: murni poster jika ada poster, atau konten kustom, atau mutiara ilmu Islami
+        let rightCol = '';
+        if (hasPoster) {
+            rightCol = `
+                <div class="slide-right-col" style="display:flex; justify-content:center; align-items:center; height:100%; padding:0; background:none; border:none; box-shadow:none;">
+                    <img src="${escapeHtml(posterUrl)}" alt="Poster ${escapeHtml(k.title)}" class="poster-only-img" onerror="this.closest('.slide-right-col').style.display='none'">
+                </div>
+            `;
+        } else if (content) {
+            rightCol = buildFeatureCard(content);
+        } else {
+            rightCol = buildFeatureCard({
+                badge: 'MUTIARA ILMU',
+                arabic: 'مَنْ سَلَكَ طَرِيقًا يَلْتَمِسُ فِيهِ عِلْمًا سَهَّلَ اللَّهُ لَهُ بِهِ طَرِيقًا إِلَى الْجَنَّةِ',
+                translation: '"Barangsiapa menempuh suatu jalan untuk mencari ilmu, maka Allah akan memudahkan baginya jalan menuju surga."',
+                reference: '(HR. Muslim no. 2699)'
+            });
+        }
+
+        const descText = k.description ? (k.description.length > 140 ? k.description.substring(0, 137) + '...' : k.description) : '';
 
         return {
-            id: 'kajian',
+            id: 'kajian-' + (k.id || ''),
             html: `
-                <div class="slide slide-kajian">
-                    <div class="slide-left-col">
+                <div class="slide slide-kajian ${!rightCol ? 'single-col' : ''}">
+                    <div class="slide-left-col" ${!rightCol ? 'style="flex:1 1 100%; max-width:100%;"' : ''}>
                         <div class="welcome-tag">
-                            <svg class="tag-icon-svg" viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/></svg>
+                            <svg class="tag-icon-svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/></svg>
                             <span>JADWAL KAJIAN ISLAM RUTIN</span>
                         </div>
-                        <h2 class="welcome-heading">Majelis Ilmu & Dakwah</h2>
-                        <div class="slide-table-wrap">
-                            <table class="slide-table">
-                                <thead>
-                                    <tr>
-                                        <th>Waktu</th>
-                                        <th>Tema Kajian</th>
-                                        <th>Narasumber</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    ${rows}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                    <div class="slide-right-col">
-                        <div class="feature-card">
-                            <div class="card-header-badge">
-                                <svg class="card-icon-svg" viewBox="0 0 24 24" width="15" height="15" fill="#facc15" aria-hidden="true"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
-                                <span>KEUTAMAAN MENUNTUT ILMU</span>
+                        <h2 class="slide-hero-title">${escapeHtml(k.title || 'Kajian Rutin')}</h2>
+                        
+                        <div class="slide-info-card">
+                            <div class="slide-info-row speaker-row">
+                                <span class="slide-info-label">NARASUMBER / PEMATERI</span>
+                                <div class="slide-speaker-name">${escapeHtml(k.speaker || '-')}</div>
                             </div>
-                            <div class="card-arabic">مَنْ سَلَكَ طَرِيقًا يَلْتَمِسُ فِيهِ عِلْمًا سَهَّلَ اللَّهُ لَهُ بِهِ طَرِيقًا إِلَى الْجَنَّةِ</div>
-                            <div class="card-translation">"Barangsiapa menempuh jalan untuk mencari ilmu, Allah mudahkan baginya jalan menuju surga."</div>
-                            <div class="card-ref">(HR. Muslim no. 2699)</div>
+
+                            <div class="slide-meta-row">
+                                <div class="slide-meta-item">
+                                    <span class="slide-info-label">WAKTU PELAKSANAAN</span>
+                                    <div class="slide-meta-val text-gold">📅 ${escapeHtml(k.day || '')} • Pukul ${escapeHtml(k.time || '')} WIB</div>
+                                </div>
+                                ${k.location ? `
+                                <div class="slide-meta-item">
+                                    <span class="slide-info-label">LOKASI / TEMPAT</span>
+                                    <div class="slide-meta-val text-white">📍 ${escapeHtml(k.location)}</div>
+                                </div>` : ''}
+                            </div>
+
+                            ${descText ? `
+                            <div class="slide-desc-row">
+                                <span class="slide-info-label">PEMBAHASAN / TEMA</span>
+                                <p class="slide-desc-text">${escapeHtml(descText)}</p>
+                            </div>` : ''}
                         </div>
                     </div>
+                    ${rightCol}
                 </div>
             `
         };
     }
 
-    // 3. Activities Slide
-    function createActivitiesSlide(activities) {
-        const rows = activities.slice(0, 3).map(a => `
-            <div style="margin-bottom:12px; border-left:3px solid var(--gold); padding-left:12px;">
-                <div style="color:var(--gold); font-size:0.9rem; font-weight:700;">📅 ${escapeHtml(a.date || '')} ${escapeHtml(a.time || '')}</div>
-                <div style="color:#ffffff; font-size:1.15rem; font-weight:700;">${escapeHtml(a.title || '')}</div>
-                <div style="color:var(--text-muted); font-size:0.85rem;">${escapeHtml(a.description || '')}</div>
-            </div>
-        `).join('');
+    // 3. Single Activity Slide (1 kegiatan = 1 slide, dengan poster atau kaligrafi amalan terbaik)
+    function createSingleActivitySlide(a, content) {
+        const posterUrl = a.imageUrl || '';
+        const hasPoster = posterUrl && posterUrl.length > 5;
+
+        let rightCol = '';
+        if (hasPoster) {
+            rightCol = `
+                <div class="slide-right-col" style="display:flex; justify-content:center; align-items:center; height:100%; padding:0; background:none; border:none; box-shadow:none;">
+                    <img src="${escapeHtml(posterUrl)}" alt="Poster ${escapeHtml(a.title)}" class="poster-only-img" onerror="this.closest('.slide-right-col').style.display='none'">
+                </div>
+            `;
+        } else if (content) {
+            rightCol = buildFeatureCard(content);
+        } else {
+            rightCol = buildFeatureCard({
+                badge: 'AMALAN TERBAIK',
+                arabic: 'وَتَعَاوَنُوا عَلَى الْبِرِّ وَالتَّقْوَىٰ',
+                translation: '"Dan tolong-menolonglah kamu dalam mengerjakan kebajikan dan takwa, dan jangan tolong-menolong dalam berbuat dosa."',
+                reference: '(QS. Al-Maidah: 2)'
+            });
+        }
+
+        const descText = a.description ? (a.description.length > 140 ? a.description.substring(0, 137) + '...' : a.description) : '';
 
         return {
-            id: 'activities',
+            id: 'activity-' + (a.id || ''),
             html: `
-                <div class="slide slide-activities">
-                    <div class="slide-left-col">
+                <div class="slide slide-activities ${!rightCol ? 'single-col' : ''}">
+                    <div class="slide-left-col" ${!rightCol ? 'style="flex:1 1 100%; max-width:100%;"' : ''}>
                         <div class="welcome-tag">
-                            <svg class="tag-icon-svg" viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19a2 2 0 0 0 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/></svg>
-                            <span>AGENDA & KEGIATAN MASJID</span>
+                            <svg class="tag-icon-svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19a2 2 0 0 0 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/></svg>
+                            <span>AGENDA &amp; KEGIATAN MASJID</span>
                         </div>
-                        <h2 class="welcome-heading">Kegiatan Terdekat</h2>
-                        <div style="margin-top:14px; width:100%;">
-                            ${rows}
-                        </div>
-                    </div>
-                    <div class="slide-right-col">
-                        <div class="feature-card">
-                            <div class="card-header-badge">
-                                <svg class="card-icon-svg" viewBox="0 0 24 24" width="15" height="15" fill="#facc15" aria-hidden="true"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
-                                <span>PENGINGAT AMAL</span>
+                        <h2 class="slide-hero-title">${escapeHtml(a.title || 'Kegiatan Masjid')}</h2>
+
+                        <div class="slide-info-card">
+                            ${a.speaker ? `
+                            <div class="slide-info-row speaker-row">
+                                <span class="slide-info-label">PENCERAMAH / PENGISI ACARA</span>
+                                <div class="slide-speaker-name">${escapeHtml(a.speaker)}</div>
+                            </div>` : ''}
+
+                            <div class="slide-meta-row">
+                                <div class="slide-meta-item">
+                                    <span class="slide-info-label">TANGGAL &amp; WAKTU</span>
+                                    <div class="slide-meta-val text-gold">📅 ${escapeHtml(a.date || '')} ${a.time ? '• ' + escapeHtml(a.time) + ' WIB' : ''}</div>
+                                </div>
+                                ${a.location ? `
+                                <div class="slide-meta-item">
+                                    <span class="slide-info-label">LOKASI / TEMPAT</span>
+                                    <div class="slide-meta-val text-white">📍 ${escapeHtml(a.location)}</div>
+                                </div>` : ''}
                             </div>
-                            <div class="card-arabic">وَتَعَاوَنُوا عَلَى الْبِرِّ وَالتَّقْوَىٰ</div>
-                            <div class="card-translation">"Dan tolong-menolonglah kamu dalam mengerjakan kebajikan dan takwa."</div>
-                            <div class="card-ref">(QS. Al-Maidah: 2)</div>
+
+                            ${descText ? `
+                            <div class="slide-desc-row">
+                                <span class="slide-info-label">DESKRIPSI ACARA</span>
+                                <p class="slide-desc-text">${escapeHtml(descText)}</p>
+                            </div>` : ''}
                         </div>
                     </div>
+                    ${rightCol}
                 </div>
             `
         };
     }
 
-    // 4. Friday Schedule Slide
-    function createFridaySlide(item) {
+    // ── Helper Date Formatting for Slides ──
+    function formatDateShortID(dateStr) {
+        if (!dateStr) return '';
+        const parts = dateStr.split('-');
+        if (parts.length === 3) {
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+            const day = parseInt(parts[2], 10);
+            const mIdx = parseInt(parts[1], 10) - 1;
+            return `${day} ${months[mIdx] || ''}`;
+        }
+        return dateStr;
+    }
+
+    function formatDateFullID(dateStr) {
+        if (!dateStr) return 'Jumat Pekan Ini';
+        const parts = dateStr.split('-');
+        if (parts.length === 3) {
+            const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+            const day = parseInt(parts[2], 10);
+            const mIdx = parseInt(parts[1], 10) - 1;
+            const year = parts[0];
+            return `${day} ${months[mIdx] || ''} ${year}`;
+        }
+        return dateStr;
+    }
+
+    // 4. Friday Schedule Slide (Dual Column: Pekan Ini + Tabel 1 Bulan Penuh)
+    function createFridaySlide(item, allFridays) {
+        const fridaysList = (allFridays && allFridays.length > 0) ? allFridays : [item];
+
+        // Header bulan untuk tabel sebulan
+        let monthHeader = 'SEBULAN';
+        if (item && item.date) {
+            const parts = item.date.split('-');
+            if (parts.length === 3) {
+                const months = ['JANUARI', 'FEBRUARI', 'MARET', 'APRIL', 'MEI', 'JUNI', 'JULI', 'AGUSTUS', 'SEPTEMBER', 'OKTOBER', 'NOVEMBER', 'DESEMBER'];
+                const mIdx = parseInt(parts[1], 10) - 1;
+                monthHeader = `${months[mIdx] || ''} ${parts[0]}`;
+            }
+        }
+
+        // Generate rows for full month table
+        const tableRowsHtml = fridaysList.map(f => {
+            const isCurrent = (f.date === item.date) || (f.id && item.id && f.id === item.id);
+            return `
+                <tr class="${isCurrent ? 'friday-row-active' : ''}">
+                    <td style="white-space:nowrap;">
+                        <span style="color:var(--gold); font-weight:800;">${formatDateShortID(f.date)}</span>
+                        ${isCurrent ? '<span style="background:var(--emerald); color:#fff; font-size:0.65rem; padding:2px 6px; border-radius:4px; margin-left:4px; font-weight:800; display:inline-block; vertical-align:middle;">PEKAN INI</span>' : ''}
+                    </td>
+                    <td><strong style="color:#ffffff;">${escapeHtml(f.khatib || '-')}</strong></td>
+                    <td style="color:var(--text-white);">${escapeHtml(f.imam || '-')}</td>
+                    <td style="color:var(--cyan-text); font-size:0.9em;">${escapeHtml(f.muazin || '-')}</td>
+                </tr>
+            `;
+        }).join('');
+
         return {
             id: 'friday',
             html: `
-                <div class="slide slide-friday">
-                    <div class="slide-left-col">
+                <div class="slide slide-friday" style="display:grid; grid-template-columns: 1fr 1.15fr; gap:2vw; align-items:center; height:100%;">
+                    <!-- Kolom Kiri: Detail Petugas Jumat Terdekat / Pekan Ini -->
+                    <div class="slide-left-col" style="padding-right:0.5vw;">
                         <div class="welcome-tag">
-                            <svg class="tag-icon-svg" viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M12 2c-.55 0-1 .45-1 1v1.1c-2.83.48-5 2.94-5 5.9 0 1.25.38 2.4 1.03 3.36L4 16v5h16v-5l-3.03-2.64c.65-.96 1.03-2.11 1.03-3.36 0-2.96-2.17-5.42-5-5.9V3c0-.55-.45-1-1-1zm-1 8h2v8h-2v-8z"/></svg>
-                            <span>SALAT JUMAT BERJEMAAH</span>
+                            <svg class="tag-icon-svg" viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true"><path d="M12 2c-.55 0-1 .45-1 1v1.1c-2.83.48-5 2.94-5 5.9 0 1.25.38 2.4 1.03 3.36L4 16v5h16v-5l-3.03-2.64c.65-.96 1.03-2.11 1.03-3.36 0-2.96-2.17-5.42-5-5.9V3c0-.55-.45-1-1-1zm-1 8h2v8h-2v-8z"/></svg>
+                            <span>SALAT JUMAT • PEKAN INI</span>
                         </div>
-                        <div class="arabic-greeting">يَا أَيُّهَا الَّذِينَ آمَنُوا إِذَا نُودِيَ لِلصَّلَاةِ مِن يَوْمِ الْجُمُعَةِ</div>
-                        <h2 class="welcome-heading">Jadwal Petugas Salat Jumat</h2>
-                        <p class="welcome-subheading">Tanggal: ${escapeHtml(item.date || 'Jumat Pekan Ini')}</p>
+                        <h2 class="slide-hero-title" style="margin:2px 0 8px 0; font-size:clamp(1.3rem, 1.8vw, 2.2rem);">Petugas Salat Jumat</h2>
+                        
+                        <div class="slide-info-card" style="gap:8px;">
+                            <div class="slide-meta-row">
+                                <div class="slide-meta-item" style="padding:6px 12px;">
+                                    <span class="slide-info-label" style="font-size:0.65rem;">WAKTU PELAKSANAAN</span>
+                                    <div class="slide-meta-val text-gold" style="font-size:clamp(0.85rem, 1.05vw, 1.2rem);">📅 Jumat, ${formatDateFullID(item.date)}</div>
+                                </div>
+                            </div>
+
+                            <div class="slide-info-row speaker-row" style="padding-left:12px; border-left:4px solid var(--gold);">
+                                <span class="slide-info-label" style="font-size:0.65rem;">KHATIB JUMAT</span>
+                                <div class="slide-speaker-name" style="color:var(--gold); font-size:clamp(1.2rem, 1.6vw, 2rem);">${escapeHtml(item.khatib || '-')}</div>
+                            </div>
+
+                            <div class="slide-meta-row">
+                                <div class="slide-meta-item" style="padding:6px 12px; flex:1;">
+                                    <span class="slide-info-label" style="font-size:0.65rem;">IMAM SALAT</span>
+                                    <div class="slide-meta-val text-white" style="font-size:clamp(0.85rem, 1vw, 1.2rem);">👳 ${escapeHtml(item.imam || '-')}</div>
+                                </div>
+                                <div class="slide-meta-item" style="padding:6px 12px; flex:1;">
+                                    <span class="slide-info-label" style="font-size:0.65rem;">MUAZIN / BILAL</span>
+                                    <div class="slide-meta-val" style="color:var(--cyan-text); font-size:clamp(0.85rem, 1vw, 1.2rem);">📢 ${escapeHtml(item.muazin || '-')}</div>
+                                </div>
+                            </div>
+
+                            ${item.tema ? `
+                            <div class="slide-desc-row" style="padding:6px 12px; border:1px solid rgba(250,204,21,0.25);">
+                                <span class="slide-info-label" style="font-size:0.65rem;">TEMA KHUTBAH</span>
+                                <p class="slide-desc-text text-gold" style="font-size:clamp(0.8rem, 0.95vw, 1.1rem); line-height:1.35;">${escapeHtml(item.tema)}</p>
+                            </div>` : ''}
+                        </div>
                     </div>
-                    <div class="slide-right-col">
-                        <div class="feature-card">
-                            <div class="card-header-badge">
-                                <svg class="card-icon-svg" viewBox="0 0 24 24" width="15" height="15" fill="#facc15" aria-hidden="true"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.91-3c-.49 0-.9.36-.98.85C16.52 14.2 14.47 16 12 16s-4.52-1.8-4.93-4.15c-.08-.49-.49-.85-.98-.85-.61 0-1.09.54-1 1.14.49 3 2.89 5.35 5.91 5.78V20c0 .55.45 1 1 1s1-.45 1-1v-2.08c3.02-.43 5.42-2.78 5.91-5.78.1-.6-.39-1.14-1-1.14z"/></svg>
-                                <span>PETUGAS JUMAT</span>
+
+                    <!-- Kolom Kanan: Tabel Jadwal Sholat Jumat 1 Bulan Penuh -->
+                    <div class="slide-right-col" style="height:100%; display:flex; align-items:center;">
+                        <div class="friday-month-card">
+                            <div style="color:var(--gold); font-size:clamp(0.72rem, 0.82vw, 0.95rem); font-weight:800; letter-spacing:0.8px; margin-bottom:8px; display:flex; align-items:center; gap:6px;">
+                                <svg viewBox="0 0 24 24" width="15" height="15" fill="#facc15"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19a2 2 0 0 0 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/></svg>
+                                <span>JADWAL PETUGAS JUMAT SEBULAN — ${monthHeader}</span>
                             </div>
-                            <div style="width:100%; text-align:left; padding:0 12px; margin-bottom:12px;">
-                                <div style="margin-bottom:8px;">
-                                    <span style="color:var(--text-muted); font-size:0.85rem;">Khatib:</span>
-                                    <div style="color:var(--gold); font-size:1.25rem; font-weight:800;">${escapeHtml(item.khatib || 'Ustadz Tamu')}</div>
-                                </div>
-                                <div style="margin-bottom:8px;">
-                                    <span style="color:var(--text-muted); font-size:0.85rem;">Imam:</span>
-                                    <div style="color:#ffffff; font-size:1.15rem; font-weight:700;">${escapeHtml(item.imam || 'Imam Rawatib')}</div>
-                                </div>
-                                <div>
-                                    <span style="color:var(--text-muted); font-size:0.85rem;">Muazin:</span>
-                                    <div style="color:var(--cyan-text); font-size:1.1rem; font-weight:700;">${escapeHtml(item.muazin || 'Muazin Masjid')}</div>
-                                </div>
-                            </div>
-                            <div class="card-ref" style="border-top:1px solid rgba(255,255,255,0.1); padding-top:8px; width:100%;">
-                                Tema: ${escapeHtml(item.tema || 'Tuntunan Ibadah & Pembinaan Takwa')}
+                            <div style="overflow-x:auto; width:100%;">
+                                <table class="friday-table">
+                                    <thead>
+                                        <tr>
+                                            <th style="width:22%;">Tanggal</th>
+                                            <th style="width:34%;">Khatib</th>
+                                            <th style="width:24%;">Imam</th>
+                                            <th style="width:20%;">Muazin</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        ${tableRowsHtml}
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
+                    </div>
+                </div>
+            `
+        };
+    }
+
+    // 4b. Tarawih 30 Nights Slide (Panoramic 3 Kolom Full)
+    function createTarawihSlide(tarawih) {
+        const title = tarawih.title || 'Jadwal Imam & Bilal Salat Tarawih';
+        const yearHijri = tarawih.yearHijri || '1447 H / 2026 M';
+        const nights = tarawih.nights || [];
+
+        // 3 kolom @ 10 malam: Malam 1-10, Malam 11-20, Malam 21-30
+        const col1 = nights.slice(0, 10);
+        const col2 = nights.slice(10, 20);
+        const col3 = nights.slice(20, 30);
+
+        const renderCol = (group, titleText) => `
+            <div class="tarawih-col">
+                <div class="tarawih-col-title">${titleText}</div>
+                <table class="tarawih-table">
+                    <thead>
+                        <tr style="border-bottom:1px solid rgba(250,204,21,0.25); text-align:left; font-size:0.75rem; color:var(--gold);">
+                            <th style="width:22%; padding:3px 4px;">Malam</th>
+                            <th style="width:48%; padding:3px 4px;">Imam</th>
+                            <th style="width:30%; padding:3px 4px;">Bilal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${group.map(n => `
+                            <tr>
+                                <td class="tarawih-night-num">Malam ${n.night}</td>
+                                <td class="tarawih-imam">${escapeHtml(n.imam || '-')}</td>
+                                <td class="tarawih-bilal">${escapeHtml(n.bilal || '-')}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            </div>
+        `;
+
+        return {
+            id: 'tarawih',
+            html: `
+                <div class="slide slide-tarawih">
+                    <div class="tarawih-header">
+                        <div>
+                            <div class="welcome-tag" style="margin-bottom:4px;">
+                                <svg class="tag-icon-svg" viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M12.3 2a10 10 0 0 0-1.9 20 10 10 0 0 0 8.6-4.9c.3-.5 0-1.1-.5-1.3-.5-.2-1.1 0-1.3.5A8 8 0 1 1 11.2 4c.5-.1.9-.6.8-1.1s-.6-.9-1.1-.9h1.4z"/></svg>
+                                <span>SEMARAK RAMADHAN • ${escapeHtml(yearHijri)}</span>
+                            </div>
+                            <h2 class="slide-hero-title" style="margin:0; font-size:clamp(1.4rem, 1.8vw, 2.2rem);">${escapeHtml(title)}</h2>
+                        </div>
+                        <div class="card-header-badge" style="margin:0; background:rgba(250,204,21,0.12); border:1px solid var(--gold); border-radius:9999px; padding:6px 14px;">
+                            <span>🌙 30 MALAM RAMADHAN PENUH</span>
+                        </div>
+                    </div>
+                    <div class="tarawih-grid">
+                        ${renderCol(col1, 'Malam 1 – 10 Ramadhan')}
+                        ${renderCol(col2, 'Malam 11 – 20 Ramadhan')}
+                        ${renderCol(col3, 'Malam 21 – 30 Ramadhan')}
                     </div>
                 </div>
             `
@@ -580,22 +865,48 @@
     }
 
     // 5. Finance & QRIS Slide
-    function createFinanceQRISSlide(finance, qris) {
-        const saldoText = finance ? `Rp ${(finance.saldo || 0).toLocaleString('id-ID')}` : 'Rp 45.250.000';
-        const pemasukanText = finance ? `Rp ${(finance.pemasukan || 0).toLocaleString('id-ID')}` : 'Rp 12.400.000';
-        const pengeluaranText = finance ? `Rp ${(finance.pengeluaran || 0).toLocaleString('id-ID')}` : 'Rp 8.150.000';
-        const qrisImg = (qris && qris.imageUrl) ? qris.imageUrl : 'assets/images/qris-masjid.svg';
+    function createFinanceQRISSlide(finance, qris, content) {
+        // Hanya tampil angka jika ada data dari admin, bukan hardcoded
+        const hasFinance = finance && (finance.saldo || finance.pemasukan || finance.pengeluaran);
+        const saldoText = hasFinance ? `Rp ${(finance.saldo || 0).toLocaleString('id-ID')}` : '-';
+        const pemasukanText = hasFinance ? `Rp ${(finance.pemasukan || 0).toLocaleString('id-ID')}` : '-';
+        const pengeluaranText = hasFinance ? `Rp ${(finance.pengeluaran || 0).toLocaleString('id-ID')}` : '-';
+        const qrisImg = (qris && qris.imageUrl) ? qris.imageUrl : '';
+        const hasQris = qrisImg && qrisImg.length > 5;
+
+        // Kolom kanan: QRIS jika ada, atau konten kustom
+        let rightCol = '';
+        if (hasQris) {
+            rightCol = `
+                <div class="slide-right-col">
+                    <div class="feature-card">
+                        <div class="card-header-badge">
+                            <svg class="card-icon-svg" viewBox="0 0 24 24" width="15" height="15" fill="#facc15" aria-hidden="true"><path d="M3 11h8V3H3v8zm2-6h4v4H5V5zM3 21h8v-8H3v8zm2-6h4v4H5v-4zM13 3v8h8V3h-8zm6 6h-4V5h4v4zM13 13h2v2h-2zM15 15h2v2h-2zM13 17h2v2h-2zM17 13h2v2h-2zM19 15h2v2h-2zM17 17h2v2h-2zM15 19h2v2h-2zM19 19h2v2h-2z"/></svg>
+                            <span>INFAQ DIGITAL QRIS</span>
+                        </div>
+                        <div style="background:#ffffff; border-radius:16px; padding:12px; display:inline-block; margin-bottom:10px;">
+                            <img src="${qrisImg}" alt="QRIS Infaq" style="width:clamp(170px, 12vw, 210px); height:clamp(170px, 12vw, 210px); object-fit:contain; display:block;">
+                        </div>
+                        <div class="card-translation" style="font-size:clamp(0.85rem, 0.95vw, 1.15rem); margin-bottom:4px; font-weight:600;">Scan QRIS menggunakan Mobile Banking atau e-Wallet</div>
+                        ${qris && qris.label ? `<div class="card-ref">${escapeHtml(qris.label)}</div>` : ''}
+                    </div>
+                </div>
+            `;
+        } else if (content) {
+            rightCol = buildFeatureCard(content);
+        }
 
         return {
             id: 'finance-qris',
             html: `
-                <div class="slide slide-finance">
-                    <div class="slide-left-col">
+                <div class="slide slide-finance ${!rightCol ? 'single-col' : ''}">
+                    <div class="slide-left-col" ${!rightCol ? 'style="flex:1 1 100%; max-width:100%;"' : ''}>
                         <div class="welcome-tag">
                             <svg class="tag-icon-svg" viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
                             <span>LAPORAN KAS & ZISWAF</span>
                         </div>
                         <h2 class="welcome-heading">Transparansi Keuangan</h2>
+                        ${hasFinance ? `
                         <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; width:100%; margin-top:10px;">
                             <div style="background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:12px; padding:12px;">
                                 <div style="color:var(--text-muted); font-size:0.8rem;">Pemasukan Kas</div>
@@ -610,32 +921,24 @@
                             <div style="color:var(--gold); font-size:0.85rem; font-weight:700;">SALDO KAS SAAT INI</div>
                             <div style="color:#ffffff; font-size:1.8rem; font-weight:800;">${saldoText}</div>
                         </div>
+                        ` : `
+                        <p class="welcome-subheading" style="margin-top:12px;">Data keuangan belum tersedia.</p>
+                        `}
                     </div>
-                    <div class="slide-right-col">
-                        <div class="feature-card">
-                            <div class="card-header-badge">
-                                <svg class="card-icon-svg" viewBox="0 0 24 24" width="15" height="15" fill="#facc15" aria-hidden="true"><path d="M3 11h8V3H3v8zm2-6h4v4H5V5zM3 21h8v-8H3v8zm2-6h4v4H5v-4zM13 3v8h8V3h-8zm6 6h-4V5h4v4zM13 13h2v2h-2zM15 15h2v2h-2zM13 17h2v2h-2zM17 13h2v2h-2zM19 15h2v2h-2zM17 17h2v2h-2zM15 19h2v2h-2zM19 19h2v2h-2z"/></svg>
-                                <span>INFAQ DIGITAL QRIS</span>
-                            </div>
-                            <div style="background:#ffffff; border-radius:12px; padding:10px; display:inline-block; margin-bottom:10px;">
-                                <img src="${qrisImg}" alt="QRIS Infaq" style="width:130px; height:130px; object-fit:contain; display:block;">
-                            </div>
-                            <div class="card-translation" style="font-size:0.85rem; margin-bottom:4px;">Scan QRIS menggunakan Mobile Banking atau e-Wallet</div>
-                            <div class="card-ref">Rekening BSI: 7123-4567-89 a.n. Masjid Teraskota</div>
-                        </div>
-                    </div>
+                    ${rightCol}
                 </div>
             `
         };
     }
 
     // 6. Announcement Slide
-    function createAnnouncementSlide(ann) {
+    function createAnnouncementSlide(ann, content) {
+        const rightCol = buildFeatureCard(content);
         return {
-            id: 'announcement',
+            id: 'announcement-' + (ann.id || ''),
             html: `
-                <div class="slide slide-announcement">
-                    <div class="slide-left-col">
+                <div class="slide slide-announcement ${!rightCol ? 'single-col' : ''}">
+                    <div class="slide-left-col" ${!rightCol ? 'style="flex:1 1 100%; max-width:100%;"' : ''}>
                         <div class="welcome-tag">
                             <svg class="tag-icon-svg" viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H5.17L4 17.17V4h16v12z"/></svg>
                             <span>PENGUMUMAN DKM</span>
@@ -645,23 +948,37 @@
                             ${escapeHtml(ann.content || '')}
                         </p>
                     </div>
-                    <div class="slide-right-col">
-                        <div class="feature-card">
-                            <div class="card-header-badge">
-                                <svg class="card-icon-svg" viewBox="0 0 24 24" width="15" height="15" fill="#facc15" aria-hidden="true"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
-                                <span>ADAB DI DALAM MASJID</span>
-                            </div>
-                            <div class="card-arabic">خَيْرُ الْبِقَاعِ مَسَاجِدُهَا</div>
-                            <div class="card-translation">"Tempat yang paling dicintai Allah di muka bumi adalah masjid-masjidnya."</div>
-                            <div class="card-ref">(HR. Muslim no. 671)</div>
-                        </div>
-                    </div>
+                    ${rightCol}
                 </div>
             `
         };
     }
 
-    // ── Slide Controller & Indicators ──
+    // ── Slide Controller & Interactive Navigation ──
+    function goToSlide(index) {
+        if (!state.slides || state.slides.length === 0) return;
+        state.currentSlideIndex = (index + state.slides.length) % state.slides.length;
+        renderCurrentSlide();
+        restartSlideTimer();
+    }
+
+    function nextSlide() {
+        goToSlide(state.currentSlideIndex + 1);
+    }
+
+    function prevSlide() {
+        goToSlide(state.currentSlideIndex - 1);
+    }
+
+    function restartSlideTimer() {
+        if (state.slideInterval) clearInterval(state.slideInterval);
+        state.slideInterval = setInterval(() => {
+            if (state.slides.length <= 1) return;
+            state.currentSlideIndex = (state.currentSlideIndex + 1) % state.slides.length;
+            renderCurrentSlide();
+        }, state.slideDuration);
+    }
+
     function renderCurrentSlide() {
         if (!DOM.slideContent || state.slides.length === 0) return;
 
@@ -685,26 +1002,35 @@
         if (!DOM.slideIndicators) return;
         DOM.slideIndicators.innerHTML = '';
 
-        state.slides.forEach((_, idx) => {
+        state.slides.forEach((slide, idx) => {
             const dot = document.createElement('span');
             dot.className = `indicator-dot ${idx === state.currentSlideIndex ? 'active' : ''}`;
+            dot.title = `Lompat ke slide ${idx + 1} (${slide.id || 'Slide'})`;
+            dot.setAttribute('role', 'button');
+            dot.setAttribute('tabindex', '0');
+            dot.addEventListener('click', (e) => {
+                e.stopPropagation();
+                goToSlide(idx);
+            });
             DOM.slideIndicators.appendChild(dot);
         });
     }
 
     function startSlideShow() {
-        if (state.slideInterval) clearInterval(state.slideInterval);
-
-        state.slideInterval = setInterval(() => {
-            if (state.slides.length <= 1) return;
-            state.currentSlideIndex = (state.currentSlideIndex + 1) % state.slides.length;
-            renderCurrentSlide();
-        }, state.slideDuration);
+        restartSlideTimer();
     }
 
-    // ── 6. Realtime Updates & Cross-Tab Sync ──
+    // ── 6. Realtime Updates, TV Remote & User Controls ──
     function subscribeToUpdates() {
-        // 1. Online Firestore listener
+        let _loadSlidesTimer = null;
+        const debouncedLoadSlides = () => {
+            if (_loadSlidesTimer) clearTimeout(_loadSlidesTimer);
+            _loadSlidesTimer = setTimeout(() => {
+                loadSlides();
+            }, 400);
+        };
+
+        // 1. Online Firestore listeners
         if (FirestoreService.isOnline && FirestoreService.isOnline()) {
             FirestoreService.listenDocument('settings', 'mosque', (data) => {
                 if (data) {
@@ -717,26 +1043,142 @@
                 if (data) applyBackgroundSettings(data);
             });
 
-            FirestoreService.listenCollection('kajian', () => loadSlides());
-            FirestoreService.listenCollection('activities', () => loadSlides());
-            FirestoreService.listenCollection('announcements', () => loadSlides());
-            FirestoreService.listenCollection('fridaySchedules', () => loadSlides());
-            FirestoreService.listenCollection('financeReports', () => loadSlides());
-            FirestoreService.listenCollection('qris', () => loadSlides());
+            FirestoreService.listenDocument('settings', 'tarawih', debouncedLoadSlides);
+
+            FirestoreService.listenCollection('kajian', debouncedLoadSlides);
+            FirestoreService.listenCollection('activities', debouncedLoadSlides);
+            FirestoreService.listenCollection('announcements', debouncedLoadSlides);
+            FirestoreService.listenCollection('fridaySchedules', debouncedLoadSlides);
+            FirestoreService.listenCollection('financeReports', debouncedLoadSlides);
+            FirestoreService.listenCollection('qris', debouncedLoadSlides);
+            FirestoreService.listenCollection('slideContent', debouncedLoadSlides);
         }
 
         // 2. Cross-tab LocalStorage & Local Change sync (Works instantly in demo mode & local server)
+        let _localSyncTimer = null;
         const handleLocalSync = (evt) => {
             if (!evt.key || evt.key.startsWith('masjid_')) {
-                console.info('[Display] Local change detected. Syncing display...');
-                loadSettings();
-                loadPrayerTimes();
-                loadSlides();
+                if (_localSyncTimer) clearTimeout(_localSyncTimer);
+                _localSyncTimer = setTimeout(() => {
+                    console.info('[Display] Local change detected. Syncing display...');
+                    loadSettings();
+                    loadPrayerTimes();
+                    debouncedLoadSlides();
+                }, 400);
             }
         };
 
         window.addEventListener('storage', handleLocalSync);
         window.addEventListener('masjid-data-update', handleLocalSync);
+
+        // 3. Keyboard & Smart TV Remote Control Navigation
+        document.addEventListener('keydown', (e) => {
+            // Check if user is typing in an input
+            if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable)) return;
+
+            switch (e.key) {
+                // Next slide (Panah kanan, panah bawah, page down, TV Next)
+                case 'ArrowRight':
+                case 'ArrowDown':
+                case 'PageDown':
+                case 'MediaTrackNext':
+                    e.preventDefault();
+                    nextSlide();
+                    break;
+
+                // Prev slide (Panah kiri, panah atas, page up, TV Prev)
+                case 'ArrowLeft':
+                case 'ArrowUp':
+                case 'PageUp':
+                case 'MediaTrackPrevious':
+                    e.preventDefault();
+                    prevSlide();
+                    break;
+
+                // Home: Slide pertama
+                case 'Home':
+                    e.preventDefault();
+                    goToSlide(0);
+                    break;
+
+                // End: Slide terakhir
+                case 'End':
+                    e.preventDefault();
+                    goToSlide(state.slides.length - 1);
+                    break;
+
+                // Spasi / OK remote: Next slide
+                case ' ':
+                    e.preventDefault();
+                    nextSlide();
+                    break;
+
+                // Fullscreen toggle ('F' key)
+                case 'f':
+                case 'F':
+                    if (!document.fullscreenElement) {
+                        document.documentElement.requestFullscreen().catch(() => { });
+                    } else {
+                        document.exitFullscreen().catch(() => { });
+                    }
+                    break;
+            }
+        });
+
+        // 4. Mouse Wheel Navigation (Scroll untuk ganti slide)
+        let _lastWheel = 0;
+        window.addEventListener('wheel', (e) => {
+            const now = Date.now();
+            if (now - _lastWheel < 350) return;
+            if (Math.abs(e.deltaY) > 25 || Math.abs(e.deltaX) > 25) {
+                _lastWheel = now;
+                if (e.deltaY > 0 || e.deltaX > 0) {
+                    nextSlide();
+                } else {
+                    prevSlide();
+                }
+            }
+        }, { passive: true });
+
+        // 5. Mouse Click & Touch Swipe Navigation on Slide Area
+        if (DOM.slideContent) {
+            DOM.slideContent.addEventListener('click', (e) => {
+                if (e.target.closest('a, button, input, .indicator-dot, .friday-table, .tarawih-table')) return;
+                const rect = DOM.slideContent.getBoundingClientRect();
+                const clickX = e.clientX - rect.left;
+                // Click on left 35% -> prev slide, right 65% -> next slide
+                if (clickX < rect.width * 0.35) {
+                    prevSlide();
+                } else {
+                    nextSlide();
+                }
+            });
+
+            // Touch Swipe Support
+            let startTouchX = 0;
+            DOM.slideContent.addEventListener('touchstart', (e) => {
+                if (e.touches && e.touches.length > 0) startTouchX = e.touches[0].clientX;
+            }, { passive: true });
+
+            DOM.slideContent.addEventListener('touchend', (e) => {
+                if (e.changedTouches && e.changedTouches.length > 0) {
+                    const diff = e.changedTouches[0].clientX - startTouchX;
+                    if (Math.abs(diff) > 40) {
+                        if (diff < 0) nextSlide();
+                        else prevSlide();
+                    }
+                }
+            }, { passive: true });
+        }
+
+        // 6. Fullscreen Toggle on Double-Click
+        document.addEventListener('dblclick', () => {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(() => { });
+            } else {
+                document.exitFullscreen().catch(() => { });
+            }
+        });
     }
 
     // ── 7. Midnight Refresh & Visibility ──
@@ -788,7 +1230,10 @@
         applyBackgroundSettings,
         loadSlides,
         loadSettings,
-        loadPrayerTimes
+        loadPrayerTimes,
+        goToSlide,
+        nextSlide,
+        prevSlide
     };
 
     // Auto-init on DOMContentLoaded
