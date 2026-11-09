@@ -66,21 +66,28 @@
 
     // ── Initialization Lifecycle ──
     function loadInstantLocalData() {
+        let hasCustomBg = false;
         // 1. Instant background from localStorage
         try {
             const savedBg = localStorage.getItem('masjid_bg_settings');
             if (savedBg) {
                 applyBackgroundSettings(JSON.parse(savedBg));
+                hasCustomBg = true;
             } else {
                 const demoStore = localStorage.getItem('masjid_demo_store');
                 if (demoStore) {
                     const parsed = JSON.parse(demoStore);
-                    if (parsed && parsed.settings && parsed.settings.background) {
+                    if (parsed && parsed.settings && parsed.settings.background && (parsed.settings.background.url || parsed.settings.background.type !== 'default')) {
                         applyBackgroundSettings(parsed.settings.background);
+                        hasCustomBg = true;
                     }
                 }
             }
         } catch(e) {}
+
+        if (!hasCustomBg) {
+            applyBackgroundSettings({ type: 'default' });
+        }
 
         // 2. Instant Mosque settings from demoStore or localStorage
         try {

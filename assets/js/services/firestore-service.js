@@ -177,7 +177,10 @@ const FirestoreService = (() => {
             await Promise.race([setPromise, timeoutPromise]);
             return { id: docId, ...data };
         } catch (error) {
-            console.warn(`[Firestore] setDocument ${collection}/${docId} fallback to local:`, error.message);
+            console.warn(`[Firestore] setDocument ${collection}/${docId} error:`, error.message);
+            if (error.code === 'permission-denied' || (error.message && error.message.toLowerCase().includes('permission'))) {
+                throw new Error('Akses ditolak database Firebase (Permission Denied). Buka Firebase Console > Firestore Database > Rules, ubah menjadi "allow read, write: if true;" agar tersinkron ke semua perangkat (TV & Laptop).');
+            }
             return { id: docId, ...data };
         }
     }
@@ -230,7 +233,10 @@ const FirestoreService = (() => {
 
             return { id: ref.id, ...data };
         } catch (error) {
-            console.warn(`[Firestore] addDocument ${collection} fallback to local:`, error.message);
+            console.warn(`[Firestore] addDocument ${collection} error:`, error.message);
+            if (error.code === 'permission-denied' || (error.message && error.message.toLowerCase().includes('permission'))) {
+                throw new Error('Akses ditolak database Firebase (Permission Denied). Harap ubah Rules di Firebase Console menjadi "allow read, write: if true;".');
+            }
             return { id: localDocId, ...data };
         }
     }
@@ -267,7 +273,10 @@ const FirestoreService = (() => {
             await Promise.race([updatePromise, timeoutPromise]);
             return { id: docId, ...data };
         } catch (error) {
-            console.warn(`[Firestore] updateDocument ${collection}/${docId} fallback to local:`, error.message);
+            console.warn(`[Firestore] updateDocument ${collection}/${docId} error:`, error.message);
+            if (error.code === 'permission-denied' || (error.message && error.message.toLowerCase().includes('permission'))) {
+                throw new Error('Akses ditolak database Firebase (Permission Denied). Harap ubah Rules di Firebase Console menjadi "allow read, write: if true;".');
+            }
             return { id: docId, ...data };
         }
     }
