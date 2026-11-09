@@ -1,0 +1,26 @@
+# Ignore server file (local dev only)
+server.js
+
+# Dependencies
+node_modules/
+
+# Documentation
+docs/
+
+# Firebase config files
+firebase/
+firebase.json
+
+# GitHub workflows
+.github/
+
+# Lock files
+package-lock.json
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
