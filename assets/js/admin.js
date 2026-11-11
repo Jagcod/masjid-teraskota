@@ -737,7 +737,24 @@ const AdminApp = (() => {
                 return;
             }
 
-            listEl.innerHTML = items.map(item => {
+            // Toolbar Bulk Delete Checkbox
+            const toolbarHtml = `
+                <div class="bulk-toolbar" id="bulk-toolbar-${pageKey}" style="display:flex; justify-content:space-between; align-items:center; background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:10px 14px; margin-bottom:12px;">
+                    <label style="display:inline-flex; align-items:center; gap:8px; font-weight:600; font-size:0.875rem; cursor:pointer; user-select:none; color:#1e293b;">
+                        <input type="checkbox" id="select-all-${pageKey}" onchange="AdminApp.toggleSelectAll('${pageKey}', this.checked)" style="width:17px; height:17px; accent-color:#059669; cursor:pointer;">
+                        <span>Pilih Semua</span>
+                    </label>
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <span id="bulk-count-${pageKey}" style="font-size:0.825rem; color:#64748b; font-weight:500;">0 dipilih</span>
+                        <button type="button" class="btn btn-danger btn-sm" id="btn-bulk-delete-${pageKey}" disabled onclick="AdminApp.bulkDelete('${pageKey}')" style="display:inline-flex; align-items:center; gap:6px; padding:5px 12px; font-size:0.825rem;">
+                            <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+                            Hapus Terpilih
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            const itemsHtml = items.map(item => {
                 const display = config.display(item);
                 const badges = (display.badges || []).map(b => 
                     `<span class="data-item-badge ${b.class}">${b.text}</span>`
@@ -747,8 +764,9 @@ const AdminApp = (() => {
                     : '';
 
                 return `
-                    <div class="data-item" data-id="${item.id}">
-                        <div class="data-item-left">
+                    <div class="data-item" data-id="${item.id}" style="display:flex; align-items:center; gap:12px;">
+                        <input type="checkbox" class="bulk-cb bulk-cb-${pageKey}" value="${item.id}" onchange="AdminApp.updateBulkState('${pageKey}')" style="width:18px; height:18px; accent-color:#059669; cursor:pointer; flex-shrink:0;">
+                        <div class="data-item-left" style="flex:1; min-width:0;">
                             ${imgThumb}
                             <div class="data-item-content">
                                 <div class="data-item-title">${escapeHtml(display.title)}</div>
@@ -756,7 +774,7 @@ const AdminApp = (() => {
                             </div>
                         </div>
                         ${badges}
-                        <div class="data-item-actions">
+                        <div class="data-item-actions" style="flex-shrink:0;">
                             <button class="btn-icon" title="Edit" onclick="AdminApp.editItem('${pageKey}', '${item.id}')">
                                 <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
                             </button>
@@ -767,6 +785,8 @@ const AdminApp = (() => {
                     </div>
                 `;
             }).join('');
+
+            listEl.innerHTML = toolbarHtml + itemsHtml;
         } catch (error) {
             console.error(`[Admin] Load ${pageKey} error:`, error);
             listEl.innerHTML = '<p class="empty-state">Gagal memuat data.</p>';
@@ -1821,6 +1841,66 @@ const AdminApp = (() => {
 
     // ── Delete Confirmation ──
 
+    // ── Bulk Actions: Checkbox Selection & Batch Delete ──
+    function toggleSelectAll(pageKey, checked) {
+        const cbs = document.querySelectorAll(`.bulk-cb-${pageKey}`);
+        cbs.forEach(cb => { cb.checked = checked; });
+        updateBulkState(pageKey);
+    }
+
+    function updateBulkState(pageKey) {
+        const allCbs = document.querySelectorAll(`.bulk-cb-${pageKey}`);
+        const checkedCbs = document.querySelectorAll(`.bulk-cb-${pageKey}:checked`);
+        const countEl = document.getElementById(`bulk-count-${pageKey}`);
+        const btnEl = document.getElementById(`btn-bulk-delete-${pageKey}`);
+        const selectAllEl = document.getElementById(`select-all-${pageKey}`);
+
+        if (countEl) countEl.textContent = `${checkedCbs.length} dipilih`;
+        if (btnEl) btnEl.disabled = (checkedCbs.length === 0);
+        if (selectAllEl) selectAllEl.checked = (allCbs.length > 0 && checkedCbs.length === allCbs.length);
+    }
+
+    async function bulkDelete(pageKey) {
+        const checkedCbs = Array.from(document.querySelectorAll(`.bulk-cb-${pageKey}:checked`));
+        const ids = checkedCbs.map(cb => cb.value);
+        if (ids.length === 0) {
+            showToast('Pilih data yang ingin dihapus terlebih dahulu.', 'warning');
+            return;
+        }
+
+        const config = COLLECTIONS[pageKey];
+        if (!config) return;
+        const collectionName = config.collection || pageKey;
+
+        if (!confirm(`Apakah Anda yakin ingin menghapus ${ids.length} data terpilih dari ${config.title}? Tindakan ini tidak dapat dibatalkan.`)) {
+            return;
+        }
+
+        const btnEl = document.getElementById(`btn-bulk-delete-${pageKey}`);
+        if (btnEl) {
+            btnEl.disabled = true;
+            btnEl.textContent = 'Menghapus...';
+        }
+
+        // Optimistic: Redupkan atau sembunyikan baris seketika (0 ms UI responsif)
+        checkedCbs.forEach(cb => {
+            const row = cb.closest('.data-item');
+            if (row) row.style.opacity = '0.3';
+        });
+
+        try {
+            await FirestoreService.deleteDocuments(collectionName, ids);
+            showToast(`${ids.length} data berhasil dihapus sekaligus!`, 'success');
+            loadCollectionData(pageKey);
+            loadDashboardData();
+        } catch (error) {
+            console.error('[Admin] Bulk delete error:', error);
+            showToast('Gagal menghapus beberapa data.', 'error');
+            loadCollectionData(pageKey);
+        }
+    }
+
+    // ── Delete Confirmation (Single Delete) ──
     function confirmDelete(collectionKey, itemId, itemTitle) {
         const config = COLLECTIONS[collectionKey];
         if (!config) return;
@@ -1834,6 +1914,11 @@ const AdminApp = (() => {
         }
 
         _confirmCallback = async () => {
+            closeConfirm();
+            // Optimistic visual feedback
+            const itemRow = document.querySelector(`.data-item[data-id="${itemId}"]`);
+            if (itemRow) itemRow.style.opacity = '0.3';
+
             try {
                 const collectionName = config.collection || collectionKey;
                 await FirestoreService.deleteDocument(collectionName, itemId);
@@ -1843,8 +1928,8 @@ const AdminApp = (() => {
             } catch (error) {
                 console.error('[Admin] Delete error:', error);
                 showToast('Gagal menghapus data.', 'error');
+                loadCollectionData(collectionKey);
             }
-            closeConfirm();
         };
 
         if (btn) {
@@ -2161,7 +2246,10 @@ const AdminApp = (() => {
         editItem,
         confirmDelete,
         closeConfirm,
-        showToast
+        showToast,
+        toggleSelectAll,
+        updateBulkState,
+        bulkDelete
     };
 })();
 

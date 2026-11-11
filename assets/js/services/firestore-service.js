@@ -119,7 +119,7 @@ const FirestoreService = (() => {
             
             const cloudDocs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-            // Gabungkan juga data yang baru ditambahkan secara lokal
+            // Gabungkan hanya data lokal sementara (local_*) yang belum terupload ke cloud
             const demoDocs = getDemoCollection(collection, options);
             const localOnlyDocs = demoDocs.filter(d => String(d.id).startsWith('local_'));
             
@@ -130,13 +130,15 @@ const FirestoreService = (() => {
                 }
             });
 
-            if (combined.length === 0) {
-                return demoDocs;
-            }
+            // Jika di cloud sudah kosong/dihapus oleh user, kembalikan kosong (JANGAN kembalikan demo data lama!)
             return combined;
         } catch (error) {
-            console.warn(`[Firestore] Get collection ${collection} fallback to local:`, error.message);
-            return getDemoCollection(collection, options);
+            console.warn(`[Firestore] Get collection ${collection} notice:`, error.message);
+            // Hanya fallback ke demo data jika Firestore memang belum terkonfigurasi
+            if (!_isOnline) {
+                return getDemoCollection(collection, options);
+            }
+            return [];
         }
     }
 
@@ -282,9 +284,10 @@ const FirestoreService = (() => {
     }
 
     /**
-     * Delete a document
+     * Delete a single document
      */
     async function deleteDocument(collection, docId) {
+        // Hapus lokal seketika (Optimistic update 0 ms)
         try {
             const store = getDemoStore();
             if (store[collection] && store[collection][docId]) {
@@ -300,11 +303,58 @@ const FirestoreService = (() => {
 
         try {
             const deletePromise = _db.collection(collection).doc(docId).delete();
-            const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('Firestore delete timeout')), 5000));
+            const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('Firestore delete timeout')), 2500));
             await Promise.race([deletePromise, timeoutPromise]);
             return true;
         } catch (error) {
-            console.warn(`[Firestore] deleteDocument ${collection}/${docId} fallback to local:`, error.message);
+            console.warn(`[Firestore] deleteDocument ${collection}/${docId} notice:`, error.message);
+            return true;
+        }
+    }
+
+    /**
+     * Delete multiple documents simultaneously (Fast Batch Delete)
+     */
+    async function deleteDocuments(collection, docIds) {
+        if (!docIds || !docIds.length) return true;
+
+        // 1. Hapus dari cache lokal seketika (0 ms UI lag)
+        try {
+            const store = getDemoStore();
+            if (store[collection]) {
+                docIds.forEach(id => {
+                    delete store[collection][id];
+                });
+                saveDemoStore(store);
+                notifyLocalChange(collection, docIds[0]);
+            }
+        } catch(e) {}
+
+        if (!_isOnline) {
+            return true;
+        }
+
+        // 2. Eksekusi batch delete di Firebase Firestore
+        try {
+            const batch = _db.batch();
+            let count = 0;
+            docIds.forEach(id => {
+                if (!String(id).startsWith('local_')) {
+                    const ref = _db.collection(collection).doc(id);
+                    batch.delete(ref);
+                    count++;
+                }
+            });
+
+            if (count > 0) {
+                const commitPromise = batch.commit();
+                const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('Firestore batch delete timeout')), 3500));
+                await Promise.race([commitPromise, timeoutPromise]);
+            }
+            return true;
+        } catch (error) {
+            console.warn(`[Firestore] Batch delete error, falling back to parallel:`, error.message);
+            await Promise.all(docIds.map(id => deleteDocument(collection, id)));
             return true;
         }
     }
@@ -743,6 +793,19 @@ const FirestoreService = (() => {
             }
         };
 
+        // Jika Firebase sudah dikonfigurasi, kosongkan data demo default agar tidak pernah menghidupkan kembali data kajian lama
+        const hasRealFirebase = typeof isFirebaseConfigured === 'function' && isFirebaseConfigured();
+        if (hasRealFirebase) {
+            defaultStore.kajian = {};
+            defaultStore.activities = {};
+            defaultStore.announcements = {};
+            defaultStore.news = {};
+            defaultStore.fridaySchedules = {};
+            defaultStore.financeReports = {};
+            defaultStore.qris = {};
+            defaultStore.slideContent = {};
+        }
+
         try {
             const saved = localStorage.getItem('masjid_demo_store');
             if (saved) {
@@ -770,6 +833,7 @@ const FirestoreService = (() => {
         addDocument,
         updateDocument,
         deleteDocument,
+        deleteDocuments,
         onDocument,
         onCollection,
         listenDocument: onDocument,

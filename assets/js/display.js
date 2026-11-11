@@ -164,6 +164,7 @@
                 loadSettings();
                 loadPrayerTimes();
                 loadSlides();
+                attachFirestoreRealtimeListeners();
             }
         }).catch(err => console.warn('[Display] Firestore init notice:', err));
     }
@@ -219,11 +220,23 @@
 
         if (DOM.dateHijri) {
             try {
+                try {
+                    const cached = localStorage.getItem('masjid_hijri_cache');
+                    if (cached && (cached.includes('Juni') || cached.includes('November') || cached.includes('2026 H'))) {
+                        localStorage.removeItem('masjid_hijri_cache');
+                    }
+                } catch(ce) {}
+
                 const hijri = await HijriDateService.getHijriDate();
-                DOM.dateHijri.textContent = hijri.formatted;
+                if (hijri && hijri.formatted) {
+                    DOM.dateHijri.textContent = hijri.formatted;
+                }
             } catch (err) {
                 console.warn('[Display] Hijri date fetch error:', err);
-                DOM.dateHijri.textContent = '';
+                const offline = HijriDateService.calculateHijriOffline();
+                if (offline && offline.formatted) {
+                    DOM.dateHijri.textContent = offline.formatted;
+                }
             }
         }
 
@@ -1126,57 +1139,91 @@
     }
 
     // ── 6. Realtime Updates, TV Remote & User Controls ──
+    let _hasAttachedFirestoreListeners = false;
+    let _loadSlidesDebounceTimer = null;
+
+    function debouncedLoadSlides() {
+        if (_loadSlidesDebounceTimer) clearTimeout(_loadSlidesDebounceTimer);
+        _loadSlidesDebounceTimer = setTimeout(() => {
+            loadSlides();
+        }, 300);
+    }
+
+    function attachFirestoreRealtimeListeners() {
+        if (_hasAttachedFirestoreListeners) return;
+        if (!FirestoreService.isOnline || !FirestoreService.isOnline()) return;
+
+        _hasAttachedFirestoreListeners = true;
+        console.info('[Display] Terhubung ke Cloud Firestore. Memasang realtime listener ke semua data...');
+
+        // 1. Sinkronisasi Identitas Masjid Realtime
+        FirestoreService.listenDocument('settings', 'mosque', (data) => {
+            if (data) {
+                console.info('[Display] Realtime update dari Cloud: settings/mosque');
+                applyMosqueSettings(data);
+                if (data.background) applyBackgroundSettings(data.background);
+            }
+        });
+
+        // 2. Sinkronisasi Background Real-Time
+        FirestoreService.listenDocument('settings', 'background', (data) => {
+            if (data) {
+                console.info('[Display] Realtime update dari Cloud: settings/background');
+                applyBackgroundSettings(data);
+            }
+        });
+
+        // 3. Sinkronisasi Jam & Jadwal Sholat Realtime
+        FirestoreService.listenDocument('settings', 'prayerConfig', (data) => {
+            if (data) {
+                console.info('[Display] Realtime update dari Cloud: settings/prayerConfig');
+                PrayerTimesService.setConfig(data);
+                if (data.timezoneLabel || data.timezone) {
+                    const currentTz = (state.settings && state.settings.timezone) || 'Asia/Jakarta';
+                    const currentTzLabel = (state.settings && state.settings.timezoneLabel) || 'WIB (TANGERANG SELATAN)';
+                    state.settings = {
+                        ...(state.settings || {}),
+                        timezone: data.timezone || currentTz,
+                        timezoneLabel: data.timezoneLabel || currentTzLabel
+                    };
+                    updateTimezoneLabel();
+                    startClock();
+                    updateDates();
+                }
+                loadPrayerTimes();
+            }
+        });
+
+        // 4. Sinkronisasi Sholat Tarawih Realtime
+        FirestoreService.listenDocument('settings', 'tarawih', debouncedLoadSlides);
+
+        // 5. Sinkronisasi Semua Koleksi Konten Real-Time
+        FirestoreService.listenCollection('kajian', (items) => {
+            console.info('[Display] Realtime update kajian:', items ? items.length : 0);
+            debouncedLoadSlides();
+        });
+        FirestoreService.listenCollection('activities', (items) => {
+            console.info('[Display] Realtime update activities:', items ? items.length : 0);
+            debouncedLoadSlides();
+        });
+        FirestoreService.listenCollection('announcements', debouncedLoadSlides);
+        FirestoreService.listenCollection('fridaySchedules', debouncedLoadSlides);
+        FirestoreService.listenCollection('financeReports', debouncedLoadSlides);
+        FirestoreService.listenCollection('qris', debouncedLoadSlides);
+        FirestoreService.listenCollection('slideContent', debouncedLoadSlides);
+    }
+
     function subscribeToUpdates() {
-        let _loadSlidesTimer = null;
-        const debouncedLoadSlides = () => {
-            if (_loadSlidesTimer) clearTimeout(_loadSlidesTimer);
-            _loadSlidesTimer = setTimeout(() => {
-                loadSlides();
-            }, 400);
-        };
+        // Coba pasang realtime listener jika Firestore sudah siap
+        attachFirestoreRealtimeListeners();
 
-        // 1. Online Firestore listeners
-        if (FirestoreService.isOnline && FirestoreService.isOnline()) {
-            FirestoreService.listenDocument('settings', 'mosque', (data) => {
-                if (data) {
-                    applyMosqueSettings(data);
-                    if (data.background) applyBackgroundSettings(data.background);
-                }
-            });
-
-            FirestoreService.listenDocument('settings', 'background', (data) => {
-                if (data) applyBackgroundSettings(data);
-            });
-
-            FirestoreService.listenDocument('settings', 'prayerConfig', (data) => {
-                if (data) {
-                    PrayerTimesService.setConfig(data);
-                    if (data.timezoneLabel || data.timezone) {
-                        const currentTz = (state.settings && state.settings.timezone) || 'Asia/Jakarta';
-                        const currentTzLabel = (state.settings && state.settings.timezoneLabel) || 'WIB (TANGERANG SELATAN)';
-                        state.settings = {
-                            ...(state.settings || {}),
-                            timezone: data.timezone || currentTz,
-                            timezoneLabel: data.timezoneLabel || currentTzLabel
-                        };
-                        updateTimezoneLabel();
-                        startClock();
-                        updateDates();
-                    }
-                    loadPrayerTimes();
-                }
-            });
-
-            FirestoreService.listenDocument('settings', 'tarawih', debouncedLoadSlides);
-
-            FirestoreService.listenCollection('kajian', debouncedLoadSlides);
-            FirestoreService.listenCollection('activities', debouncedLoadSlides);
-            FirestoreService.listenCollection('announcements', debouncedLoadSlides);
-            FirestoreService.listenCollection('fridaySchedules', debouncedLoadSlides);
-            FirestoreService.listenCollection('financeReports', debouncedLoadSlides);
-            FirestoreService.listenCollection('qris', debouncedLoadSlides);
-            FirestoreService.listenCollection('slideContent', debouncedLoadSlides);
-        }
+        // Background polling sync cadangan setiap 15 detik (Jaminan TV & HP selalu update walau WebSocket sempat putus)
+        setInterval(() => {
+            if (FirestoreService.isOnline && FirestoreService.isOnline()) {
+                loadSettings();
+                debouncedLoadSlides();
+            }
+        }, 15000);
 
         // 2. Cross-tab LocalStorage & Local Change sync (Works instantly in demo mode & local server)
         let _localSyncTimer = null;
