@@ -516,10 +516,8 @@
         // Load custom slide content from admin (untuk kartu ayat/hadits di sisi kanan)
         let slideContentMap = {};
         try {
-            const slideContentItems = await FirestoreService.getCollection('slideContent', {
-                where: [['isActive', '==', true]],
-                orderBy: 'order'
-            });
+            let slideContentItems = await FirestoreService.getCollection('slideContent', {});
+            slideContentItems = (slideContentItems || []).filter(function(item) { return item.isActive === true; }).sort(function(a, b) { return (a.order || 0) - (b.order || 0); });
             if (slideContentItems && slideContentItems.length > 0) {
                 slideContentItems.forEach(sc => {
                     const key = sc.slideType || '';
@@ -535,10 +533,9 @@
             slides.push(createWelcomeSlide(slideContentMap['welcome']));
 
             // Slide per Kajian (masing-masing 1 slide dengan poster)
-            const kajian = await FirestoreService.getCollection('kajian', {
-                where: [['isActive', '==', true]],
-                orderBy: 'order'
-            });
+            let kajian = await FirestoreService.getCollection('kajian', {});
+            kajian = (kajian || []).filter(function(item) { return item.isActive === true; }).sort(function(a, b) { return (a.order || 0) - (b.order || 0); });
+            console.log('[Display] Kajian loaded:', kajian.length, 'items');
             if (kajian && kajian.length > 0) {
                 const kajianContent = slideContentMap['kajian'];
                 kajian.forEach(k => {
@@ -547,10 +544,9 @@
             }
 
             // Slide per Kegiatan (Hanya tampilkan kegiatan yang belum lewat tanggalnya)
-            const activities = await FirestoreService.getCollection('activities', {
-                where: [['isActive', '==', true]],
-                orderBy: 'order'
-            });
+            let activities = await FirestoreService.getCollection('activities', {});
+            activities = (activities || []).filter(function(item) { return item.isActive === true; }).sort(function(a, b) { return (a.order || 0) - (b.order || 0); });
+            console.log('[Display] Activities loaded:', activities.length, 'items');
             if (activities && activities.length > 0) {
                 const actContent = slideContentMap['activities'];
                 const todayStr = new Date().toISOString().split('T')[0];
@@ -564,11 +560,8 @@
             }
 
             // Slide Petugas Salat Jumat (1 Bulan Penuh + Pekan Ini)
-            const fridaySchedules = await FirestoreService.getCollection('fridaySchedules', {
-                where: [['isActive', '==', true]],
-                orderBy: 'date',
-                orderDir: 'asc'
-            });
+            let fridaySchedules = await FirestoreService.getCollection('fridaySchedules', {});
+            fridaySchedules = (fridaySchedules || []).filter(function(item) { return item.isActive === true; }).sort(function(a, b) { return (a.date || '').localeCompare(b.date || ''); });
             if (fridaySchedules && fridaySchedules.length > 0) {
                 const nowStr = new Date().toISOString().split('T')[0];
                 let currentFriday = fridaySchedules.find(f => (f.date || '') >= nowStr) || fridaySchedules[fridaySchedules.length - 1];
@@ -586,23 +579,17 @@
             }
 
             // Slide Laporan Kas & QRIS Infaq
-            const finance = await FirestoreService.getCollection('financeReports', {
-                where: [['isActive', '==', true]],
-                limit: 1
-            });
-            const qris = await FirestoreService.getCollection('qris', {
-                where: [['isActive', '==', true]],
-                limit: 1
-            });
+            let finance = await FirestoreService.getCollection('financeReports', {});
+            finance = (finance || []).filter(function(item) { return item.isActive === true; }).slice(0, 1);
+            let qris = await FirestoreService.getCollection('qris', {});
+            qris = (qris || []).filter(function(item) { return item.isActive === true; }).slice(0, 1);
             if ((finance && finance.length > 0) || (qris && qris.length > 0)) {
                 slides.push(createFinanceQRISSlide(finance ? finance[0] : null, qris ? qris[0] : null, slideContentMap['finance']));
             }
 
             // Slide Pengumuman (masing-masing 1 slide)
-            const announcements = await FirestoreService.getCollection('announcements', {
-                where: [['isActive', '==', true]],
-                orderBy: 'order'
-            });
+            let announcements = await FirestoreService.getCollection('announcements', {});
+            announcements = (announcements || []).filter(function(item) { return item.isActive === true; }).sort(function(a, b) { return (a.order || 0) - (b.order || 0); });
             if (announcements && announcements.length > 0) {
                 const annContent = slideContentMap['announcement'];
                 announcements.forEach(ann => {
@@ -611,7 +598,8 @@
             }
 
         } catch (err) {
-            console.warn('[Display] Slide load error:', err);
+            console.error('[Display] SLIDE LOAD ERROR:', err.message, err.stack);
+            console.error('[Display] Error name:', err.name, 'code:', err.code);
         }
 
         // Ensure at least welcome slide is present

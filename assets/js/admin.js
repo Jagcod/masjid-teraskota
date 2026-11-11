@@ -728,9 +728,8 @@ const AdminApp = (() => {
         listEl.innerHTML = '<p class="empty-state">Memuat...</p>';
 
         try {
-            const items = await FirestoreService.getCollection(collectionName, {
-                orderBy: 'order'
-            });
+            let items = await FirestoreService.getCollection(collectionName, {});
+            items = (items || []).sort(function(a, b) { return (a.order || 0) - (b.order || 0); });
 
             if (items.length === 0) {
                 listEl.innerHTML = '<p class="empty-state">Belum ada data. Klik tombol tambah untuk memulai.</p>';
