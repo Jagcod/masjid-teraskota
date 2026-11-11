@@ -1561,8 +1561,18 @@ const AdminApp = (() => {
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, width, height);
 
-                    // Kompresi ke JPEG ringan berkualitas tinggi untuk tampilan TV
-                    const compressedDataUrl = canvas.toDataURL('image/jpeg', quality);
+                    // Pertahankan transparansi PNG & WebP (JANGAN paksa ke JPEG karena JPEG mengubah transparansi jadi kotak hitam!)
+                    const isPng = file.type === 'image/png' || (file.name && file.name.toLowerCase().endsWith('.png'));
+                    const isWebP = file.type === 'image/webp' || (file.name && file.name.toLowerCase().endsWith('.webp'));
+                    
+                    let compressedDataUrl;
+                    if (isPng) {
+                        compressedDataUrl = canvas.toDataURL('image/png');
+                    } else if (isWebP) {
+                        compressedDataUrl = canvas.toDataURL('image/webp', quality);
+                    } else {
+                        compressedDataUrl = canvas.toDataURL('image/jpeg', quality);
+                    }
                     resolve(compressedDataUrl);
                 };
                 img.onerror = () => reject(new Error('Gagal memuat file gambar untuk kompresi.'));

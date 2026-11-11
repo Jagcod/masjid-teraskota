@@ -176,6 +176,8 @@ html, body {
     height: 100%;
     object-fit: contain;
     filter: none;
+    background: transparent;
+    mix-blend-mode: screen; /* Menghilangkan background hitam otomatis jika gambar logo memiliki kotak hitam */
 }
 
 .mosque-info {
