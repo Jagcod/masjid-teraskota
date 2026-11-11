@@ -44,6 +44,9 @@
         DOM.mosqueName = document.getElementById('mosque-name');
         DOM.mosqueAddress = document.getElementById('address-text');
         DOM.mosqueLogo = document.getElementById('mosque-logo');
+        if (DOM.mosqueLogo) {
+            processLogoTransparency(DOM.mosqueLogo);
+        }
 
         // Slide Showcase
         DOM.slideContainer = document.getElementById('slide-container');
@@ -297,6 +300,56 @@
         }
     }
 
+    
+    // Helper: Hapus background hitam otomatis dari gambar logo (terutama jika berupa JPEG / screenshot berlatar hitam)
+    function processLogoTransparency(imgEl) {
+        if (!imgEl) return;
+        function process() {
+            try {
+                if (!imgEl.naturalWidth || !imgEl.naturalHeight) return;
+                const w = imgEl.naturalWidth;
+                const h = imgEl.naturalHeight;
+                const canvas = document.createElement('canvas');
+                canvas.width = w;
+                canvas.height = h;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(imgEl, 0, 0);
+                const imgData = ctx.getImageData(0, 0, w, h);
+                const data = imgData.data;
+
+                // Cek 4 sudut gambar: jika dominan hitam (#000000), jadikan transparan
+                const corners = [0, (w - 1) * 4, ((h - 1) * w) * 4, (((h - 1) * w) + (w - 1)) * 4];
+                let blackCornerCount = 0;
+                for (let i = 0; i < corners.length; i++) {
+                    const idx = corners[i];
+                    const r = data[idx], g = data[idx + 1], b = data[idx + 2], a = data[idx + 3];
+                    if (a > 150 && r < 40 && g < 40 && b < 40) blackCornerCount++;
+                }
+
+                if (blackCornerCount >= 2) {
+                    for (let i = 0; i < data.length; i += 4) {
+                        const r = data[i], g = data[i + 1], b = data[i + 2];
+                        if (r < 35 && g < 35 && b < 35) {
+                            data[i + 3] = 0; // transparan total
+                        } else if (r < 60 && g < 60 && b < 60) {
+                            const maxVal = Math.max(r, g, b);
+                            data[i + 3] = Math.round((maxVal / 60) * 255); // anti-aliasing halus
+                        }
+                    }
+                    ctx.putImageData(imgData, 0, 0);
+                    imgEl.src = canvas.toDataURL('image/png');
+                }
+            } catch (e) {
+                // Cross-origin atau browser sandbox limitation
+            }
+        }
+        if (imgEl.complete && imgEl.naturalWidth) {
+            process();
+        } else {
+            imgEl.onload = process;
+        }
+    }
+
     function applyMosqueSettings(settings) {
         if (!settings) return;
 
@@ -315,6 +368,7 @@
         if (settings.logoUrl && DOM.mosqueLogo) {
             DOM.mosqueLogo.src = settings.logoUrl;
             DOM.mosqueLogo.style.display = '';
+            processLogoTransparency(DOM.mosqueLogo);
         }
 
         if (settings.runningText && DOM.runningText) {

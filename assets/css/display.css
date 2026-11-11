@@ -177,7 +177,7 @@ html, body {
     object-fit: contain;
     filter: none;
     background: transparent;
-    mix-blend-mode: screen; /* Menghilangkan background hitam otomatis jika gambar logo memiliki kotak hitam */
+    mix-blend-mode: screen;
 }
 
 .mosque-info {
@@ -212,7 +212,7 @@ html, body {
 .header-right {
     display: flex;
     align-items: center;
-    gap: 1.8vw;
+    gap: 2.2vw;
     flex-shrink: 0;
     white-space: nowrap;
 }
@@ -224,20 +224,19 @@ html, body {
     justify-content: center;
     white-space: nowrap;
     flex-shrink: 0;
+    margin-right: 12px;
 }
 
 .date-masehi {
-    font-size: clamp(0.95rem, 1.2vw, 1.45rem);
+    font-size: clamp(1.05rem, 1.35vw, 1.65rem);
     font-weight: 700;
     color: var(--text-white);
     line-height: 1.2;
+    letter-spacing: 0.3px;
 }
 
 .date-hijri {
-    font-size: clamp(0.85rem, 1.05vw, 1.3rem);
-    font-weight: 700;
-    color: var(--gold);
-    margin-top: 4px;
+    display: none !important;
 }
 
 /* Clock Card */

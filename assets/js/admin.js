@@ -980,14 +980,26 @@ const AdminApp = (() => {
                 const file = e.target.files[0];
                 if (file) {
                     try {
-                        const base64 = await compressImage(file, 400, 400, 0.85);
+                        const isPng = file.type === 'image/png' || (file.name && file.name.toLowerCase().endsWith('.png'));
+                        let base64;
+                        // Jika file PNG di bawah 400KB, baca langsung tanpa kompresi agar 100% transparan tanpa kotak hitam
+                        if (isPng && file.size < 450 * 1024) {
+                            base64 = await new Promise((res, rej) => {
+                                const r = new FileReader();
+                                r.onload = ev => res(ev.target.result);
+                                r.onerror = rej;
+                                r.readAsDataURL(file);
+                            });
+                        } else {
+                            base64 = await compressImage(file, 400, 400, 0.85);
+                        }
                         _currentLogoBase64 = base64;
                         if (logoPreview) {
                             logoPreview.src = base64;
                             logoPreview.classList.remove('hidden');
                         }
                         if (logoPlaceholder) logoPlaceholder.classList.add('hidden');
-                        showToast('Logo masjid berhasil dipilih.', 'info');
+                        showToast('Logo masjid transparan berhasil dipilih.', 'info');
                     } catch (err) {
                         showToast('Gagal memproses file gambar logo.', 'error');
                     }
