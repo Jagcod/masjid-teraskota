@@ -5,11 +5,8 @@
  * 
  * Sources:
  * 1. Primary: Aladhan API (provides accurate Hijri date with adjustment)
- * 2. Fallback: Local calculation using Intl.DateTimeFormat with 'islamic-umalqura' calendar
- * 3. Last resort: Approximate calculation
- * 
- * Note: Hijri dates may vary by ±1 day depending on moon sighting authority.
- * Admin can adjust the offset via Firestore settings.
+ * 2. Secondary: Browser Intl API with 'islamic-umalqura' calendar
+ * 3. Offline Guarantee: Built-in Kuwaiti Algorithm (calculated in 0 ms, works on any Smart TV/offline)
  */
 
 const HijriDateService = (() => {
@@ -34,18 +31,10 @@ const HijriDateService = (() => {
 
     const CACHE_KEY = 'masjid_hijri_cache';
 
-    /**
-     * Set Hijri adjustment (admin configurable)
-     * @param {number} adjustment - Days to add/subtract (-2 to +2)
-     */
     function setAdjustment(adjustment) {
         _hijriAdjustment = Math.max(-2, Math.min(2, parseInt(adjustment) || 0));
     }
 
-    /**
-     * Get formatted Masehi (Gregorian) date
-     * @returns {string} e.g., "Rabu, 28 Oktober 2026"
-     */
     function getMasehiDate(date) {
         const d = date || new Date();
         const dayName = MASEHI_DAYS[d.getDay()];
@@ -56,8 +45,85 @@ const HijriDateService = (() => {
     }
 
     /**
-     * Get Hijri date from Aladhan API
+     * Hitung Kalender Hijriah secara Matematis (Offline Guarantee)
+     * Tidak membutuhkan internet, langsung tersedia dalam 0 milidetik
      */
+    function calculateHijriOffline(date) {
+        const d = date ? new Date(date) : new Date();
+        if (_hijriAdjustment !== 0) {
+            d.setDate(d.getDate() + _hijriAdjustment);
+        }
+
+        let day = d.getDate();
+        let month = d.getMonth();
+        let year = d.getFullYear();
+
+        let m = month + 1;
+        let y = year;
+        if (m < 3) {
+            y -= 1;
+            m += 12;
+        }
+
+        let a = Math.floor(y / 100);
+        let b = 2 - a + Math.floor(a / 4);
+        if (y < 1583) b = 0;
+        if (y === 1582) {
+            if (m > 10) b = -10;
+            if (m === 10) {
+                b = 0;
+                if (day > 4) b = -10;
+            }
+        }
+
+        let jd = Math.floor(365.25 * (y + 4716)) + Math.floor(30.6001 * (m + 1)) + day + b - 1524;
+
+        b = 0;
+        if (jd > 2299160) {
+            a = Math.floor((jd - 1867216.25) / 36524.25);
+            b = 1 + a - Math.floor(a / 4);
+        }
+        let bb = jd + b + 1524;
+        let cc = Math.floor((bb - 122.1) / 365.25);
+        let dd = Math.floor(365.25 * cc);
+        let ee = Math.floor((bb - dd) / 30.6001);
+        day = (bb - dd) - Math.floor(30.6001 * ee);
+        month = ee - 1;
+        if (ee > 13) {
+            cc += 1;
+            month = ee - 13;
+        }
+        year = cc - 4716;
+
+        let iyear = 10631.0 / 30.0;
+        let epochastro = 1948084;
+        let shift1 = 8.01 / 60.0;
+
+        let z = jd - epochastro;
+        let cyc = Math.floor(z / 10631);
+        z = z - 10631 * cyc;
+        let j = Math.floor((z - shift1) / iyear);
+        let iy = 30 * cyc + j;
+        z = z - Math.floor(j * iyear + shift1);
+        let im = Math.floor((z + 28.5001) / 29.5);
+        if (im === 13) im = 12;
+        let id = Math.floor(z - Math.floor(29.5001 * im - 29));
+
+        let hijriYear = iy + 1;
+        let hijriMonth = Math.max(1, Math.min(12, im));
+        let hijriDay = Math.max(1, Math.min(30, id));
+
+        const monthName = HIJRI_MONTHS[hijriMonth - 1] || 'Jumadil Akhir';
+
+        return {
+            day: hijriDay,
+            month: hijriMonth,
+            monthName: monthName,
+            year: hijriYear,
+            formatted: `${hijriDay} ${monthName} ${hijriYear} H`
+        };
+    }
+
     async function fetchHijriFromAPI(date) {
         const d = date || new Date();
         const dd = String(d.getDate()).padStart(2, '0');
@@ -90,22 +156,16 @@ const HijriDateService = (() => {
                 formatted: `${parseInt(hijri.day)} ${HIJRI_MONTHS[parseInt(hijri.month.number) - 1] || hijri.month.en} ${hijri.year} H`
             };
 
-            // Cache
             cacheHijri(result, `${yyyy}-${mm}-${dd}`);
             return result;
         } catch (error) {
-            console.warn('[HijriDate] API fetch failed:', error.message);
+            console.warn('[HijriDate] API fetch notice:', error.message);
             return null;
         }
     }
 
-    /**
-     * Get Hijri date using browser's Intl API (fallback)
-     */
     function getHijriFromIntl(date) {
         const d = date || new Date();
-
-        // Apply adjustment
         if (_hijriAdjustment !== 0) {
             const adjusted = new Date(d);
             adjusted.setDate(adjusted.getDate() + _hijriAdjustment);
@@ -113,7 +173,6 @@ const HijriDateService = (() => {
         }
 
         try {
-            // Try islamic-umalqura calendar (used in Saudi Arabia / most common)
             const formatter = new Intl.DateTimeFormat('id-u-ca-islamic-umalqura', {
                 day: 'numeric',
                 month: 'long',
@@ -130,7 +189,6 @@ const HijriDateService = (() => {
             }
 
             if (day && month && year) {
-                // Try to find our Indonesian month name
                 const monthIndex = parseInt(month) - 1;
                 const monthName = (monthIndex >= 0 && monthIndex < 12) 
                     ? HIJRI_MONTHS[monthIndex] 
@@ -144,53 +202,38 @@ const HijriDateService = (() => {
                     formatted: `${parseInt(day)} ${monthName} ${year.replace(/\s*AH/i, '')} H`
                 };
             }
-        } catch (e) {
-            console.warn('[HijriDate] Intl API not supported:', e.message);
-        }
+        } catch (e) {}
 
         return null;
     }
 
-    /**
-     * Get today's Hijri date (tries API first, then Intl, then cache)
-     */
     async function getHijriDate(date) {
         const d = date || new Date();
         const dateStr = d.toISOString().split('T')[0];
 
-        // Try cached first for speed
+        // 1. Try cached first
         const cached = getCachedHijri(dateStr);
         if (cached) return cached;
 
-        // Try Intl (instant, no network)
+        // 2. Try Intl API
         const intlResult = getHijriFromIntl(d);
         if (intlResult) {
             cacheHijri(intlResult, dateStr);
         }
 
-        // Fetch from API in background (non-blocking)
+        // 3. Fallback to instant mathematical calculation (0 ms, guaranteed)
+        const offlineResult = calculateHijriOffline(d);
+
+        // 4. Fetch official API in background to update cache & event
         fetchHijriFromAPI(d).then(apiResult => {
             if (apiResult) {
                 cacheHijri(apiResult, dateStr);
-                // Dispatch event so display can update
                 window.dispatchEvent(new CustomEvent('masjid-hijri-updated', { detail: apiResult }));
             }
         }).catch(() => {});
 
-        // Return Intl result immediately
-        if (intlResult) return intlResult;
-
-        // Last resort
-        return {
-            day: 0,
-            month: 0,
-            monthName: '',
-            year: 0,
-            formatted: 'Tanggal Hijriah tidak tersedia'
-        };
+        return intlResult || offlineResult;
     }
-
-    // ── Cache ──
 
     function cacheHijri(result, dateStr) {
         try {
@@ -215,6 +258,7 @@ const HijriDateService = (() => {
     return {
         getMasehiDate,
         getHijriDate,
+        calculateHijriOffline,
         setAdjustment,
         HIJRI_MONTHS,
         MASEHI_DAYS,

@@ -116,6 +116,7 @@
     async function init() {
         console.info('[Display] Initializing TV display system...');
         cacheDOMReferences();
+        hideConnectionStatus();
 
         // 1. Start Clock & Calendar Immediately
         startClock();
@@ -268,7 +269,13 @@
             if (prayerConfig) {
                 PrayerTimesService.setConfig(prayerConfig);
                 if (prayerConfig.timezoneLabel || prayerConfig.timezone) {
-                    state.settings = { ...(state.settings || {}), timezone: prayerConfig.timezone || state.settings?.timezone, timezoneLabel: prayerConfig.timezoneLabel || state.settings?.timezoneLabel };
+                    const currentTz = (state.settings && state.settings.timezone) || 'Asia/Jakarta';
+                    const currentTzLabel = (state.settings && state.settings.timezoneLabel) || 'WIB (TANGERANG SELATAN)';
+                    state.settings = {
+                        ...(state.settings || {}),
+                        timezone: prayerConfig.timezone || currentTz,
+                        timezoneLabel: prayerConfig.timezoneLabel || currentTzLabel
+                    };
                     updateTimezoneLabel();
                 }
             }
@@ -1145,7 +1152,13 @@
                 if (data) {
                     PrayerTimesService.setConfig(data);
                     if (data.timezoneLabel || data.timezone) {
-                        state.settings = { ...(state.settings || {}), timezone: data.timezone || state.settings?.timezone, timezoneLabel: data.timezoneLabel || state.settings?.timezoneLabel };
+                        const currentTz = (state.settings && state.settings.timezone) || 'Asia/Jakarta';
+                        const currentTzLabel = (state.settings && state.settings.timezoneLabel) || 'WIB (TANGERANG SELATAN)';
+                        state.settings = {
+                            ...(state.settings || {}),
+                            timezone: data.timezone || currentTz,
+                            timezoneLabel: data.timezoneLabel || currentTzLabel
+                        };
                         updateTimezoneLabel();
                         startClock();
                         updateDates();

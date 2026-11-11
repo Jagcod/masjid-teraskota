@@ -527,8 +527,8 @@ const FirestoreService = (() => {
         // Apply ordering
         if (options.orderBy) {
             items.sort((a, b) => {
-                const aVal = a[options.orderBy] ?? '';
-                const bVal = b[options.orderBy] ?? '';
+                const aVal = (a[options.orderBy] !== undefined && a[options.orderBy] !== null ? a[options.orderBy] : '');
+                const bVal = (b[options.orderBy] !== undefined && b[options.orderBy] !== null ? b[options.orderBy] : '');
                 if (typeof aVal === 'string' && typeof bVal === 'string') {
                     return options.orderDir === 'desc' ? bVal.localeCompare(aVal) : aVal.localeCompare(bVal);
                 }
