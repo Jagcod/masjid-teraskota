@@ -552,22 +552,9 @@ html, body {
     font-weight: 500;
 }
 
-/* Slide Indicator Dots (Clickable & Sleek) */
+/* Slide Indicator Dots (Disembunyikan total agar layar TV bersih dan elegan) */
 .slide-indicators {
-    height: 24px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    z-index: 25;
-    margin: 10px auto 2px auto;
-    width: fit-content;
-    padding: 4px 14px;
-    background: rgba(15, 27, 43, 0.75);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    border-radius: 9999px;
-    user-select: none;
-    cursor: pointer;
+    display: none !important;
 }
 
 .indicator-dot {
