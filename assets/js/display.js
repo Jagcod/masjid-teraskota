@@ -263,9 +263,9 @@
                 applyMosqueSettings(mosqueSettings);
             }
 
-            // Background Settings
+            // Background Settings (Hanya perbarui jika ada data kustom yang valid dari cloud)
             const bgSettings = await FirestoreService.getDocument('settings', 'background');
-            if (bgSettings) {
+            if (bgSettings && (bgSettings.url || bgSettings.type !== 'default')) {
                 applyBackgroundSettings(bgSettings);
             } else if (mosqueSettings && mosqueSettings.background) {
                 applyBackgroundSettings(mosqueSettings.background);
@@ -375,13 +375,31 @@
 
     /**
      * Apply Dynamic Background (Supports ANY format: Image, Video, Gradient)
+     * Dilengkapi Anti-Flicker & Cache State agar background tetap 100% kokoh/netep, tidak berkedip atau berubah-ubah.
      */
+    let _lastAppliedBgKey = '';
+
     function applyBackgroundSettings(bg) {
         if (!bg) return;
 
         const type = bg.type || 'default';
         const url = bg.url || '';
         const opacity = bg.opacity !== undefined ? bg.opacity : 0.65;
+        const fitMode = bg.fitMode || 'cover';
+
+        // Cegah re-render jika background yang sama sudah terpasang di layar (Anti-Blink / Anti-Flicker)
+        const bgKey = `${type}_${url.length}_${opacity}_${fitMode}`;
+        if (_lastAppliedBgKey === bgKey) {
+            return;
+        }
+        _lastAppliedBgKey = bgKey;
+
+        // Simpan background kustom ke localStorage agar tetap netep saat reload
+        if (url || type !== 'default') {
+            try {
+                localStorage.setItem('masjid_bg_settings', JSON.stringify(bg));
+            } catch(e) {}
+        }
 
         // 1. Set Overlay Darkness Opacity
         document.documentElement.style.setProperty('--bg-overlay-opacity', opacity);
@@ -392,7 +410,6 @@
         const isGradient = type === 'gradient';
 
         if (isVideo && DOM.bgVideo) {
-            // Play Video
             if (DOM.bgVideo.src !== url) {
                 DOM.bgVideo.src = url;
                 DOM.bgVideo.load();
@@ -401,23 +418,21 @@
             DOM.bgVideo.play().catch(e => console.info('[Display] Video autoplay notice:', e));
             if (DOM.bgImage) DOM.bgImage.style.backgroundImage = 'none';
         } else if (isImage && DOM.bgImage) {
-            // Set Background Image
             if (DOM.bgVideo) {
                 DOM.bgVideo.pause();
                 DOM.bgVideo.classList.add('hidden');
             }
             DOM.bgImage.style.backgroundImage = `url("${url}")`;
-            DOM.bgImage.style.backgroundSize = 'cover';
+            DOM.bgImage.style.backgroundSize = fitMode;
             DOM.bgImage.style.backgroundPosition = 'center center';
+            DOM.bgImage.style.backgroundRepeat = 'no-repeat';
         } else if (isGradient && DOM.bgImage) {
-            // Set Custom Gradient
             if (DOM.bgVideo) {
                 DOM.bgVideo.pause();
                 DOM.bgVideo.classList.add('hidden');
             }
             DOM.bgImage.style.background = url || 'radial-gradient(circle at 50% 20%, #1a324b 0%, #0b131e 75%, #050a10 100%)';
         } else {
-            // Reset to Default Modern Islamic Vector Background
             if (DOM.bgVideo) {
                 DOM.bgVideo.pause();
                 DOM.bgVideo.classList.add('hidden');
@@ -605,7 +620,7 @@
         }
 
         state.slides = slides;
-        state.currentSlideIndex = 0;
+        if (state.currentSlideIndex >= state.slides.length) { state.currentSlideIndex = 0; }
         renderCurrentSlide();
         renderSlideIndicators();
     }
@@ -1217,13 +1232,12 @@
         // Coba pasang realtime listener jika Firestore sudah siap
         attachFirestoreRealtimeListeners();
 
-        // Background polling sync cadangan setiap 15 detik (Jaminan TV & HP selalu update walau WebSocket sempat putus)
+        // Background polling sync cadangan berkala yang lembut (tanpa mengganggu slide atau background yang sudah aktif)
         setInterval(() => {
             if (FirestoreService.isOnline && FirestoreService.isOnline()) {
                 loadSettings();
-                debouncedLoadSlides();
             }
-        }, 15000);
+        }, 60000);
 
         // 2. Cross-tab LocalStorage & Local Change sync (Works instantly in demo mode & local server)
         let _localSyncTimer = null;
