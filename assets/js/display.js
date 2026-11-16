@@ -386,9 +386,10 @@
                 setTimeout(() => {
                     if (DOM.runningText && DOM.runningText.parentElement) {
                         const textWidth = DOM.runningText.scrollWidth || 1200;
-                        const wrapperWidth = DOM.runningText.parentElement.offsetWidth || window.innerWidth;
-                        const totalDistance = textWidth + wrapperWidth;
-                        const duration = Math.max(75, Math.round(totalDistance / 38));
+                        const screenWidth = window.innerWidth || 1920;
+                        const totalDistance = textWidth + screenWidth;
+                        // Kecepatan lambat, sangat tenang dan super smooth (~35 px/detik)
+                        const duration = Math.max(85, Math.round(totalDistance / 35));
                         DOM.runningText.style.animationDuration = duration + 's';
                     }
                 }, 100);
@@ -705,7 +706,7 @@
                             <span>AHLAN WA SAHLAN</span>
                             <span class="welcome-pill-sparkle">&#10022;</span>
                         </div>
-                        <div class="welcome-arabic-text">السَّلَامُ علَيْكُمْ وَرَحْمَةُ اللهِ وَبَرَكَاتُهُ</div>
+                        <div class="welcome-arabic-text">السَّلَامُ عَلَيْكُمْ وَرَحْمَةُ اللهِ وَبَرَكَاتُهُ</div>
                         <div class="welcome-gold-sep"></div>
                         <h2 class="welcome-masjid-title">Selamat Datang di <span class="gold-gradient-text">Masjid Teraskota</span></h2>
                     </div>

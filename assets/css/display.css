@@ -892,25 +892,30 @@ html, body {
     position: relative;
     display: flex;
     align-items: center;
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+    isolation: isolate;
 }
 
 .running-text {
     display: inline-block;
-    font-size: clamp(1rem, 1.3vw, 1.7rem);
+    font-size: clamp(1rem, 1.3vw, 1.65rem);
     font-weight: 700;
     color: var(--text-white);
-    padding-left: 100%;
+    padding: 0;
+    margin: 0;
     white-space: nowrap;
     will-change: transform;
-    transform: translate3d(0, 0, 0);
-    -webkit-transform: translate3d(0, 0, 0);
-    animation: marquee 85s linear infinite !important;
+    transform: translate3d(100vw, 0, 0);
+    -webkit-transform: translate3d(100vw, 0, 0);
+    animation: marquee 90s linear infinite !important;
+    text-rendering: optimizeSpeed;
 }
 
 @keyframes marquee {
     0% {
-        transform: translate3d(0, 0, 0);
-        -webkit-transform: translate3d(0, 0, 0);
+        transform: translate3d(100vw, 0, 0);
+        -webkit-transform: translate3d(100vw, 0, 0);
     }
     100% {
         transform: translate3d(-100%, 0, 0);
@@ -1063,9 +1068,9 @@ html, body {
     font-size: clamp(0.72rem, 0.82vw, 0.95rem);
     font-weight: 800;
     letter-spacing: 2.5px;
-    padding: 6px 20px;
+    padding: 6px 22px;
     border-radius: 9999px;
-    margin-bottom: 1.5vh;
+    margin-bottom: 3.5vh !important;
 }
 
 .welcome-pill-sparkle {
@@ -1076,11 +1081,12 @@ html, body {
 /* Welcome Arabic Typography (Generous line-height, beautiful calligraphy) */
 .welcome-arabic-text {
     font-family: var(--font-arabic);
-    font-size: clamp(3.2rem, 5.2vw, 5.6rem) !important;
+    font-size: clamp(2.8rem, 4.6vw, 5.2rem) !important;
     font-weight: 700;
     color: #ffffff;
-    line-height: 1.45;
-    margin: 0.6vh 0 1.2vh 0;
+    line-height: 1.6;
+    padding-top: 0.8vh;
+    margin: 1vh 0 2vh 0 !important;
     direction: rtl;
     text-align: center;
     width: 100%;
