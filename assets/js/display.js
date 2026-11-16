@@ -685,14 +685,29 @@
             id: 'welcome',
             html: `
                 <div class="slide slide-welcome single-col centered">
-                    <div class="slide-center-card" style="max-width:980px;">
-                        <div class="welcome-tag centered-tag">
-                            <svg class="tag-icon-svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M12 2c-.55 0-1 .45-1 1v1.1c-2.83.48-5 2.94-5 5.9 0 1.25.38 2.4 1.03 3.36L4 16v5h16v-5l-3.03-2.64c.65-.96 1.03-2.11 1.03-3.36 0-2.96-2.17-5.42-5-5.9V3c0-.55-.45-1-1-1zm-1 8h2v8h-2v-8z"/></svg>
-                            <span>AHLAN WA SAHLAN • RUMAH ALLAH</span>
+                    <div class="welcome-slide-inner">
+                        <div class="welcome-ornament-top">
+                            <span class="welcome-ornament-line"></span>
+                            <span class="welcome-ornament-diamond">&#9670;</span>
+                            <span class="welcome-ornament-line"></span>
                         </div>
-                        <div class="arabic-greeting" style="font-size:clamp(2.2rem, 3.6vw, 4.4rem); margin-bottom:1.5vh;">السَّلَامُ عَلَيْكُمْ وَرَحْمَةُ اللهِ وَبَرَكَاتُهُ</div>
-                        <h2 class="slide-hero-title-center" style="font-size:clamp(1.8rem, 2.8vw, 3.4rem); margin-bottom:1vh;">Selamat Datang di <span class="text-gold">Masjid Teraskota</span></h2>
-                        <p class="welcome-subheading" style="font-size:clamp(1.05rem, 1.35vw, 1.6rem); color:var(--text-muted); font-weight:500;">Pusat Ibadah, Dakwah & Pembinaan Umat • BSD City</p>
+                        <div class="welcome-badge-row">
+                            <span class="welcome-star">&#9733;</span>
+                            <span class="welcome-badge-text">AHLAN WA SAHLAN</span>
+                            <span class="welcome-star">&#9733;</span>
+                        </div>
+                        <div class="arabic-greeting welcome-arabic-big">السَّلَامُ علَيْكُمْ وَرَحْمَةُ اللهِ وَبَرَكَاتُهُ</div>
+                        <div class="welcome-divider">
+                            <span class="welcome-divider-line"></span>
+                            <span class="welcome-divider-gem">&#10022;</span>
+                            <span class="welcome-divider-line"></span>
+                        </div>
+                        <h2 class="welcome-main-title">Selamat Datang di <span class="text-gold">Masjid Teraskota</span></h2>
+                        <div class="welcome-ornament-bottom">
+                            <span class="welcome-ornament-line"></span>
+                            <span class="welcome-ornament-diamond">&#9670;</span>
+                            <span class="welcome-ornament-line"></span>
+                        </div>
                     </div>
                 </div>
             `

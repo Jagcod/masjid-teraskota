@@ -1114,3 +1114,108 @@ html, body {
     font-weight: 500;
     margin: 4px 0 0 0;
 }
+
+
+/* ── Welcome Slide Redesign (Elegan, Tanpa Subheading) ── */
+.welcome-slide-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    width: 100%;
+    max-width: 900px;
+    padding: 3.5vh 4vw;
+    background: rgba(10, 20, 35, 0.78);
+    border: 1.5px solid rgba(250, 204, 21, 0.3);
+    border-radius: 28px;
+    backdrop-filter: blur(18px);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05);
+    gap: 1.4vh;
+}
+
+.welcome-ornament-top,
+.welcome-ornament-bottom {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 60%;
+    justify-content: center;
+}
+
+.welcome-ornament-line {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(to right, transparent, rgba(250,204,21,0.5), transparent);
+    display: block;
+}
+
+.welcome-ornament-diamond {
+    color: var(--gold);
+    font-size: 0.75rem;
+    opacity: 0.75;
+}
+
+.welcome-badge-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 0.4vh;
+}
+
+.welcome-star {
+    color: var(--gold);
+    font-size: clamp(0.7rem, 0.9vw, 1.1rem);
+    opacity: 0.9;
+}
+
+.welcome-badge-text {
+    font-size: clamp(0.75rem, 0.95vw, 1.15rem);
+    font-weight: 800;
+    letter-spacing: 3px;
+    color: var(--gold);
+    text-transform: uppercase;
+}
+
+.welcome-arabic-big {
+    font-family: var(--font-arabic);
+    font-size: clamp(2.4rem, 4vw, 5rem) !important;
+    color: var(--text-white);
+    line-height: 1.55;
+    direction: rtl;
+    text-align: center;
+    width: 100%;
+    text-shadow: 0 2px 16px rgba(250,204,21,0.15);
+    margin: 0.3vh 0;
+}
+
+.welcome-divider {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 55%;
+    justify-content: center;
+    margin: 0.4vh 0;
+}
+
+.welcome-divider-line {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(to right, transparent, rgba(250,204,21,0.4), transparent);
+    display: block;
+}
+
+.welcome-divider-gem {
+    color: var(--gold);
+    font-size: 0.8rem;
+    opacity: 0.8;
+}
+
+.welcome-main-title {
+    font-size: clamp(1.9rem, 2.9vw, 3.6rem);
+    font-weight: 800;
+    color: var(--text-white);
+    line-height: 1.2;
+    margin: 0;
+    letter-spacing: -0.5px;
+}
