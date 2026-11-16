@@ -685,29 +685,15 @@
             id: 'welcome',
             html: `
                 <div class="slide slide-welcome single-col centered">
-                    <div class="welcome-slide-inner">
-                        <div class="welcome-ornament-top">
-                            <span class="welcome-ornament-line"></span>
-                            <span class="welcome-ornament-diamond">&#9670;</span>
-                            <span class="welcome-ornament-line"></span>
+                    <div class="welcome-card">
+                        <div class="welcome-pill">
+                            <span class="welcome-pill-sparkle">&#10022;</span>
+                            <span>AHLAN WA SAHLAN</span>
+                            <span class="welcome-pill-sparkle">&#10022;</span>
                         </div>
-                        <div class="welcome-badge-row">
-                            <span class="welcome-star">&#9733;</span>
-                            <span class="welcome-badge-text">AHLAN WA SAHLAN</span>
-                            <span class="welcome-star">&#9733;</span>
-                        </div>
-                        <div class="arabic-greeting welcome-arabic-big">السَّلَامُ علَيْكُمْ وَرَحْمَةُ اللهِ وَبَرَكَاتُهُ</div>
-                        <div class="welcome-divider">
-                            <span class="welcome-divider-line"></span>
-                            <span class="welcome-divider-gem">&#10022;</span>
-                            <span class="welcome-divider-line"></span>
-                        </div>
-                        <h2 class="welcome-main-title">Selamat Datang di <span class="text-gold">Masjid Teraskota</span></h2>
-                        <div class="welcome-ornament-bottom">
-                            <span class="welcome-ornament-line"></span>
-                            <span class="welcome-ornament-diamond">&#9670;</span>
-                            <span class="welcome-ornament-line"></span>
-                        </div>
+                        <div class="welcome-arabic-text">السَّلَامُ علَيْكُمْ وَرَحْمَةُ اللهِ وَبَرَكَاتُهُ</div>
+                        <div class="welcome-gold-sep"></div>
+                        <h2 class="welcome-masjid-title">Selamat Datang di <span class="gold-gradient-text">Masjid Teraskota</span></h2>
                     </div>
                 </div>
             `
@@ -727,9 +713,10 @@
                 html: `
                     <div class="slide slide-kajian single-col centered">
                         <div class="slide-center-card">
-                            <div class="welcome-tag centered-tag">
-                                <svg class="tag-icon-svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/></svg>
+                            <div class="welcome-pill">
+                                <span class="welcome-pill-sparkle">&#10022;</span>
                                 <span>JADWAL KAJIAN ISLAM RUTIN</span>
+                                <span class="welcome-pill-sparkle">&#10022;</span>
                             </div>
                             <h2 class="slide-hero-title-center">${escapeHtml(k.title || 'Kajian Rutin')}</h2>
                             
@@ -825,9 +812,10 @@
                 html: `
                     <div class="slide slide-activities single-col centered">
                         <div class="slide-center-card">
-                            <div class="welcome-tag centered-tag">
-                                <svg class="tag-icon-svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19a2 2 0 0 0 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/></svg>
+                            <div class="welcome-pill">
+                                <span class="welcome-pill-sparkle">&#10022;</span>
                                 <span>AGENDA &amp; KEGIATAN MASJID</span>
+                                <span class="welcome-pill-sparkle">&#10022;</span>
                             </div>
                             <h2 class="slide-hero-title-center">${escapeHtml(a.title || 'Kegiatan Masjid')}</h2>
 
