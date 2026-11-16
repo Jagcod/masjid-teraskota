@@ -382,6 +382,16 @@
                 } else {
                     DOM.runningText.textContent = raw;
                 }
+                // Hitung durasi agar kecepatan berjalan lambat, santai, dan sangat smooth (~38 pixel/detik)
+                setTimeout(() => {
+                    if (DOM.runningText && DOM.runningText.parentElement) {
+                        const textWidth = DOM.runningText.scrollWidth || 1200;
+                        const wrapperWidth = DOM.runningText.parentElement.offsetWidth || window.innerWidth;
+                        const totalDistance = textWidth + wrapperWidth;
+                        const duration = Math.max(75, Math.round(totalDistance / 38));
+                        DOM.runningText.style.animationDuration = duration + 's';
+                    }
+                }, 100);
             }
         }
 
