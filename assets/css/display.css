@@ -368,8 +368,9 @@ html, body {
     margin-top: 8px;
     margin-bottom: 14px;
     direction: rtl;
-    text-align: right;
-    align-self: flex-start;
+    text-align: center;
+    align-self: center;
+    width: 100%;
 }
 
 .welcome-heading {
