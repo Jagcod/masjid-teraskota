@@ -62,84 +62,186 @@ const FirestoreService = (() => {
         return _isOnline;
     }
 
-    // ── CRUD Operations ──
-
-    /**
-     * Get a single document
-     */
-    async function getDocument(collection, docId) {
-        if (!_isOnline || !docId || String(docId).startsWith('local_')) {
-            return getDemoData(collection, docId);
-        }
-
-        try {
-            const getPromise = _db.collection(collection).doc(docId).get();
-            const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('Firestore timeout')), 5000));
-            const doc = await Promise.race([getPromise, timeoutPromise]);
-            if (doc.exists) {
-                return { id: doc.id, ...doc.data() };
+    // ── Firestore REST API Helper (Ultra Cepat ~200ms & Kebal Blokir Jaringan) ──
+    function parseFirestoreRestFields(fields) {
+        if (!fields) return {};
+        const res = {};
+        for (const [key, valObj] of Object.entries(fields)) {
+            if (valObj.stringValue !== undefined) res[key] = valObj.stringValue;
+            else if (valObj.booleanValue !== undefined) res[key] = valObj.booleanValue;
+            else if (valObj.integerValue !== undefined) res[key] = parseInt(valObj.integerValue, 10);
+            else if (valObj.doubleValue !== undefined) res[key] = parseFloat(valObj.doubleValue);
+            else if (valObj.timestampValue !== undefined) res[key] = valObj.timestampValue;
+            else if (valObj.arrayValue !== undefined) {
+                res[key] = (valObj.arrayValue.values || []).map(v => {
+                    if (v.stringValue !== undefined) return v.stringValue;
+                    if (v.mapValue !== undefined) return parseFirestoreRestFields(v.mapValue.fields);
+                    return v;
+                });
+            } else if (valObj.mapValue !== undefined) {
+                res[key] = parseFirestoreRestFields(valObj.mapValue.fields);
+            } else if (valObj.nullValue !== undefined) {
+                res[key] = null;
             }
-            return getDemoData(collection, docId);
-        } catch (error) {
-            console.warn(`[Firestore] Get ${collection}/${docId} fallback to local:`, error.message);
-            return getDemoData(collection, docId);
+        }
+        return res;
+    }
+
+    async function fetchCollectionRest(collection) {
+        try {
+            const projectId = (typeof FIREBASE_CONFIG !== 'undefined' && FIREBASE_CONFIG.projectId) || 'masjidtv-57edd';
+            const url = 'https://firestore.googleapis.com/v1/projects/' + projectId + '/databases/(default)/documents/' + collection + '?pageSize=100';
+            const resp = await fetch(url);
+            if (!resp.ok) return [];
+            const data = await resp.json();
+            if (!data.documents || !data.documents.length) return [];
+            return data.documents.map(doc => {
+                const id = doc.name.split('/').pop();
+                const fields = parseFirestoreRestFields(doc.fields);
+                return { id, ...fields };
+            });
+        } catch (e) {
+            console.warn('[Firestore REST Fallback] Collection ' + collection + ' error:', e.message);
+            return [];
         }
     }
 
+    async function fetchDocumentRest(collection, docId) {
+        try {
+            const projectId = (typeof FIREBASE_CONFIG !== 'undefined' && FIREBASE_CONFIG.projectId) || 'masjidtv-57edd';
+            const url = 'https://firestore.googleapis.com/v1/projects/' + projectId + '/databases/(default)/documents/' + collection + '/' + docId;
+            const resp = await fetch(url);
+            if (!resp.ok) return null;
+            const doc = await resp.json();
+            if (!doc || !doc.fields) return null;
+            const fields = parseFirestoreRestFields(doc.fields);
+            return { id: docId, ...fields };
+        } catch (e) {
+            console.warn('[Firestore REST Fallback] Document ' + collection + '/' + docId + ' error:', e.message);
+            return null;
+        }
+    }
+
+    // ── CRUD Operations ──
+
     /**
-     * Get all documents from a collection
+     * Get a single document (Cache First -> SDK -> Fast REST Fallback)
+     */
+    async function getDocument(collection, docId) {
+        if (!docId || String(docId).startsWith('local_')) {
+            return getDemoData(collection, docId);
+        }
+
+        // 1. Coba ambil dari Cache Instan (0 ms)
+        let cachedDoc = null;
+        try {
+            const cStr = localStorage.getItem('masjid_cache_doc_' + collection + '_' + docId);
+            if (cStr) cachedDoc = JSON.parse(cStr);
+        } catch(e) {}
+
+        if (!_isOnline) {
+            return cachedDoc || getDemoData(collection, docId);
+        }
+
+        try {
+            // Coba SDK dengan timeout singkat 2 detik
+            const getPromise = _db.collection(collection).doc(docId).get();
+            const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('SDK timeout')), 2000));
+            const doc = await Promise.race([getPromise, timeoutPromise]);
+            if (doc.exists) {
+                const res = { id: doc.id, ...doc.data() };
+                try { localStorage.setItem('masjid_cache_doc_' + collection + '_' + docId, JSON.stringify(res)); } catch(e) {}
+                return res;
+            }
+        } catch (error) {
+            console.warn('[Firestore] SDK getDocument ' + collection + '/' + docId + ' slow/failed, using REST API:', error.message);
+        }
+
+        // 2. Fallback instan ke REST API Google (~200ms)
+        const restDoc = await fetchDocumentRest(collection, docId);
+        if (restDoc) {
+            try { localStorage.setItem('masjid_cache_doc_' + collection + '_' + docId, JSON.stringify(restDoc)); } catch(e) {}
+            return restDoc;
+        }
+
+        return cachedDoc || getDemoData(collection, docId);
+    }
+
+    /**
+     * Get all documents from a collection (Instant Local Cache + Fast REST Fallback)
      */
     async function getCollection(collection, options = {}) {
-        if (!_isOnline) return getDemoCollection(collection, options);
+        // 1. Cache Instan dari LocalStorage (Data langsung muncul 0 milidetik!)
+        let cachedItems = null;
+        try {
+            const cachedStr = localStorage.getItem('masjid_cache_col_' + collection);
+            if (cachedStr) {
+                cachedItems = JSON.parse(cachedStr);
+            }
+        } catch(e) {}
 
+        if (!_isOnline) {
+            return cachedItems || getDemoCollection(collection, options);
+        }
+
+        let cloudDocs = null;
+
+        // 2. Coba fetch via Firebase SDK (Timeout 2 detik agar tidak pernah nunggu lama)
         try {
             let query = _db.collection(collection);
 
-            // Apply filters
             if (options.where) {
                 for (const [field, op, value] of options.where) {
                     query = query.where(field, op, value);
                 }
             }
-
-            // Apply ordering
             if (options.orderBy) {
                 query = query.orderBy(options.orderBy, options.orderDir || 'asc');
             }
-
-            // Apply limit
             if (options.limit) {
                 query = query.limit(options.limit);
             }
 
-            // Proteksi timeout 2.5 detik agar tidak pernah hang
             const getPromise = query.get();
-            const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('Firestore getCollection timeout')), 5000));
+            const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('SDK timeout')), 2000));
             const snapshot = await Promise.race([getPromise, timeoutPromise]);
-            
-            const cloudDocs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-
-            // Gabungkan hanya data lokal sementara (local_*) yang belum terupload ke cloud
-            const demoDocs = getDemoCollection(collection, options);
-            const localOnlyDocs = demoDocs.filter(d => String(d.id).startsWith('local_'));
-            
-            let combined = [...cloudDocs];
-            localOnlyDocs.forEach(loc => {
-                if (!combined.some(c => c.id === loc.id)) {
-                    combined.push(loc);
-                }
-            });
-
-            // Jika di cloud sudah kosong/dihapus oleh user, kembalikan kosong (JANGAN kembalikan demo data lama!)
-            return combined;
+            cloudDocs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         } catch (error) {
-            console.warn(`[Firestore] Get collection ${collection} notice:`, error.message);
-            // Hanya fallback ke demo data jika Firestore memang belum terkonfigurasi
-            if (!_isOnline) {
-                return getDemoCollection(collection, options);
-            }
-            return [];
+            console.warn('[Firestore] SDK getCollection ' + collection + ' slow/failed, using REST API fallback:', error.message);
         }
+
+        // 3. Jika SDK timeout atau gagal, LANGSUNG ambil dari REST API Google (~200ms)
+        if (!cloudDocs) {
+            cloudDocs = await fetchCollectionRest(collection);
+            // Terapkan client-side filter jika ada options.where
+            if (options.where && options.where.length > 0) {
+                cloudDocs = cloudDocs.filter(doc => {
+                    return options.where.every(([f, op, val]) => {
+                        if (op === '==') return doc[f] === val;
+                        return true;
+                    });
+                });
+            }
+        }
+
+        // Gabungkan dengan dokumen lokal temporary jika ada
+        const demoDocs = getDemoCollection(collection, options);
+        const localOnlyDocs = demoDocs.filter(d => String(d.id).startsWith('local_'));
+        let combined = [...(cloudDocs || [])];
+        localOnlyDocs.forEach(loc => {
+            if (!combined.some(c => c.id === loc.id)) {
+                combined.push(loc);
+            }
+        });
+
+        // 4. Update cache LocalStorage agar buka berikutnya instan
+        if (combined && combined.length >= 0) {
+            try {
+                localStorage.setItem('masjid_cache_col_' + collection, JSON.stringify(combined));
+            } catch(e) {}
+        }
+
+        return combined.length > 0 ? combined : (cachedItems || []);
     }
 
     /**

@@ -13,7 +13,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     <!-- Stylesheets -->
-    <link rel="stylesheet" href="../assets/css/admin.css?v=20261111_09">
+    <link rel="stylesheet" href="../assets/css/admin.css?v=20261116_01">
 
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="../assets/images/favicon.svg">
@@ -209,7 +209,7 @@
                                     <span>⚡ Pusat Kontrol Cepat DKM</span>
                                     <span class="badge badge-active" style="font-size:0.75rem;">Langsung Aktif di TV</span>
                                 </h3>
-                                <p class="section-desc">Ubah teks berjalan, update saldo kas, atau aktifkan mode sholat secara cepat tanpa membuka menu dalam.</p>
+                                
                             </div>
                             <div style="display:flex; gap:8px;">
                                 <button type="button" class="btn btn-outline btn-sm" id="btn-sync-tv" title="Kirim sinyal refresh ke layar TV">
@@ -231,7 +231,7 @@
                                         <span>📢 Teks Berjalan di TV (Running Text)</span>
                                     </label>
                                     <textarea id="quick-running-text" class="form-control" rows="2" placeholder="Ketik warta atau imbauan jamaah di sini..." style="resize:vertical; font-size:0.88rem; width:100%;"></textarea>
-                                    <small style="color:var(--text-muted); font-size:0.75rem; display:block; margin-top:4px;">Tips: Gunakan tanda bintang atau titik (•) untuk pemisah kalimat.</small>
+                                    
                                 </div>
                                 <button type="button" class="btn btn-primary btn-sm" id="btn-save-quick-ticker" style="margin-top:10px; width:100%;">
                                     💾 Simpan Running Text
@@ -372,7 +372,7 @@
                         <div class="section-header">
                             <div>
                                 <h3>Background Layar Display TV</h3>
-                                <p class="section-desc">Ganti background layar TV dengan format gambar apa saja (JPG, PNG, WebP, GIF, SVG), video (MP4, WebM), atau gradien warna kustom.</p>
+                                
                             </div>
                             <a href="../index.html" target="_blank" class="btn btn-outline btn-sm">Buka Display TV ↗</a>
                         </div>
@@ -573,7 +573,7 @@
                         <div class="section-header">
                             <div>
                                 <h3>Jam Digital &amp; Zona Waktu Daerah</h3>
-                                <p class="section-desc">Pilih zona waktu masjid Anda (WIB, WITA, atau WIT). Jam Display TV akan sinkron otomatis secara presisi.</p>
+                                
                             </div>
                             <div class="admin-live-clock-card" style="background:rgba(45,212,191,0.1); border:1px solid rgba(45,212,191,0.3); border-radius:12px; padding:8px 16px; text-align:center;">
                                 <div style="font-size:0.75rem; color:var(--text-muted); font-weight:700;">JAM SAAT INI</div>
@@ -607,8 +607,7 @@
                     <!-- Kartu Perhitungan Otomatis Lokasi & API Kemenag RI -->
                     <div class="section-card">
                         <h3>Lokasi &amp; Perhitungan Otomatis (Metode Kemenag RI)</h3>
-                        <p class="section-desc">Pilih kota masjid Anda atau masukkan koordinat GPS untuk menghitung jadwal sholat otomatis resmi standar Kementerian Agama RI.</p>
-                        
+
                         <div class="form-group" style="margin-bottom:16px;">
                             <label for="quick-city-select">Pilihan Cepat Kota / Kabupaten:</label>
                             <select id="quick-city-select" style="font-weight:600;">
@@ -663,8 +662,7 @@
                     <!-- Kartu Override Manual (Input Jam Sholat Sendiri) -->
                     <div class="section-card">
                         <h3>Input Waktu Sholat Manual (Kode Jam Sholat Digital)</h3>
-                        <p class="section-desc">Aktifkan opsi ini jika pengurus masjid ingin memasukkan jam Subuh, Dzuhur, Ashar, Maghrib, Isya secara manual sesuai jadwal resmi masjid. Waktu yang Anda masukkan akan langsung ditampilkan di layar TV.</p>
-                        
+
                         <form id="form-prayer-override" class="admin-form">
                             <div class="form-group">
                                 <label class="toggle-label" style="background:rgba(255,255,255,0.06); padding:12px 18px; border-radius:12px; border:1px solid var(--gold-border); display:inline-flex; align-items:center; cursor:pointer;">
@@ -702,7 +700,7 @@
                         <div class="section-header">
                             <div>
                                 <h3>Pengingat Suara &amp; Hitung Mundur Iqamah</h3>
-                                <p class="section-desc">Atur bunyi nada alarm saat waktu sholat masuk dan durasi jeda hitung mundur menuju Iqamah di layar Display TV.</p>
+                                
                             </div>
                         </div>
                         <form id="form-prayer-audio" class="admin-form">
@@ -739,7 +737,7 @@
                         <div class="section-header">
                             <div>
                                 <h3>Daftar Kajian Rutin Masjid</h3>
-                                <p class="section-desc">Kelola jadwal majelis taklim, kajian tafsir, dan ceramah rutin mingguan.</p>
+                                
                             </div>
                             <button class="btn btn-primary btn-sm" onclick="AdminApp.showModal('kajian')">+ Tambah Kajian</button>
                         </div>
@@ -755,7 +753,7 @@
                         <div class="section-header">
                             <div>
                                 <h3>Daftar Kegiatan &amp; Poster Acara Masjid</h3>
-                                <p class="section-desc">Unggah pamflet/poster kegiatan format apa saja (JPG, PNG, WebP) agar tampil memukau di Display TV tanpa terpotong.</p>
+                                
                             </div>
                             <button class="btn btn-primary btn-sm" onclick="AdminApp.showModal('activities')">+ Tambah Kegiatan &amp; Poster</button>
                         </div>
@@ -810,7 +808,7 @@
                         <div class="section-header">
                             <div>
                                 <h3>Jadwal Sholat Tarawih &amp; Witir (30 Malam Penuh)</h3>
-                                <p class="section-desc">Atur nama Imam &amp; Bilal selama 30 malam Ramadhan. Anda dapat mengaktifkan atau menonaktifkan tampilan slide ini di Display TV sewaktu-waktu.</p>
+                                
                             </div>
                             <div style="display:flex; gap:10px; align-items:center;">
                                 <button type="button" class="btn btn-outline btn-sm" id="btn-tarawih-autofill">⚡ Isi Otomatis Contoh</button>
@@ -921,7 +919,7 @@
                         <form id="form-display-settings" class="admin-form">
                             <div class="form-group">
                                 <label>Urutan Slide</label>
-                                <p class="section-desc">Atur urutan konten yang ditampilkan di TV. Drag untuk mengubah urutan.</p>
+                                
                                 <div id="slide-order-list" class="slide-order-list">
                                     <!-- Populated by JS -->
                                 </div>
@@ -943,7 +941,7 @@
                         <div class="section-header">
                             <div>
                                 <h3>Konten Kustom Slide Display TV</h3>
-                                <p class="section-desc">Tambahkan kutipan ayat Al-Qur'an, Hadits, atau doa untuk ditampilkan di sisi kanan setiap slide. Jika tidak ada konten yang diatur, sisi kanan slide tidak akan menampilkan apa-apa.</p>
+                                
                             </div>
                             <button class="btn btn-primary btn-sm" onclick="AdminApp.showModal('slideContent')">+ Tambah Konten</button>
                         </div>
@@ -957,7 +955,7 @@
                 <div id="page-preview" class="admin-page" data-title="Pratinjau TV">
                     <div class="section-card">
                         <h3>Pratinjau Display TV</h3>
-                        <p class="section-desc">Lihat tampilan Display TV dalam ukuran kecil. Untuk pengalaman penuh, buka halaman Display TV di tab baru.</p>
+                        
                         <div style="margin-bottom:16px">
                             <a id="preview-link" href="../index.html" target="_blank" class="btn btn-primary">Buka Display TV (Tab Baru)</a>
                         </div>
@@ -1007,8 +1005,8 @@
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
 
     <!-- Scripts -->
-    <script src="../assets/js/firebase-config.js?v=20261111_09"></script>
-    <script src="../assets/js/services/firestore-service.js?v=20261111_09"></script>
-    <script src="../assets/js/admin.js?v=20261111_09"></script>
+    <script src="../assets/js/firebase-config.js?v=20261116_01"></script>
+    <script src="../assets/js/services/firestore-service.js?v=20261116_01"></script>
+    <script src="../assets/js/admin.js?v=20261116_01"></script>
 </body>
 </html>

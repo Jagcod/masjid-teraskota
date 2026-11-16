@@ -891,6 +891,8 @@ html, body {
     position: relative;
     display: flex;
     align-items: center;
+    contain: layout paint;
+    perspective: 1000px;
 }
 
 .running-text {
@@ -898,15 +900,25 @@ html, body {
     font-size: clamp(0.95rem, 1.2vw, 1.6rem);
     font-weight: 700;
     color: var(--text-white);
-    padding-left: 100%;
+    padding-left: 100vw;
     white-space: nowrap;
+    transform: translate3d(0, 0, 0);
+    -webkit-transform: translate3d(0, 0, 0);
     will-change: transform;
-    animation: marquee 35s linear infinite !important;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    animation: marquee 32s linear infinite !important;
 }
 
 @keyframes marquee {
-    0% { transform: translateX(0); }
-    100% { transform: translateX(-100%); }
+    0% {
+        transform: translate3d(0, 0, 0);
+        -webkit-transform: translate3d(0, 0, 0);
+    }
+    100% {
+        transform: translate3d(-100%, 0, 0);
+        -webkit-transform: translate3d(-100%, 0, 0);
+    }
 }
 
 /* ── 8. FALLBACK SCREEN ── */
@@ -1007,4 +1019,97 @@ html, body {
     font-weight: 500;
     margin: 0;
     line-height: 1.5;
+}
+
+
+/* ── Centered Card for Kajian & Kegiatan tanpa Poster (Tanpa Hadits Kanan) ── */
+.slide.single-col.centered {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    width: 100% !important;
+    height: 100% !important;
+}
+
+.slide-center-card {
+    width: 100%;
+    max-width: 960px;
+    background: rgba(15, 27, 43, 0.82);
+    border: 1.5px solid rgba(250, 204, 21, 0.35);
+    border-radius: 24px;
+    padding: 3vh 3.5vw;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    backdrop-filter: blur(14px);
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5);
+}
+
+.centered-tag {
+    margin-bottom: 1.2vh;
+}
+
+.slide-hero-title-center {
+    font-size: clamp(1.8rem, 2.6vw, 3.2rem);
+    font-weight: 800;
+    color: var(--text-white);
+    line-height: 1.2;
+    margin: 0 0 1.8vh 0;
+    letter-spacing: -0.5px;
+}
+
+.slide-info-card-center {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 1.4vh;
+}
+
+.slide-speaker-box {
+    background: rgba(56, 189, 248, 0.12);
+    border: 1px solid rgba(56, 189, 248, 0.35);
+    border-radius: 16px;
+    padding: 1.4vh 2vw;
+}
+
+.slide-speaker-name-large {
+    color: var(--cyan-text);
+    font-size: clamp(1.4rem, 2.1vw, 2.6rem);
+    font-weight: 800;
+    line-height: 1.2;
+    margin-top: 4px;
+}
+
+.slide-meta-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1.2vw;
+    width: 100%;
+}
+
+.slide-meta-cell {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 14px;
+    padding: 1.2vh 1.6vw;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.slide-desc-box {
+    background: rgba(15, 27, 43, 0.6);
+    border: 1px solid rgba(250, 204, 21, 0.25);
+    border-radius: 14px;
+    padding: 1.2vh 2vw;
+    width: 100%;
+}
+
+.slide-desc-text-center {
+    font-size: clamp(0.95rem, 1.15vw, 1.35rem);
+    color: #e2e8f0;
+    line-height: 1.5;
+    font-weight: 500;
+    margin: 4px 0 0 0;
 }

@@ -373,11 +373,15 @@
 
         if (settings.runningText && DOM.runningText) {
             const raw = settings.runningText.trim();
-            const items = raw.split(/[\n|•]+/).map(s => s.trim()).filter(Boolean);
-            if (items.length > 1) {
-                DOM.runningText.innerHTML = items.map(t => escapeHtml(t)).join(' <span style="color:var(--gold); margin:0 1.2vw; font-size:1.15em;">✦</span> ');
-            } else {
-                DOM.runningText.textContent = raw;
+            // Hanya update jika teks benar-benar berbeda agar animasi marquee tidak patah/tersentak
+            if (DOM.runningText._currentRawText !== raw) {
+                DOM.runningText._currentRawText = raw;
+                const items = raw.split(/[\n|•]+/).map(s => s.trim()).filter(Boolean);
+                if (items.length > 1) {
+                    DOM.runningText.innerHTML = items.map(t => escapeHtml(t)).join(' <span style="color:var(--gold); margin:0 1.2vw; font-size:1.15em;">✦</span> ');
+                } else {
+                    DOM.runningText.textContent = raw;
+                }
             }
         }
 
@@ -667,46 +671,29 @@
         renderSlideIndicators();
     }
 
-    // ── Helper: Buat kartu konten kanan (hanya jika ada data dari admin) ──
+    // ── Helper: Buat kartu konten kanan (Dinonaktifkan: Tidak ada hadits yang menetap) ──
     function buildFeatureCard(content) {
-        if (!content) return '';
-        if (!content.badge && !content.arabic && !content.translation) return '';
-
-        return `
-            <div class="slide-right-col">
-                <div class="feature-card">
-                    ${content.badge ? `
-                    <div class="card-header-badge">
-                        <svg class="card-icon-svg" viewBox="0 0 24 24" width="15" height="15" fill="#facc15" aria-hidden="true"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
-                        <span>${escapeHtml(content.badge)}</span>
-                    </div>` : ''}
-                    ${content.arabic ? `<div class="card-arabic">${escapeHtml(content.arabic)}</div>` : ''}
-                    ${content.translation ? `<div class="card-translation">${escapeHtml(content.translation)}</div>` : ''}
-                    ${content.reference ? `<div class="card-ref">${escapeHtml(content.reference)}</div>` : ''}
-                </div>
-            </div>
-        `;
+        // Hapus hadits menetap / Mutiara Ilmu sesuai permintaan
+        return '';
     }
 
     // ── Slide Builders ──
 
-    // 1. Welcome Slide
+    // 1. Welcome Slide (Full Width & Centered Elegan, Tanpa Hadits Menetap)
     function createWelcomeSlide(content) {
-        const rightCol = buildFeatureCard(content);
         return {
             id: 'welcome',
             html: `
-                <div class="slide slide-welcome ${!rightCol ? 'single-col' : ''}">
-                    <div class="slide-left-col" ${!rightCol ? 'style="flex:1 1 100%; max-width:100%;"' : ''}>
-                        <div class="welcome-tag">
-                            <svg class="tag-icon-svg" viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M12 2c-.55 0-1 .45-1 1v1.1c-2.83.48-5 2.94-5 5.9 0 1.25.38 2.4 1.03 3.36L4 16v5h16v-5l-3.03-2.64c.65-.96 1.03-2.11 1.03-3.36 0-2.96-2.17-5.42-5-5.9V3c0-.55-.45-1-1-1zm-1 8h2v8h-2v-8z"/></svg>
+                <div class="slide slide-welcome single-col centered">
+                    <div class="slide-center-card" style="max-width:980px;">
+                        <div class="welcome-tag centered-tag">
+                            <svg class="tag-icon-svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M12 2c-.55 0-1 .45-1 1v1.1c-2.83.48-5 2.94-5 5.9 0 1.25.38 2.4 1.03 3.36L4 16v5h16v-5l-3.03-2.64c.65-.96 1.03-2.11 1.03-3.36 0-2.96-2.17-5.42-5-5.9V3c0-.55-.45-1-1-1zm-1 8h2v8h-2v-8z"/></svg>
                             <span>AHLAN WA SAHLAN • RUMAH ALLAH</span>
                         </div>
-                        <div class="arabic-greeting">السَّلَامُ عَلَيْكُمْ وَرَحْمَةُ اللهِ وَبَرَكَاتُهُ</div>
-                        <h2 class="welcome-heading">Selamat Datang di <span class="text-gold">Masjid Teraskota</span></h2>
-                        <p class="welcome-subheading">Pusat Ibadah, Dakwah & Pembinaan Umat • BSD City</p>
+                        <div class="arabic-greeting" style="font-size:clamp(2.2rem, 3.6vw, 4.4rem); margin-bottom:1.5vh;">السَّلَامُ عَلَيْكُمْ وَرَحْمَةُ اللهِ وَبَرَكَاتُهُ</div>
+                        <h2 class="slide-hero-title-center" style="font-size:clamp(1.8rem, 2.8vw, 3.4rem); margin-bottom:1vh;">Selamat Datang di <span class="text-gold">Masjid Teraskota</span></h2>
+                        <p class="welcome-subheading" style="font-size:clamp(1.05rem, 1.35vw, 1.6rem); color:var(--text-muted); font-weight:500;">Pusat Ibadah, Dakwah & Pembinaan Umat • BSD City</p>
                     </div>
-                    ${rightCol}
                 </div>
             `
         };
@@ -716,33 +703,63 @@
     function createSingleKajianSlide(k, content) {
         const posterUrl = k.imageUrl || '';
         const hasPoster = posterUrl && posterUrl.length > 5;
+        const descText = k.description ? (k.description.length > 160 ? k.description.substring(0, 157) + '...' : k.description) : '';
 
-        // Kolom kanan: murni poster jika ada poster, atau konten kustom, atau mutiara ilmu Islami
-        let rightCol = '';
-        if (hasPoster) {
-            rightCol = `
-                <div class="slide-right-col" style="display:flex; justify-content:center; align-items:center; height:100%; padding:0; background:none; border:none; box-shadow:none;">
-                    <img src="${escapeHtml(posterUrl)}" alt="Poster ${escapeHtml(k.title)}" class="poster-only-img" onerror="this.closest('.slide-right-col').style.display='none'">
-                </div>
-            `;
-        } else if (content) {
-            rightCol = buildFeatureCard(content);
-        } else {
-            rightCol = buildFeatureCard({
-                badge: 'MUTIARA ILMU',
-                arabic: 'مَنْ سَلَكَ طَرِيقًا يَلْتَمِسُ فِيهِ عِلْمًا سَهَّلَ اللَّهُ لَهُ بِهِ طَرِيقًا إِلَى الْجَنَّةِ',
-                translation: '"Barangsiapa menempuh suatu jalan untuk mencari ilmu, maka Allah akan memudahkan baginya jalan menuju surga."',
-                reference: '(HR. Muslim no. 2699)'
-            });
+        // JIKA TIDAK ADA POSTER GAMBAR: Tampilkan di TENGAH (centered) tanpa hadis
+        if (!hasPoster) {
+            return {
+                id: 'kajian-' + (k.id || ''),
+                html: `
+                    <div class="slide slide-kajian single-col centered">
+                        <div class="slide-center-card">
+                            <div class="welcome-tag centered-tag">
+                                <svg class="tag-icon-svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/></svg>
+                                <span>JADWAL KAJIAN ISLAM RUTIN</span>
+                            </div>
+                            <h2 class="slide-hero-title-center">${escapeHtml(k.title || 'Kajian Rutin')}</h2>
+                            
+                            <div class="slide-info-card-center">
+                                <div class="slide-speaker-box">
+                                    <span class="slide-info-label">NARASUMBER / PEMATERI</span>
+                                    <div class="slide-speaker-name-large">🎙️ ${escapeHtml(k.speaker || '-')}</div>
+                                </div>
+
+                                <div class="slide-meta-grid">
+                                    <div class="slide-meta-cell">
+                                        <span class="slide-info-label">WAKTU PELAKSANAAN</span>
+                                        <div class="slide-meta-val text-gold">📅 ${escapeHtml(k.day || '')} • Pukul ${escapeHtml(k.time || '')} WIB</div>
+                                    </div>
+                                    ${k.location ? `
+                                    <div class="slide-meta-cell">
+                                        <span class="slide-info-label">LOKASI / TEMPAT</span>
+                                        <div class="slide-meta-val text-white">📍 ${escapeHtml(k.location)}</div>
+                                    </div>` : ''}
+                                </div>
+
+                                ${descText ? `
+                                <div class="slide-desc-box">
+                                    <span class="slide-info-label">TEMA / PEMBAHASAN</span>
+                                    <p class="slide-desc-text-center">${escapeHtml(descText)}</p>
+                                </div>` : ''}
+                            </div>
+                        </div>
+                    </div>
+                `
+            };
         }
 
-        const descText = k.description ? (k.description.length > 140 ? k.description.substring(0, 137) + '...' : k.description) : '';
+        // JIKA ADA POSTER GAMBAR: Tampilkan 2 kolom (Kiri info, Kanan poster murni)
+        const rightCol = `
+            <div class="slide-right-col" style="display:flex; justify-content:center; align-items:center; height:100%; padding:0; background:none; border:none; box-shadow:none;">
+                <img src="${escapeHtml(posterUrl)}" alt="Poster ${escapeHtml(k.title)}" class="poster-only-img" onerror="this.closest('.slide-right-col').style.display='none'">
+            </div>
+        `;
 
         return {
             id: 'kajian-' + (k.id || ''),
             html: `
-                <div class="slide slide-kajian ${!rightCol ? 'single-col' : ''}">
-                    <div class="slide-left-col" ${!rightCol ? 'style="flex:1 1 100%; max-width:100%;"' : ''}>
+                <div class="slide slide-kajian">
+                    <div class="slide-left-col">
                         <div class="welcome-tag">
                             <svg class="tag-icon-svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/></svg>
                             <span>JADWAL KAJIAN ISLAM RUTIN</span>
@@ -780,36 +797,68 @@
         };
     }
 
-    // 3. Single Activity Slide (1 kegiatan = 1 slide, dengan poster atau kaligrafi amalan terbaik)
+    // 3. Single Activity Slide (1 kegiatan = 1 slide)
     function createSingleActivitySlide(a, content) {
         const posterUrl = a.imageUrl || '';
         const hasPoster = posterUrl && posterUrl.length > 5;
+        const descText = a.description ? (a.description.length > 160 ? a.description.substring(0, 157) + '...' : a.description) : '';
 
-        let rightCol = '';
-        if (hasPoster) {
-            rightCol = `
-                <div class="slide-right-col" style="display:flex; justify-content:center; align-items:center; height:100%; padding:0; background:none; border:none; box-shadow:none;">
-                    <img src="${escapeHtml(posterUrl)}" alt="Poster ${escapeHtml(a.title)}" class="poster-only-img" onerror="this.closest('.slide-right-col').style.display='none'">
-                </div>
-            `;
-        } else if (content) {
-            rightCol = buildFeatureCard(content);
-        } else {
-            rightCol = buildFeatureCard({
-                badge: 'AMALAN TERBAIK',
-                arabic: 'وَتَعَاوَنُوا عَلَى الْبِرِّ وَالتَّقْوَىٰ',
-                translation: '"Dan tolong-menolonglah kamu dalam mengerjakan kebajikan dan takwa, dan jangan tolong-menolong dalam berbuat dosa."',
-                reference: '(QS. Al-Maidah: 2)'
-            });
+        // JIKA TIDAK ADA POSTER GAMBAR: Tampilkan di TENGAH (centered) tanpa hadis
+        if (!hasPoster) {
+            return {
+                id: 'activity-' + (a.id || ''),
+                html: `
+                    <div class="slide slide-activities single-col centered">
+                        <div class="slide-center-card">
+                            <div class="welcome-tag centered-tag">
+                                <svg class="tag-icon-svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19a2 2 0 0 0 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/></svg>
+                                <span>AGENDA &amp; KEGIATAN MASJID</span>
+                            </div>
+                            <h2 class="slide-hero-title-center">${escapeHtml(a.title || 'Kegiatan Masjid')}</h2>
+
+                            <div class="slide-info-card-center">
+                                ${a.speaker ? `
+                                <div class="slide-speaker-box">
+                                    <span class="slide-info-label">PENCERAMAH / PENGISI ACARA</span>
+                                    <div class="slide-speaker-name-large">🎙️ ${escapeHtml(a.speaker)}</div>
+                                </div>` : ''}
+
+                                <div class="slide-meta-grid">
+                                    <div class="slide-meta-cell">
+                                        <span class="slide-info-label">WAKTU KEGIATAN</span>
+                                        <div class="slide-meta-val text-gold">📅 ${escapeHtml(a.date || '')} ${a.time ? '• Pukul ' + escapeHtml(a.time) + ' WIB' : ''}</div>
+                                    </div>
+                                    ${a.location ? `
+                                    <div class="slide-meta-cell">
+                                        <span class="slide-info-label">TEMPAT / LOKASI</span>
+                                        <div class="slide-meta-val text-white">📍 ${escapeHtml(a.location)}</div>
+                                    </div>` : ''}
+                                </div>
+
+                                ${descText ? `
+                                <div class="slide-desc-box">
+                                    <span class="slide-info-label">KETERANGAN ACARA</span>
+                                    <p class="slide-desc-text-center">${escapeHtml(descText)}</p>
+                                </div>` : ''}
+                            </div>
+                        </div>
+                    </div>
+                `
+            };
         }
 
-        const descText = a.description ? (a.description.length > 140 ? a.description.substring(0, 137) + '...' : a.description) : '';
+        // JIKA ADA POSTER GAMBAR: Tampilkan 2 kolom (Kiri info, Kanan poster murni)
+        const rightCol = `
+            <div class="slide-right-col" style="display:flex; justify-content:center; align-items:center; height:100%; padding:0; background:none; border:none; box-shadow:none;">
+                <img src="${escapeHtml(posterUrl)}" alt="Poster ${escapeHtml(a.title)}" class="poster-only-img" onerror="this.closest('.slide-right-col').style.display='none'">
+            </div>
+        `;
 
         return {
             id: 'activity-' + (a.id || ''),
             html: `
-                <div class="slide slide-activities ${!rightCol ? 'single-col' : ''}">
-                    <div class="slide-left-col" ${!rightCol ? 'style="flex:1 1 100%; max-width:100%;"' : ''}>
+                <div class="slide slide-activities">
+                    <div class="slide-left-col">
                         <div class="welcome-tag">
                             <svg class="tag-icon-svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19a2 2 0 0 0 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/></svg>
                             <span>AGENDA &amp; KEGIATAN MASJID</span>
@@ -825,19 +874,19 @@
 
                             <div class="slide-meta-row">
                                 <div class="slide-meta-item">
-                                    <span class="slide-info-label">TANGGAL &amp; WAKTU</span>
-                                    <div class="slide-meta-val text-gold">📅 ${escapeHtml(a.date || '')} ${a.time ? '• ' + escapeHtml(a.time) + ' WIB' : ''}</div>
+                                    <span class="slide-info-label">WAKTU KEGIATAN</span>
+                                    <div class="slide-meta-val text-gold">📅 ${escapeHtml(a.date || '')} ${a.time ? '• Pukul ' + escapeHtml(a.time) + ' WIB' : ''}</div>
                                 </div>
                                 ${a.location ? `
                                 <div class="slide-meta-item">
-                                    <span class="slide-info-label">LOKASI / TEMPAT</span>
+                                    <span class="slide-info-label">TEMPAT / LOKASI</span>
                                     <div class="slide-meta-val text-white">📍 ${escapeHtml(a.location)}</div>
                                 </div>` : ''}
                             </div>
 
                             ${descText ? `
                             <div class="slide-desc-row">
-                                <span class="slide-info-label">DESKRIPSI ACARA</span>
+                                <span class="slide-info-label">KETERANGAN ACARA</span>
                                 <p class="slide-desc-text">${escapeHtml(descText)}</p>
                             </div>` : ''}
                         </div>
