@@ -9,6 +9,10 @@
     .display-container {
         padding: 2vh 3vw 1.5vh 3vw;
     }
+    .mosque-logo-wrapper {
+        width: 140px;
+        max-width: 155px;
+    }
     .mosque-name {
         font-size: 3rem;
     }
@@ -50,6 +54,10 @@
     .display-container {
         padding: 2vh 2.5vw 1.2vh 2.5vw;
     }
+    .mosque-logo-wrapper {
+        width: 105px;
+        max-width: 115px;
+    }
     .clock-hm {
         font-size: 3.6rem;
     }
@@ -75,6 +83,10 @@
 @media screen and (min-width: 1025px) and (max-width: 1599px) {
     .display-container {
         padding: 1.5vh 2vw 1vh 2vw;
+    }
+    .mosque-logo-wrapper {
+        width: 82px;
+        max-width: 92px;
     }
     .display-header {
         height: 12vh;
