@@ -655,6 +655,9 @@
                 });
             }
 
+            // Slide Penutup: Wassalamu'alaikum (selalu tampil di akhir urutan slide)
+            slides.push(createClosingSlide(slideContentMap['closing']));
+
         } catch (err) {
             console.error('[Display] SLIDE LOAD ERROR:', err.message, err.stack);
             console.error('[Display] Error name:', err.name, 'code:', err.code);
@@ -663,6 +666,7 @@
         // Ensure at least welcome slide is present
         if (slides.length === 0) {
             slides.push(createWelcomeSlide(null));
+            slides.push(createClosingSlide(null));
         }
 
         state.slides = slides;
@@ -694,6 +698,27 @@
                         <div class="welcome-arabic-text">السَّلَامُ علَيْكُمْ وَرَحْمَةُ اللهِ وَبَرَكَاتُهُ</div>
                         <div class="welcome-gold-sep"></div>
                         <h2 class="welcome-masjid-title">Selamat Datang di <span class="gold-gradient-text">Masjid Teraskota</span></h2>
+                    </div>
+                </div>
+            `
+        };
+    }
+
+    // 1b. Closing Slide (Wassalamu'alaikum, Desain Sama Persis seperti Slide Assalamu'alaikum)
+    function createClosingSlide(content) {
+        return {
+            id: 'closing',
+            html: `
+                <div class="slide slide-closing single-col centered">
+                    <div class="welcome-card">
+                        <div class="welcome-pill">
+                            <span class="welcome-pill-sparkle">&#10022;</span>
+                            <span>JAZAKUMULLAH KHAIRAN</span>
+                            <span class="welcome-pill-sparkle">&#10022;</span>
+                        </div>
+                        <div class="welcome-arabic-text">وَالسَّلَامُ عَلَيْكُمْ وَرَحْمَةُ اللهِ وَبَرَكَاتُهُ</div>
+                        <div class="welcome-gold-sep"></div>
+                        <h2 class="welcome-masjid-title">Sampai Berjumpa Kembali di <span class="gold-gradient-text">Masjid Teraskota</span></h2>
                     </div>
                 </div>
             `
