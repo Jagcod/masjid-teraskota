@@ -966,15 +966,19 @@
     function createFridaySlide(item, allFridays) {
         const fridaysList = (allFridays && allFridays.length > 0) ? allFridays : [item];
 
-        // Header bulan untuk tabel sebulan
-        let monthHeader = 'SEBULAN';
+        // Header bulan otomatis untuk tabel petugas Jumat
+        const months = ['JANUARI', 'FEBRUARI', 'MARET', 'APRIL', 'MEI', 'JUNI', 'JULI', 'AGUSTUS', 'SEPTEMBER', 'OKTOBER', 'NOVEMBER', 'DESEMBER'];
+        let monthHeader = '';
         if (item && item.date) {
             const parts = item.date.split('-');
             if (parts.length === 3) {
-                const months = ['JANUARI', 'FEBRUARI', 'MARET', 'APRIL', 'MEI', 'JUNI', 'JULI', 'AGUSTUS', 'SEPTEMBER', 'OKTOBER', 'NOVEMBER', 'DESEMBER'];
                 const mIdx = parseInt(parts[1], 10) - 1;
                 monthHeader = `${months[mIdx] || ''} ${parts[0]}`;
             }
+        }
+        if (!monthHeader) {
+            const now = new Date();
+            monthHeader = `${months[now.getMonth()]} ${now.getFullYear()}`;
         }
 
         // Generate rows for full month table
@@ -1042,7 +1046,7 @@
                         <div class="friday-month-card">
                             <div style="color:var(--gold); font-size:clamp(0.72rem, 0.82vw, 0.95rem); font-weight:800; letter-spacing:0.8px; margin-bottom:8px; display:flex; align-items:center; gap:6px;">
                                 <svg viewBox="0 0 24 24" width="15" height="15" fill="#facc15"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19a2 2 0 0 0 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/></svg>
-                                <span>JADWAL PETUGAS JUMAT SEBULAN — ${monthHeader}</span>
+                                <span>JADWAL PETUGAS JUMAT • BULAN ${monthHeader}</span>
                             </div>
                             <div style="overflow-x:auto; width:100%;">
                                 <table class="friday-table">
