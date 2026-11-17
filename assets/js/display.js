@@ -55,6 +55,8 @@
 
         // Footer Ticker
         DOM.runningText = document.getElementById('running-text');
+        DOM.runningTextTrack = document.getElementById('running-text-track');
+        DOM.runningTextClone = document.getElementById('running-text-clone');
 
         // Background Layer
         DOM.bgVideo = document.getElementById('bg-video');
@@ -127,6 +129,15 @@
 
         // 2. Load Local Data INSTANTLY (0 ms latency, no waiting for database)
         loadInstantLocalData();
+
+        // 2b. Initialize Footer Running Text Seamless Loop
+        if (DOM.runningText) {
+            const initialText = DOM.runningText.textContent.trim();
+            if (initialText) {
+                DOM.runningText._currentRawText = initialText;
+                updateRunningTextContent(initialText);
+            }
+        }
 
         // 3. Load Prayer Times Immediately (from cache/defaults)
         loadPrayerTimes();
@@ -373,26 +384,10 @@
 
         if (settings.runningText && DOM.runningText) {
             const raw = settings.runningText.trim();
-            // Hanya update jika teks benar-benar berbeda agar animasi marquee tidak patah/tersentak
+            // Hanya update jika teks benar-benar berbeda agar animasi tidak tersentak
             if (DOM.runningText._currentRawText !== raw) {
                 DOM.runningText._currentRawText = raw;
-                const items = raw.split(/[\n|•]+/).map(s => s.trim()).filter(Boolean);
-                if (items.length > 1) {
-                    DOM.runningText.innerHTML = items.map(t => escapeHtml(t)).join(' <span style="color:var(--gold); margin:0 1.2vw; font-size:1.15em;">✦</span> ');
-                } else {
-                    DOM.runningText.textContent = raw;
-                }
-                // Hitung durasi agar kecepatan berjalan lambat, santai, dan sangat smooth (~38 pixel/detik)
-                setTimeout(() => {
-                    if (DOM.runningText && DOM.runningText.parentElement) {
-                        const textWidth = DOM.runningText.scrollWidth || 1200;
-                        const screenWidth = window.innerWidth || 1920;
-                        const totalDistance = textWidth + screenWidth;
-                        // Kecepatan lambat, sangat tenang dan super smooth (~35 px/detik)
-                        const duration = Math.max(85, Math.round(totalDistance / 35));
-                        DOM.runningText.style.animationDuration = duration + 's';
-                    }
-                }, 100);
+                updateRunningTextContent(raw);
             }
         }
 
@@ -441,6 +436,71 @@
             if (el) el.remove();
         }
     }
+
+    // ── Seamless Infinite Running Text Engine (GPU-Optimized for Smart TV) ──
+    let _runningTextRaf = null;
+    let _resizeRunningTextTimer = null;
+
+    function updateRunningTextContent(raw) {
+        if (!DOM.runningText) return;
+        const items = raw ? raw.split(/[\n|•]+/).map(s => s.trim()).filter(Boolean) : [];
+        if (items.length === 0) return;
+
+        const sep = ' <span class="ticker-sep">✦</span> ';
+        let blockHtml = items.map(t => escapeHtml(t)).join(sep);
+        blockHtml += sep;
+
+        // Pastikan isi 1 blok teks cukup panjang (melebihi lebar layar TV)
+        // Jika teks pendek, gandakan beberapa kali agar aliran teks mulus tanpa celah kosong
+        let formattedText = blockHtml;
+        const roughCharLength = items.join(' ').length;
+        if (roughCharLength < 120) {
+            while (formattedText.length < 350) {
+                formattedText += blockHtml;
+            }
+        }
+
+        // Terapkan ke elemen utama dan klon identik
+        DOM.runningText.innerHTML = formattedText;
+        if (DOM.runningTextClone) {
+            DOM.runningTextClone.innerHTML = formattedText;
+        }
+
+        // Hitung durasi linear stabil berdasarkan lebar piksel aktual
+        if (_runningTextRaf) cancelAnimationFrame(_runningTextRaf);
+        _runningTextRaf = requestAnimationFrame(() => {
+            const track = DOM.runningTextTrack || document.getElementById('running-text-track');
+            if (!track || !DOM.runningText) return;
+
+            // Lebar 1 blok teks (50% dari total track)
+            const singleBlockWidth = DOM.runningText.scrollWidth || 1600;
+            const screenW = window.innerWidth || 1920;
+
+            // Kecepatan konstan: ~42 px/detik pada 1080p, ~65 px/detik pada 4K TV
+            // Kecepatan stabil, tenang & sangat mudah dibaca jemaah
+            const speed = (screenW >= 2500) ? 65 : 42;
+            const duration = Math.max(25, Math.round(singleBlockWidth / speed));
+
+            track.style.setProperty('--ticker-duration', duration + 's');
+        });
+    }
+
+    if (document.fonts && document.fonts.ready) {
+        document.fonts.ready.then(() => {
+            if (DOM.runningText && DOM.runningText._currentRawText) {
+                updateRunningTextContent(DOM.runningText._currentRawText);
+            }
+        });
+    }
+
+    window.addEventListener('resize', () => {
+        if (_resizeRunningTextTimer) clearTimeout(_resizeRunningTextTimer);
+        _resizeRunningTextTimer = setTimeout(() => {
+            if (DOM.runningText && DOM.runningText._currentRawText) {
+                updateRunningTextContent(DOM.runningText._currentRawText);
+            }
+        }, 300);
+    });
 
     /**
      * Apply Dynamic Background (Supports ANY format: Image, Video, Gradient)
@@ -533,11 +593,11 @@
 
         const nextPrayer = PrayerTimesService.getNextPrayer(times);
 
-        // Update all 7 prayer cards
+        // Update all 7 prayer cards (hanya sentuh DOM jika nilai benar-benar berubah untuk menghemat CPU/GPU TV)
         state.prayerKeys.forEach(key => {
             // Time text
             const timeEl = document.getElementById(`time-${key}`);
-            if (timeEl && times[key]) {
+            if (timeEl && times[key] && timeEl.textContent !== times[key]) {
                 timeEl.textContent = times[key];
             }
 
@@ -547,7 +607,9 @@
 
             if (cardEl) {
                 if (nextPrayer && key === nextPrayer.key) {
-                    cardEl.classList.add('active');
+                    if (!cardEl.classList.contains('active')) {
+                        cardEl.classList.add('active');
+                    }
 
                     // Format Countdown: -HH:MM:SS
                     if (countdownEl && nextPrayer.countdown) {
@@ -555,12 +617,21 @@
                         const hStr = String(hours).padStart(2, '0');
                         const mStr = String(minutes).padStart(2, '0');
                         const sStr = String(seconds).padStart(2, '0');
-                        countdownEl.textContent = `-${hStr}:${mStr}:${sStr}`;
-                        countdownEl.classList.remove('hidden');
+                        const cdText = `-${hStr}:${mStr}:${sStr}`;
+                        if (countdownEl.textContent !== cdText) {
+                            countdownEl.textContent = cdText;
+                        }
+                        if (countdownEl.classList.contains('hidden')) {
+                            countdownEl.classList.remove('hidden');
+                        }
                     }
                 } else {
-                    cardEl.classList.remove('active');
-                    if (countdownEl) countdownEl.classList.add('hidden');
+                    if (cardEl.classList.contains('active')) {
+                        cardEl.classList.remove('active');
+                    }
+                    if (countdownEl && !countdownEl.classList.contains('hidden')) {
+                        countdownEl.classList.add('hidden');
+                    }
                 }
             }
         });

@@ -478,7 +478,7 @@
     .slide, .bg-media {
         transition: none !important;
     }
-    .connection-dot {
+    .connection-dot, .running-text-track {
         animation: none !important;
     }
 }
