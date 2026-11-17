@@ -438,12 +438,15 @@
     }
 
     // ── Seamless Infinite Running Text Engine (GPU-Optimized for Smart TV) ──
-    let _runningTextRaf = null;
+    let _runningTextTimer = null;
     let _resizeRunningTextTimer = null;
 
     function updateRunningTextContent(raw) {
         if (!DOM.runningText) return;
-        const items = raw ? raw.split(/[\n|•]+/).map(s => s.trim()).filter(Boolean) : [];
+        if (!raw) return;
+
+        // Pisahkan teks berdasarkan newline, bullet •, atau bintang ✦
+        const items = raw.split(/[\n|•✦]+/).map(s => s.trim()).filter(Boolean);
         if (items.length === 0) return;
 
         const sep = ' <span class="ticker-sep">✦</span> ';
@@ -451,11 +454,11 @@
         blockHtml += sep;
 
         // Pastikan isi 1 blok teks cukup panjang (melebihi lebar layar TV)
-        // Jika teks pendek, gandakan beberapa kali agar aliran teks mulus tanpa celah kosong
         let formattedText = blockHtml;
-        const roughCharLength = items.join(' ').length;
-        if (roughCharLength < 120) {
-            while (formattedText.length < 350) {
+        const screenW = window.innerWidth || 1920;
+        if (formattedText.length < 250) {
+            formattedText += blockHtml;
+            if (formattedText.length < 250) {
                 formattedText += blockHtml;
             }
         }
@@ -467,22 +470,21 @@
         }
 
         // Hitung durasi linear stabil berdasarkan lebar piksel aktual
-        if (_runningTextRaf) cancelAnimationFrame(_runningTextRaf);
-        _runningTextRaf = requestAnimationFrame(() => {
+        if (_runningTextTimer) clearTimeout(_runningTextTimer);
+        _runningTextTimer = setTimeout(() => {
             const track = DOM.runningTextTrack || document.getElementById('running-text-track');
             if (!track || !DOM.runningText) return;
 
             // Lebar 1 blok teks (50% dari total track)
-            const singleBlockWidth = DOM.runningText.scrollWidth || 1600;
-            const screenW = window.innerWidth || 1920;
+            const singleBlockWidth = DOM.runningText.offsetWidth || DOM.runningText.scrollWidth || 1600;
 
             // Kecepatan konstan: ~42 px/detik pada 1080p, ~65 px/detik pada 4K TV
-            // Kecepatan stabil, tenang & sangat mudah dibaca jemaah
             const speed = (screenW >= 2500) ? 65 : 42;
-            const duration = Math.max(25, Math.round(singleBlockWidth / speed));
+            const duration = Math.max(20, Math.round(singleBlockWidth / speed));
 
-            track.style.setProperty('--ticker-duration', duration + 's');
-        });
+            track.style.animationDuration = duration + 's';
+            track.style.webkitAnimationDuration = duration + 's';
+        }, 50);
     }
 
     if (document.fonts && document.fonts.ready) {
