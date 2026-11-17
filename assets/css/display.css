@@ -872,6 +872,8 @@ html, body {
     gap: 1.2vw;
     box-shadow: none;
     overflow: hidden;
+    /* Isolasi layer: perubahan DOM di luar footer TIDAK memicu repaint di dalam footer */
+    contain: layout style;
 }
 
 .info-badge {
@@ -897,7 +899,6 @@ html, body {
 .running-text-wrapper {
     flex: 1;
     min-width: 0;
-    height: 100%;
     overflow: hidden;
     position: relative;
     display: flex;
@@ -905,35 +906,31 @@ html, body {
 }
 
 .running-text-track {
-    display: inline-flex;
-    flex-direction: row;
+    display: flex;
     align-items: center;
-    height: 100%;
-    width: max-content;
     white-space: nowrap;
     will-change: transform;
+    /* GPU-composited layer: animasi berjalan di compositor thread, bukan main thread */
     transform: translate3d(0, 0, 0);
     -webkit-transform: translate3d(0, 0, 0);
-    animation: ticker-seamless 60s linear infinite;
-    -webkit-animation: ticker-seamless 60s linear infinite;
+    animation: ticker-scroll 60s linear infinite;
+    -webkit-animation: ticker-scroll 60s linear infinite;
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
-    perspective: 1000px;
-    -webkit-perspective: 1000px;
 }
 
 .running-text {
     flex-shrink: 0;
-    display: inline-flex;
-    align-items: center;
+    display: inline-block;
     font-size: clamp(1rem, 1.3vw, 1.65rem);
     font-weight: 700;
     color: var(--text-white);
-    padding: 0;
+    padding: 0 0.6vw 0 0;
     margin: 0;
     white-space: nowrap;
-    line-height: normal;
-    text-rendering: optimizeLegibility;
+    line-height: 1;
+    /* optimizeSpeed lebih ringan dari optimizeLegibility untuk animasi bergerak */
+    text-rendering: optimizeSpeed;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
@@ -942,26 +939,24 @@ html, body {
     color: var(--gold);
     margin: 0 1.2vw;
     font-size: 1.15em;
-    display: inline-block;
-    flex-shrink: 0;
+    display: inline;
 }
 
-@keyframes ticker-seamless {
-    0% {
+/* Keyframe murni: hanya translate3d, 100% di-handle compositor thread GPU */
+@keyframes ticker-scroll {
+    from {
         transform: translate3d(0, 0, 0);
-        -webkit-transform: translate3d(0, 0, 0);
     }
-    100% {
+    to {
         transform: translate3d(-50%, 0, 0);
-        -webkit-transform: translate3d(-50%, 0, 0);
     }
 }
 
-@-webkit-keyframes ticker-seamless {
-    0% {
+@-webkit-keyframes ticker-scroll {
+    from {
         -webkit-transform: translate3d(0, 0, 0);
     }
-    100% {
+    to {
         -webkit-transform: translate3d(-50%, 0, 0);
     }
 }

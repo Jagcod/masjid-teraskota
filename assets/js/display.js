@@ -446,16 +446,16 @@
         if (!raw) return;
 
         // Pisahkan teks berdasarkan newline, bullet •, atau bintang ✦
-        const items = raw.split(/[\n|•✦]+/).map(s => s.trim()).filter(Boolean);
+        var items = raw.split(/[\n|•✦]+/).map(function(s) { return s.trim(); }).filter(Boolean);
         if (items.length === 0) return;
 
-        const sep = ' <span class="ticker-sep">✦</span> ';
-        let blockHtml = items.map(t => escapeHtml(t)).join(sep);
+        var sep = ' <span class="ticker-sep">✦</span> ';
+        var blockHtml = items.map(function(t) { return escapeHtml(t); }).join(sep);
+        // Tambahkan separator di akhir agar seamless saat loop
         blockHtml += sep;
 
-        // Pastikan isi 1 blok teks cukup panjang (melebihi lebar layar TV)
-        let formattedText = blockHtml;
-        const screenW = window.innerWidth || 1920;
+        // 1 blok = isi running text lengkap dengan separator
+        var formattedText = blockHtml;
         if (formattedText.length < 250) {
             formattedText += blockHtml;
             if (formattedText.length < 250) {
@@ -463,45 +463,58 @@
             }
         }
 
-        // Terapkan ke elemen utama dan klon identik
+        // Dapatkan track element
+        var track = DOM.runningTextTrack || document.getElementById('running-text-track');
+        if (!track) return;
+
+        // Pastikan status animasi selalu running (tidak pernah di-pause)
+        track.style.animationPlayState = 'running';
+        track.style.webkitAnimationPlayState = 'running';
+
+        // Set konten ke kedua blok (utama + clone untuk seamless loop)
         DOM.runningText.innerHTML = formattedText;
         if (DOM.runningTextClone) {
             DOM.runningTextClone.innerHTML = formattedText;
         }
 
-        // Hitung durasi linear stabil berdasarkan lebar piksel aktual
+        // Hitung durasi yang proporsional terhadap panjang teks
         if (_runningTextTimer) clearTimeout(_runningTextTimer);
-        _runningTextTimer = setTimeout(() => {
-            const track = DOM.runningTextTrack || document.getElementById('running-text-track');
+        _runningTextTimer = setTimeout(function() {
             if (!track || !DOM.runningText) return;
 
-            // Lebar 1 blok teks (50% dari total track)
-            const singleBlockWidth = DOM.runningText.offsetWidth || DOM.runningText.scrollWidth || 1600;
+            // Ukur lebar 1 blok teks (elemen utama saja, bukan track)
+            var singleBlockWidth = DOM.runningText.offsetWidth || DOM.runningText.scrollWidth || 2000;
 
-            // Kecepatan konstan: ~42 px/detik pada 1080p, ~65 px/detik pada 4K TV
-            const speed = (screenW >= 2500) ? 65 : 42;
-            const duration = Math.max(20, Math.round(singleBlockWidth / speed));
+            // Kecepatan: ~45 px/detik (nyaman dibaca, tidak terlalu cepat)
+            var screenW = window.innerWidth || 1920;
+            var speed = (screenW >= 2500) ? 60 : 45;
+            var duration = Math.max(15, Math.round(singleBlockWidth / speed));
 
+            // Set durasi animasi
             track.style.animationDuration = duration + 's';
             track.style.webkitAnimationDuration = duration + 's';
-        }, 50);
+            track.style.animationPlayState = 'running';
+            track.style.webkitAnimationPlayState = 'running';
+        }, 80);
     }
 
+    // Re-kalkulasi durasi saat font selesai dimuat (lebar teks bisa berubah)
     if (document.fonts && document.fonts.ready) {
-        document.fonts.ready.then(() => {
+        document.fonts.ready.then(function() {
             if (DOM.runningText && DOM.runningText._currentRawText) {
                 updateRunningTextContent(DOM.runningText._currentRawText);
             }
         });
     }
 
-    window.addEventListener('resize', () => {
+    // Re-kalkulasi durasi saat layar di-resize
+    window.addEventListener('resize', function() {
         if (_resizeRunningTextTimer) clearTimeout(_resizeRunningTextTimer);
-        _resizeRunningTextTimer = setTimeout(() => {
+        _resizeRunningTextTimer = setTimeout(function() {
             if (DOM.runningText && DOM.runningText._currentRawText) {
                 updateRunningTextContent(DOM.runningText._currentRawText);
             }
-        }, 300);
+        }, 500);
     });
 
     /**
