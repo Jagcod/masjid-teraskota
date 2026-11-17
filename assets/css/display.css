@@ -297,17 +297,20 @@ html, body {
 
 /* ── 5. MIDDLE SLIDE SHOWCASE ── */
 .display-main {
-    height: 55vh;
+    flex: 1 1 auto;
+    height: auto;
+    min-height: 0;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    justify-content: center;
     position: relative;
     padding: 0.5vh 0;
+    margin-bottom: 1.2vh;
 }
 
 .slide-container {
     width: 100%;
-    height: calc(100% - 24px);
+    height: 100%;
     position: relative;
 }
 
@@ -753,10 +756,12 @@ html, body {
 
 /* ── 6. PRAYER TIMES BAR (7 COMPACT HORIZONTAL CARDS) ── */
 .prayer-section {
-    height: 12.5vh;
-    min-height: 80px;
+    flex-shrink: 0;
+    height: auto;
+    min-height: unset;
     display: flex;
     align-items: center;
+    margin-bottom: 1.2vh;
 }
 
 .poster-only-img {

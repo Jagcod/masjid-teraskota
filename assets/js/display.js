@@ -86,7 +86,7 @@
                     }
                 }
             }
-        } catch(e) {}
+        } catch (e) { }
 
         if (!hasCustomBg) {
             applyBackgroundSettings({ type: 'default' });
@@ -110,7 +110,7 @@
                     }
                 }
             }
-        } catch(e) {}
+        } catch (e) { }
 
         // 3. Instant Timezone label
         updateTimezoneLabel();
@@ -228,7 +228,7 @@
                     if (cached && (cached.includes('Juni') || cached.includes('November') || cached.includes('2026 H'))) {
                         localStorage.removeItem('masjid_hijri_cache');
                     }
-                } catch(ce) {}
+                } catch (ce) { }
 
                 const hijri = await HijriDateService.getHijriDate();
                 if (hijri && hijri.formatted) {
@@ -300,7 +300,7 @@
         }
     }
 
-    
+
     // Helper: Hapus background hitam otomatis dari gambar logo (terutama jika berupa JPEG / screenshot berlatar hitam)
     function processLogoTransparency(imgEl) {
         if (!imgEl) return;
@@ -467,7 +467,7 @@
         if (url || type !== 'default') {
             try {
                 localStorage.setItem('masjid_bg_settings', JSON.stringify(bg));
-            } catch(e) {}
+            } catch (e) { }
         }
 
         // 1. Set Overlay Darkness Opacity
@@ -586,7 +586,7 @@
         let slideContentMap = {};
         try {
             let slideContentItems = await FirestoreService.getCollection('slideContent', {});
-            slideContentItems = (slideContentItems || []).filter(function(item) { return item.isActive === true; }).sort(function(a, b) { return (a.order || 0) - (b.order || 0); });
+            slideContentItems = (slideContentItems || []).filter(function (item) { return item.isActive === true; }).sort(function (a, b) { return (a.order || 0) - (b.order || 0); });
             if (slideContentItems && slideContentItems.length > 0) {
                 slideContentItems.forEach(sc => {
                     const key = sc.slideType || '';
@@ -603,7 +603,7 @@
 
             // Slide per Kajian (masing-masing 1 slide dengan poster)
             let kajian = await FirestoreService.getCollection('kajian', {});
-            kajian = (kajian || []).filter(function(item) { return item.isActive === true; }).sort(function(a, b) { return (a.order || 0) - (b.order || 0); });
+            kajian = (kajian || []).filter(function (item) { return item.isActive === true; }).sort(function (a, b) { return (a.order || 0) - (b.order || 0); });
             console.log('[Display] Kajian loaded:', kajian.length, 'items');
             if (kajian && kajian.length > 0) {
                 const kajianContent = slideContentMap['kajian'];
@@ -614,7 +614,7 @@
 
             // Slide per Kegiatan (Hanya tampilkan kegiatan yang belum lewat tanggalnya)
             let activities = await FirestoreService.getCollection('activities', {});
-            activities = (activities || []).filter(function(item) { return item.isActive === true; }).sort(function(a, b) { return (a.order || 0) - (b.order || 0); });
+            activities = (activities || []).filter(function (item) { return item.isActive === true; }).sort(function (a, b) { return (a.order || 0) - (b.order || 0); });
             console.log('[Display] Activities loaded:', activities.length, 'items');
             if (activities && activities.length > 0) {
                 const actContent = slideContentMap['activities'];
@@ -630,7 +630,7 @@
 
             // Slide Petugas Salat Jumat (1 Bulan Penuh + Pekan Ini)
             let fridaySchedules = await FirestoreService.getCollection('fridaySchedules', {});
-            fridaySchedules = (fridaySchedules || []).filter(function(item) { return item.isActive === true; }).sort(function(a, b) { return (a.date || '').localeCompare(b.date || ''); });
+            fridaySchedules = (fridaySchedules || []).filter(function (item) { return item.isActive === true; }).sort(function (a, b) { return (a.date || '').localeCompare(b.date || ''); });
             if (fridaySchedules && fridaySchedules.length > 0) {
                 const nowStr = new Date().toISOString().split('T')[0];
                 let currentFriday = fridaySchedules.find(f => (f.date || '') >= nowStr) || fridaySchedules[fridaySchedules.length - 1];
@@ -649,16 +649,16 @@
 
             // Slide Laporan Kas & QRIS Infaq
             let finance = await FirestoreService.getCollection('financeReports', {});
-            finance = (finance || []).filter(function(item) { return item.isActive === true; }).slice(0, 1);
+            finance = (finance || []).filter(function (item) { return item.isActive === true; }).slice(0, 1);
             let qris = await FirestoreService.getCollection('qris', {});
-            qris = (qris || []).filter(function(item) { return item.isActive === true; }).slice(0, 1);
+            qris = (qris || []).filter(function (item) { return item.isActive === true; }).slice(0, 1);
             if ((finance && finance.length > 0) || (qris && qris.length > 0)) {
                 slides.push(createFinanceQRISSlide(finance ? finance[0] : null, qris ? qris[0] : null, slideContentMap['finance']));
             }
 
             // Slide Pengumuman (masing-masing 1 slide)
             let announcements = await FirestoreService.getCollection('announcements', {});
-            announcements = (announcements || []).filter(function(item) { return item.isActive === true; }).sort(function(a, b) { return (a.order || 0) - (b.order || 0); });
+            announcements = (announcements || []).filter(function (item) { return item.isActive === true; }).sort(function (a, b) { return (a.order || 0) - (b.order || 0); });
             if (announcements && announcements.length > 0) {
                 const annContent = slideContentMap['announcement'];
                 announcements.forEach(ann => {
@@ -1381,7 +1381,7 @@
                 try {
                     const localBg = localStorage.getItem('masjid_bg_settings');
                     if (localBg) applyBackgroundSettings(JSON.parse(localBg));
-                } catch(e) {}
+                } catch (e) { }
                 updateTimezoneLabel();
 
                 if (_localSyncTimer) clearTimeout(_localSyncTimer);

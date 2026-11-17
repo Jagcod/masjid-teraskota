@@ -109,7 +109,10 @@
         font-size: 1.4rem;
     }
     .display-main {
-        height: 48vh;
+        flex: 1 1 auto;
+        height: auto;
+        min-height: 0;
+        margin-bottom: 1.2vh;
     }
     .arabic-greeting,
     .welcome-arabic-text {
@@ -135,8 +138,9 @@
         font-size: 0.88rem;
     }
     .prayer-section {
-        height: 22vh;
-        min-height: 105px;
+        height: auto;
+        min-height: unset;
+        margin-bottom: 1.2vh;
     }
     .prayer-grid {
         gap: 0.6vw;
@@ -173,11 +177,15 @@
         min-height: 60px;
     }
     .display-main {
-        height: 48vh;
+        flex: 1 1 auto;
+        height: auto;
+        min-height: 0;
+        margin-bottom: 1vh;
     }
     .prayer-section {
-        height: 22vh;
-        min-height: 95px;
+        height: auto;
+        min-height: unset;
+        margin-bottom: 1vh;
     }
     .prayer-time {
         font-size: 1.45rem;
