@@ -1,12 +1,32 @@
 // Service Worker for Admin Masjid Teraskota PWA (WebAPK)
-const CACHE_NAME = 'admin-teraskota-v1';
+const CACHE_NAME = 'admin-teraskota-v2';
+const STATIC_ASSETS = [
+    '/admin',
+    '/admin/manifest.json',
+    '/admin/icon-192.png',
+    '/admin/icon-512.png'
+];
 
 self.addEventListener('install', (event) => {
-    self.skipWaiting();
+    event.waitUntil(
+        caches.open(CACHE_NAME).then((cache) => {
+            return cache.addAll(STATIC_ASSETS).catch((e) => {
+                console.warn('[SW] Pre-cache fallback:', e);
+            });
+        }).then(() => self.skipWaiting())
+    );
 });
 
 self.addEventListener('activate', (event) => {
-    event.waitUntil(self.clients.claim());
+    event.waitUntil(
+        caches.keys().then((keys) => {
+            return Promise.all(
+                keys.map((k) => {
+                    if (k !== CACHE_NAME) return caches.delete(k);
+                })
+            );
+        }).then(() => self.clients.claim())
+    );
 });
 
 // Network-first fetch strategy with safe bypass for real-time Firebase services
@@ -28,9 +48,18 @@ self.addEventListener('fetch', (event) => {
     }
 
     event.respondWith(
-        fetch(event.request).catch(() => {
-            return caches.match(event.request);
+        fetch(event.request).then((response) => {
+            if (response && response.status === 200) {
+                const responseClone = response.clone();
+                caches.open(CACHE_NAME).then((cache) => {
+                    cache.put(event.request, responseClone);
+                });
+            }
+            return response;
+        }).catch(() => {
+            return caches.match(event.request).then((cached) => {
+                return cached || caches.match('/admin');
+            });
         })
     );
 });
-
