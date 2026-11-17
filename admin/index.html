@@ -15,6 +15,15 @@
     <!-- Stylesheets -->
     <link rel="stylesheet" href="../assets/css/admin.css?v=20261116_04">
 
+    <!-- PWA / WebAPK Settings -->
+    <meta name="theme-color" content="#0b131e">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Admin Masjid">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon-192.png">
+
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="../assets/images/favicon.svg">
 </head>
@@ -997,5 +1006,18 @@
     <script src="../assets/js/firebase-config.js?v=20261116_04"></script>
     <script src="../assets/js/services/firestore-service.js?v=20261116_04"></script>
     <script src="../assets/js/admin.js?v=20261116_04"></script>
+
+    <!-- PWA / WebAPK Service Worker Registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('./sw.js').then(function(reg) {
+                    console.log('[PWA] Service Worker aktif.');
+                }).catch(function(err) {
+                    console.warn('[PWA] Service Worker note:', err);
+                });
+            });
+        }
+    </script>
 </body>
 </html>
