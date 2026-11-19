@@ -8,8 +8,8 @@
 :root {
     /* Theme Colors */
     --bg-dark: #0b131e;
-    --bg-card: rgba(15, 27, 43, 0.75);
-    --bg-card-active: rgba(6, 78, 59, 0.4);
+    --bg-card: rgba(15, 27, 43, 0.35);
+    --bg-card-active: rgba(6, 78, 59, 0.32);
     --bg-header: rgba(11, 19, 30, 0.95);
     --bg-footer: #080e17;
 
@@ -242,16 +242,17 @@ html, body {
 
 /* Clock Card */
 .clock-card {
-    background: rgba(15, 27, 43, 0.7);
-    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(15, 27, 43, 0.35);
+    border: 1px solid rgba(255, 255, 255, 0.15);
     border-radius: 16px;
     padding: 0.6vh 1.4vw;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    backdrop-filter: blur(12px);
-    box-shadow: none;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
     flex-shrink: 0;
     white-space: nowrap;
 }
@@ -407,7 +408,7 @@ html, body {
 .feature-card {
     width: 100%;
     max-height: 44vh;
-    background: rgba(15, 27, 43, 0.72);
+    background: rgba(15, 27, 43, 0.4);
     border: 1px solid var(--gold-border);
     border-radius: 16px;
     padding: 2.5vh 1.5vw;
@@ -416,8 +417,9 @@ html, body {
     align-items: center;
     justify-content: center;
     text-align: center;
-    backdrop-filter: blur(14px);
-    box-shadow: none;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
     overflow: hidden;
 }
 
@@ -778,8 +780,8 @@ html, body {
 }
 
 .prayer-card {
-    background: rgba(15, 27, 43, 0.75);
-    border: 1px solid var(--border-subtle);
+    background: rgba(15, 27, 43, 0.35);
+    border: 1px solid rgba(255, 255, 255, 0.15);
     border-radius: 12px;
     padding: 0.8vh 0.5vw;
     display: flex;
@@ -788,8 +790,9 @@ html, body {
     justify-content: center;
     text-align: center;
     backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     transition: all 0.3s ease;
-    box-shadow: none;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.12);
     position: relative;
     overflow: hidden;
 }

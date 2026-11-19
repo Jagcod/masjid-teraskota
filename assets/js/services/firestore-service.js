@@ -258,6 +258,9 @@ const FirestoreService = (() => {
                 updatedAt: new Date().toISOString()
             };
             saveDemoStore(store);
+            // Update document cache & invalidate collection cache agar pembacaan berikutnya instan & fresh
+            localStorage.setItem('masjid_cache_doc_' + collection + '_' + docId, JSON.stringify({ id: docId, ...data }));
+            localStorage.removeItem('masjid_cache_col_' + collection);
             notifyLocalChange(collection, docId);
         } catch(e) {}
 

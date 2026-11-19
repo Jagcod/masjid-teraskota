@@ -57,6 +57,9 @@
             <button type="button" id="demo-login-btn" class="btn btn-demo btn-block" onclick="AdminApp.loginDemo()">
                 🚀 Masuk Langsung (Mode Admin)
             </button>
+            <button type="button" id="pwa-install-btn" class="btn btn-secondary btn-block" style="margin-top:10px; background:rgba(56,189,248,0.12); border:1px solid rgba(56,189,248,0.45); color:#38bdf8; font-weight:700; display:flex; align-items:center; justify-content:center; gap:8px;">
+                📲 Pasang Aplikasi di HP (Install App)
+            </button>
             <div class="login-footer">
                 <p id="firebase-status" class="firebase-status">Memeriksa koneksi...</p>
             </div>
@@ -878,8 +881,28 @@
 
                 <!-- ===== QRIS PAGE ===== -->
                 <div id="page-qris" class="admin-page" data-title="QRIS">
+                    <!-- Section Data QRIS Aktif (Menetap Seperti Kajian) -->
                     <div class="section-card">
-                        <h3>QRIS Infaq & Sedekah</h3>
+                        <div class="section-header">
+                            <div>
+                                <h3>Data QRIS Aktif di Layar TV</h3>
+                                <p style="color:#64748b; font-size:0.875rem; margin-top:2px;">QRIS yang tersimpan di database cloud dan tampil di Layar TV Display</p>
+                            </div>
+                            <button type="button" class="btn btn-primary btn-sm" id="btn-toggle-qris-form" onclick="AdminApp.toggleQrisForm()">+ Ganti / Perbarui QRIS</button>
+                        </div>
+                        <div id="qris-list" class="data-list">
+                            <p class="empty-state">Memuat data QRIS...</p>
+                        </div>
+                    </div>
+
+                    <!-- Section Form Pengaturan / Unggah QRIS -->
+                    <div class="section-card" id="qris-form-card">
+                        <div class="section-header">
+                            <div>
+                                <h3 id="qris-form-title">Form Unggah / Edit QRIS Infaq</h3>
+                                <p style="color:#64748b; font-size:0.875rem; margin-top:2px;">Upload gambar barcode QRIS dan atur label nama infaq</p>
+                            </div>
+                        </div>
                         <form id="form-qris" class="admin-form">
                             <div class="form-group">
                                 <label for="qris-label">Label QRIS</label>
@@ -889,10 +912,10 @@
                                 <label>Gambar QRIS</label>
                                 <div class="file-upload-area" id="qris-upload-area">
                                     <input type="file" id="qris-file" accept="image/*" class="file-input">
-                                    <div class="file-upload-placeholder">
+                                    <div class="file-upload-placeholder" id="qris-file-placeholder">
                                         <svg viewBox="0 0 24 24" width="32" height="32" fill="currentColor" opacity="0.4"><path d="M19 7v2.99s-1.99.01-2 0V7h-3s.01-1.99 0-2h3V2h2v3h3v2h-3zm-3 4V8h-3V5H5c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2v-8h-3zM5 19l3-4 2 3 3-4 4 5H5z"/></svg>
                                         <p>Klik atau drag gambar QRIS ke sini</p>
-                                        <p class="file-hint">Format: JPG, PNG. Maks 2MB</p>
+                                        <p class="file-hint">Format: JPG, PNG. Otomatis dikompres &amp; dioptimasi</p>
                                     </div>
                                     <img id="qris-preview" class="file-preview hidden" alt="Preview QRIS">
                                 </div>
@@ -903,8 +926,9 @@
                                     <span>Tampilkan di Display TV</span>
                                 </label>
                             </div>
-                            <div class="form-actions">
-                                <button type="submit" class="btn btn-primary">Simpan QRIS</button>
+                            <div class="form-actions" style="display:flex; gap:10px;">
+                                <button type="submit" class="btn btn-primary" id="btn-save-qris">💾 Simpan QRIS ke Cloud &amp; TV</button>
+                                <button type="button" class="btn btn-outline" id="btn-cancel-qris-edit" style="display:none;" onclick="AdminApp.cancelQrisEdit()">Batal</button>
                             </div>
                         </form>
                     </div>
@@ -1022,12 +1046,38 @@
         // Tangkap event install prompt agar siap dipicu
         window.addEventListener('beforeinstallprompt', function(e) {
             console.log('[PWA] Aplikasi siap diinstal sebagai WebAPK!');
+            e.preventDefault();
             window.deferredPrompt = e;
+            var btn = document.getElementById('pwa-install-btn');
+            if (btn) btn.style.display = 'flex';
+        });
+
+        // Handler klik tombol install
+        document.addEventListener('DOMContentLoaded', function() {
+            var btn = document.getElementById('pwa-install-btn');
+            if (btn) {
+                btn.addEventListener('click', function() {
+                    if (window.deferredPrompt) {
+                        window.deferredPrompt.prompt();
+                        window.deferredPrompt.userChoice.then(function(choice) {
+                            if (choice.outcome === 'accepted') {
+                                console.log('[PWA] Pengguna menyetujui instalasi.');
+                                btn.style.display = 'none';
+                            }
+                            window.deferredPrompt = null;
+                        });
+                    } else {
+                        alert('Untuk memasang di HP:\n1. Tekan tombol titik tiga (⋮) di pojok kanan atas Chrome.\n2. Pilih "Tambahkan ke Layar Utama" atau "Instal Aplikasi".');
+                    }
+                });
+            }
         });
 
         window.addEventListener('appinstalled', function() {
             console.log('[PWA] Aplikasi Admin Masjid Teraskota berhasil diinstal!');
             window.deferredPrompt = null;
+            var btn = document.getElementById('pwa-install-btn');
+            if (btn) btn.style.display = 'none';
         });
     </script>
 </body>

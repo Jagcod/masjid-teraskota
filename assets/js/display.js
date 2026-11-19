@@ -1249,6 +1249,32 @@
             rightCol = buildFeatureCard(content);
         }
 
+        // Jika belum ada data keuangan tapi ada QRIS, tampilkan sebagai Slide Infaq QRIS yang elegan
+        if (!hasFinance && hasQris) {
+            return {
+                id: 'qris-infaq',
+                html: `
+                    <div class="slide slide-qris ${!rightCol ? 'single-col' : ''}">
+                        <div class="slide-left-col" ${!rightCol ? 'style="flex:1 1 100%; max-width:100%;"' : ''}>
+                            <div class="welcome-tag">
+                                <svg class="tag-icon-svg" viewBox="0 0 24 24" width="15" height="15" fill="#facc15" aria-hidden="true"><path d="M3 11h8V3H3v8zm2-6h4v4H5V5zM3 21h8v-8H3v8zm2-6h4v4H5v-4zM13 3v8h8V3h-8zm6 6h-4V5h4v4zM13 13h2v2h-2zM15 15h2v2h-2zM13 17h2v2h-2zM17 13h2v2h-2zM19 15h2v2h-2zM17 17h2v2h-2zM15 19h2v2h-2zM19 19h2v2h-2z"/></svg>
+                                <span>INFAQ &amp; SEDEKAH DIGITAL</span>
+                            </div>
+                            <h2 class="welcome-heading">${escapeHtml((qris && qris.label) || 'Infaq QRIS Masjid')}</h2>
+                            <p class="welcome-subheading" style="color:#ffffff; font-weight:500; font-size:clamp(1rem, 1.25vw, 1.35rem); margin-top:14px; line-height:1.6;">
+                                Salurkan infaq dan sedekah terbaik Anda untuk kemakmuran, kenyamanan jamaah, dan operasional ibadah Masjid Teraskota.
+                            </p>
+                            <div style="margin-top:18px; display:flex; flex-wrap:wrap; gap:8px;">
+                                <span style="background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.18); padding:5px 12px; border-radius:999px; font-size:0.85rem; color:#f8fafc; font-weight:600;">📱 Semua Mobile Banking (BCA, Mandiri, BSI, dll)</span>
+                                <span style="background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.18); padding:5px 12px; border-radius:999px; font-size:0.85rem; color:#f8fafc; font-weight:600;">💳 Semua E-Wallet (GoPay, OVO, Dana, LinkAja)</span>
+                            </div>
+                        </div>
+                        ${rightCol}
+                    </div>
+                `
+            };
+        }
+
         return {
             id: 'finance-qris',
             html: `

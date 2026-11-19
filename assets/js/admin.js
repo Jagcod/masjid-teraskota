@@ -907,29 +907,149 @@ const AdminApp = (() => {
         }
     }
 
+    let _cachedQRISData = null;
+
     async function loadQRISData() {
+        const listEl = document.getElementById('qris-list');
+        if (listEl) listEl.innerHTML = '<p class="empty-state">Memuat data QRIS...</p>';
         try {
             const qris = await FirestoreService.getDocument('qris', 'main');
-            if (!qris) {
-                const qrisList = await FirestoreService.getCollection('qris', { limit: 1 });
-                if (qrisList.length > 0) applyQRISData(qrisList[0]);
-            } else {
+            if (qris && (qris.imageUrl || qris.label)) {
+                _cachedQRISData = qris;
                 applyQRISData(qris);
+            } else {
+                const qrisList = await FirestoreService.getCollection('qris', { limit: 1 });
+                if (qrisList.length > 0 && (qrisList[0].imageUrl || qrisList[0].label)) {
+                    _cachedQRISData = qrisList[0];
+                    applyQRISData(qrisList[0]);
+                } else {
+                    renderQRISList(null);
+                }
             }
         } catch (e) {
             console.warn('[Admin] Load QRIS error:', e);
+            renderQRISList(null);
         }
     }
 
     function applyQRISData(qris) {
-        setInputValue('qris-label', qris.label);
-        document.getElementById('qris-active').checked = qris.isActive !== false;
-        if (qris.imageUrl) {
+        if (!qris) {
+            renderQRISList(null);
+            return;
+        }
+        setInputValue('qris-label', qris.label || 'QRIS Infaq Masjid Teraskota');
+        const activeCheck = document.getElementById('qris-active');
+        if (activeCheck) activeCheck.checked = qris.isActive !== false;
+        
+        const preview = document.getElementById('qris-preview');
+        const placeholder = document.getElementById('qris-file-placeholder');
+        if (qris.imageUrl && preview) {
+            preview.src = qris.imageUrl;
+            preview.classList.remove('hidden');
+            if (placeholder) placeholder.classList.add('hidden');
+        }
+
+        renderQRISList(qris);
+    }
+
+    function renderQRISList(qris) {
+        const listEl = document.getElementById('qris-list');
+        if (!listEl) return;
+
+        if (!qris || (!qris.imageUrl && !qris.label)) {
+            listEl.innerHTML = '<p class="empty-state">Belum ada QRIS yang tersimpan. Silakan isi form di bawah untuk mengunggah gambar QRIS infaq masjid.</p>';
+            return;
+        }
+
+        const isActive = qris.isActive !== false;
+        const imgThumb = qris.imageUrl 
+            ? `<div style="background:#ffffff; border:1px solid #cbd5e1; border-radius:10px; padding:6px; flex-shrink:0; display:flex; align-items:center; justify-content:center;">
+                 <img src="${escapeHtml(qris.imageUrl)}" class="item-thumb-preview" alt="QRIS" style="width:70px; height:70px; object-fit:contain; display:block; border-radius:6px;" onerror="this.style.display='none'">
+               </div>`
+            : '';
+
+        listEl.innerHTML = `
+            <div class="data-item" data-id="main" style="display:flex; align-items:center; gap:16px; padding:16px; background:#ffffff; border:1px solid #e2e8f0; border-radius:12px;">
+                ${imgThumb}
+                <div class="data-item-left" style="flex:1; min-width:0;">
+                    <div class="data-item-content">
+                        <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px; flex-wrap:wrap;">
+                            <div class="data-item-title" style="font-size:1.05rem; font-weight:700; color:#0f172a;">${escapeHtml(qris.label || 'QRIS Infaq Masjid')}</div>
+                            <span class="data-item-badge ${isActive ? 'badge-active' : 'badge-inactive'}">${isActive ? 'Aktif di TV' : 'Nonaktif'}</span>
+                        </div>
+                        <div class="data-item-subtitle" style="font-size:0.85rem; color:#64748b; margin-bottom:4px;">
+                            ${qris.imageUrl ? '✅ Gambar QRIS tersimpan &amp; siap di-scan jamaah' : '⚠️ Belum ada gambar barcode QRIS'}
+                        </div>
+                        <div style="font-size:0.8rem; color:#059669; font-weight:600; display:flex; align-items:center; gap:4px;">
+                            <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                            Tersimpan di Cloud Database &amp; Sinkron Real-Time ke Layar TV
+                        </div>
+                    </div>
+                </div>
+                <div class="data-item-actions" style="flex-shrink:0; display:flex; gap:8px;">
+                    <button type="button" class="btn btn-outline btn-sm" onclick="AdminApp.editQRIS()" title="Edit QRIS" style="display:inline-flex; align-items:center; gap:6px;">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+                        Edit
+                    </button>
+                    <button type="button" class="btn btn-danger btn-sm" onclick="AdminApp.deleteQRIS()" title="Hapus QRIS" style="display:inline-flex; align-items:center; gap:6px;">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+                        Hapus
+                    </button>
+                </div>
+            </div>
+        `;
+    }
+
+    function editQRIS() {
+        const formCard = document.getElementById('qris-form-card');
+        const formTitle = document.getElementById('qris-form-title');
+        const cancelBtn = document.getElementById('btn-cancel-qris-edit');
+        if (formCard) {
+            formCard.scrollIntoView({ behavior: 'smooth' });
+            formCard.style.outline = '2px solid #059669';
+            setTimeout(() => { if (formCard) formCard.style.outline = ''; }, 1500);
+        }
+        if (formTitle) formTitle.textContent = 'Edit QRIS Infaq Masjid';
+        if (cancelBtn) cancelBtn.style.display = 'inline-block';
+        const labelInput = document.getElementById('qris-label');
+        if (labelInput) labelInput.focus();
+    }
+
+    function cancelQrisEdit() {
+        const formTitle = document.getElementById('qris-form-title');
+        const cancelBtn = document.getElementById('btn-cancel-qris-edit');
+        if (formTitle) formTitle.textContent = 'Form Unggah / Edit QRIS Infaq';
+        if (cancelBtn) cancelBtn.style.display = 'none';
+    }
+
+    async function deleteQRIS() {
+        if (!confirm('Apakah Anda yakin ingin menghapus data QRIS dari layar TV?')) return;
+        try {
+            await FirestoreService.deleteDocument('qris', 'main');
+            _cachedQRISData = null;
+            setInputValue('qris-label', '');
             const preview = document.getElementById('qris-preview');
+            const placeholder = document.getElementById('qris-file-placeholder');
             if (preview) {
-                preview.src = qris.imageUrl;
-                preview.classList.remove('hidden');
+                preview.src = '';
+                preview.classList.add('hidden');
             }
+            if (placeholder) placeholder.classList.remove('hidden');
+            renderQRISList(null);
+            window.dispatchEvent(new CustomEvent('masjid-data-update', { detail: { collection: 'qris', docId: 'main' } }));
+            try { window.dispatchEvent(new Event('storage')); } catch(e) {}
+            showToast('QRIS berhasil dihapus.', 'info');
+        } catch (err) {
+            showToast('Gagal menghapus QRIS: ' + err.message, 'error');
+        }
+    }
+
+    function toggleQrisForm() {
+        const formCard = document.getElementById('qris-form-card');
+        if (formCard) {
+            formCard.scrollIntoView({ behavior: 'smooth' });
+            const labelInput = document.getElementById('qris-label');
+            if (labelInput) labelInput.focus();
         }
     }
 
@@ -1210,6 +1330,9 @@ const AdminApp = (() => {
             }
 
             await FirestoreService.setDocument('qris', 'main', data);
+            _cachedQRISData = data;
+            applyQRISData(data);
+            cancelQrisEdit();
             // Notify other tabs and display to refresh QRIS data
             window.dispatchEvent(new CustomEvent('masjid-data-update', { detail: { collection: 'qris', docId: 'main' } }));
             try { window.dispatchEvent(new Event('storage')); } catch(e) {}
@@ -1225,10 +1348,12 @@ const AdminApp = (() => {
                     const reader = new FileReader();
                     reader.onload = (ev) => {
                         const preview = document.getElementById('qris-preview');
+                        const placeholder = document.getElementById('qris-file-placeholder');
                         if (preview) {
                             preview.src = ev.target.result;
                             preview.classList.remove('hidden');
                         }
+                        if (placeholder) placeholder.classList.add('hidden');
                     };
                     reader.readAsDataURL(file);
                 }
@@ -2306,7 +2431,11 @@ const AdminApp = (() => {
         showToast,
         toggleSelectAll,
         updateBulkState,
-        bulkDelete
+        bulkDelete,
+        editQRIS,
+        deleteQRIS,
+        toggleQrisForm,
+        cancelQrisEdit
     };
 })();
 
