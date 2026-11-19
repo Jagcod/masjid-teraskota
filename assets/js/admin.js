@@ -1154,30 +1154,66 @@ const AdminApp = (() => {
                 const file = fileInput.files[0];
                 
                 // Validate
-                if (file.size > 2 * 1024 * 1024) {
-                    throw new Error('Ukuran file maksimal 2MB.');
+                if (file.size > 5 * 1024 * 1024) {
+                    throw new Error('Ukuran file maksimal 5MB.');
                 }
                 if (!file.type.startsWith('image/')) {
                     throw new Error('File harus berupa gambar.');
                 }
 
                 try {
-                    const url = await FirestoreService.uploadFile(`qris/main.${file.name.split('.').pop()}`, file);
-                    data.imageUrl = url;
+                    const url = await FirestoreService.uploadFile('qris/main.' + file.name.split('.').pop(), file);
+                    // Jika hasil upload berupa base64 Data URL yang terlalu besar (>800KB),
+                    // kompres agar tidak melebihi batas dokumen Firestore (1MB)
+                    if (url && url.startsWith('data:') && url.length > 800000) {
+                        console.info('[Admin] QRIS base64 terlalu besar (' + Math.round(url.length/1024) + 'KB), mengkompresi...');
+                        const compressed = await compressImage(file, 500, 500, 0.7);
+                        data.imageUrl = compressed;
+                    } else {
+                        data.imageUrl = url;
+                    }
                 } catch (uploadErr) {
-                    console.warn('[Admin] QRIS upload failed:', uploadErr);
-                    showToast('Upload gambar gagal. Data tetap disimpan tanpa gambar.', 'warning');
+                    console.warn('[Admin] QRIS upload failed, compressing as base64:', uploadErr);
+                    // Fallback: kompres gambar ke ukuran kecil agar muat di Firestore
+                    try {
+                        const compressed = await compressImage(file, 500, 500, 0.7);
+                        data.imageUrl = compressed;
+                        showToast('Gambar dikompres otomatis (Firebase Storage belum aktif).', 'info');
+                    } catch (compErr) {
+                        showToast('Upload gambar gagal. Data disimpan tanpa gambar.', 'warning');
+                    }
                 }
             } else {
                 // Keep existing image URL
                 const preview = document.getElementById('qris-preview');
                 if (preview && preview.src && !preview.classList.contains('hidden')) {
-                    data.imageUrl = preview.src;
+                    // Jika preview src adalah base64 yang terlalu besar, kompres
+                    if (preview.src.startsWith('data:') && preview.src.length > 800000) {
+                        // Buat blob dari preview src untuk dikompresi
+                        try {
+                            const blob = await fetch(preview.src).then(function(r) { return r.blob(); });
+                            const compressed = await compressImage(blob, 500, 500, 0.7);
+                            data.imageUrl = compressed;
+                        } catch (e) {
+                            data.imageUrl = preview.src;
+                        }
+                    } else {
+                        data.imageUrl = preview.src;
+                    }
                 }
             }
 
+            // Validasi: pastikan imageUrl tidak melebihi batas Firestore
+            if (data.imageUrl && data.imageUrl.length > 900000) {
+                console.warn('[Admin] imageUrl masih terlalu besar (' + Math.round(data.imageUrl.length/1024) + 'KB), potong.');
+                throw new Error('Gambar terlalu besar bahkan setelah dikompresi. Gunakan gambar QRIS yang lebih kecil (di bawah 1MB).');
+            }
+
             await FirestoreService.setDocument('qris', 'main', data);
-            showToast('QRIS tersimpan.', 'success');
+            // Notify other tabs and display to refresh QRIS data
+            window.dispatchEvent(new CustomEvent('masjid-data-update', { detail: { collection: 'qris', docId: 'main' } }));
+            try { window.dispatchEvent(new Event('storage')); } catch(e) {}
+            showToast('QRIS berhasil disimpan & tersinkron ke TV! ✅', 'success');
         });
 
         // QRIS file preview

@@ -285,7 +285,9 @@ const FirestoreService = (() => {
             if (error.code === 'permission-denied' || (error.message && error.message.toLowerCase().includes('permission'))) {
                 throw new Error('Akses ditolak database Firebase (Permission Denied). Buka Firebase Console > Firestore Database > Rules, ubah menjadi "allow read, write: if true;" agar tersinkron ke semua perangkat (TV & Laptop).');
             }
-            return { id: docId, ...data };
+            // Log but still warn about sync failure
+            console.error('[Firestore] Data hanya tersimpan lokal, TIDAK tersinkron ke perangkat lain:', error.message);
+            return { id: docId, ...data, _localOnly: true };
         }
     }
 
@@ -586,9 +588,9 @@ const FirestoreService = (() => {
             }
         });
 
-        // Timeout 1.5 detik: jika storage belum diaktifkan di Firebase Console, fallback ke Base64 seketika
+        // Timeout 8 detik: berikan waktu cukup untuk upload, jika storage belum diaktifkan di Firebase Console maka fallback ke Base64
         const timeoutPromise = new Promise((_, reject) => 
-            setTimeout(() => reject(new Error('Storage upload timeout, fallback to base64')), 1500)
+            setTimeout(() => reject(new Error('Storage upload timeout, fallback to base64')), 8000)
         );
 
         try {
